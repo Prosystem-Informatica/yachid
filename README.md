@@ -11,21 +11,21 @@ Este projeto utiliza uma **Clean Architecture adaptada**, com **BLoC/Cubit** par
 ## 📁 Estrutura de Pastas
 
 lib/
-└─ app/
-├─ core/                 # Recursos compartilhados
-│   ├─ config/
-│   ├─ helpers/
-│   ├─ rest/
-│   └─ ui/
-├─ features/             # Camada de UI e regras de cada módulo
-│   └─ auth/
-│       └─ ui/
-├─ model/                # Entidades e modelos globais
-├─ repositories/         # Regras de negócio e fontes de dados
-├─ app_routes.dart
-├─ app_widget.dart
-├─ bloc_injector.dart
-└─ main.dart
+└── app/
+├── core/ # Recursos compartilhados
+│ ├── config/
+│ ├── helpers/
+│ ├── rest/
+│ └── ui/
+├── features/ # Camada de UI (módulos)
+│ └── auth/
+│ └── ui/
+├── model/ # Entidades e modelos globais
+├── repositories/ # Regras de negócio e fontes de dados
+├── app_routes.dart
+├── app_widget.dart
+├── bloc_injector.dart
+└── main.dart
 
 ---
 
