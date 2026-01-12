@@ -1,12 +1,15 @@
 Yachid
 
-🚀 Flutter Web • Clean Architecture + BLoC
+# 🚀 Flutter Web • Clean Architecture + BLoC
 
-Arquitetura limpa, modular e escalável para aplicações Flutter Web.
+> Arquitetura limpa, modular e escalável para aplicações Flutter Web.
 
-Este projeto utiliza uma Clean Architecture adaptada, com BLoC/Cubit para gerenciamento de estado, priorizando organização por domínio, manutenibilidade e crescimento sustentável do código.
+Este projeto utiliza uma **Clean Architecture adaptada**, com **BLoC/Cubit** para gerenciamento de estado, priorizando organização por domínio, manutenibilidade e crescimento sustentável do código.
 
-📁 Estrutura de Pastas
+---
+
+## 📁 Estrutura de Pastas
+
 lib/
 └─ app/
 ├─ core/                 # Recursos compartilhados
@@ -24,32 +27,33 @@ lib/
 ├─ bloc_injector.dart
 └─ main.dart
 
-🧱 Arquitetura
+---
 
-A aplicação segue uma Clean Architecture adaptada ao Flutter, baseada em módulos, garantindo:
+## 🧱 Arquitetura
 
-🔹 Separação clara de responsabilidades
+A aplicação segue uma **Clean Architecture adaptada ao Flutter**, baseada em módulos, garantindo:
 
-🔹 Baixo acoplamento
+- Separação clara de responsabilidades
+- Baixo acoplamento
+- Alta escalabilidade
+- Código previsível e testável
 
-🔹 Alta escalabilidade
+---
 
-🔹 Código previsível e testável
+## 🧠 Gerenciamento de Estado
 
-🧠 Gerenciamento de Estado
+- flutter_bloc
+- Cubit
+- Equatable
+- Geração automática de código com `build_runner`
 
-flutter_bloc
+---
 
-Cubit
+## ⚙️ Geração de Código
 
-Equatable
+Sempre que criar ou modificar `State`s de Cubits/BLoCs, execute:
 
-Geração automática de código com build_runner
-
-⚙️ Geração de Código
-
-Sempre que criar ou modificar States de Cubits/BLoCs, execute:
-
+```bash
 dart run build_runner build --delete-conflicting-outputs
 
 ▶️ Executando o Projeto
