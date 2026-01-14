@@ -19,7 +19,7 @@ class AppWidget extends StatelessWidget {
         colorScheme: ColorScheme.light(
           primary: AppColors.primaryColor,
           primaryContainer: AppColors.primaryDark,
-          secondary: AppColors.primaryLight,
+          secondary: AppColors.secondaryColor,
           onPrimary: AppColors.textOnPrimary,
           surface: AppColors.textOnPrimary,
           error: AppColors.error,

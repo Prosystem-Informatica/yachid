@@ -23,4 +23,11 @@ abstract class RestClient {
     Map<String, dynamic>? queryParameters,
     Map<String, String>? headers,
   });
+
+  Future<RestClientResponse<T>> put<T>(
+      String path, {
+        dynamic data,
+        Map<String, dynamic>? queryParameters,
+        Map<String, String>? headers,
+      });
 }

@@ -1,18 +1,20 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+
 
 class RestClientResponse<T> {
-  T? data;
-  int? statusCode;
-  RestClientResponse({this.data, this.statusCode});
+  final T? data;
+  final int statusCode;
 
-  factory RestClientResponse.fromHttp(http.Response response) {
-    try {
-      final res = jsonDecode(response.body);
-      return RestClientResponse(data: res, statusCode: response.statusCode);
-    } on Exception catch (e) {
-      rethrow;
-    }
+  RestClientResponse({
+    this.data,
+    required this.statusCode,
+  });
+
+  factory RestClientResponse.fromDio(Response response) {
+    return RestClientResponse(
+      data: response.data,
+      statusCode: response.statusCode ?? 0,
+    );
   }
 }
+
