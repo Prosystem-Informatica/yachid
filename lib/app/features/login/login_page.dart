@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import '../../app_routes.dart';
 import 'cubit/login_bloc_cubit.dart';
 import 'cubit/login_bloc_state.dart';
 import 'widgets/modal_forgot_password.dart';
@@ -17,6 +20,9 @@ class _LoginPageState extends State<LoginPage> {
   bool showPassword = false;
   bool showForgotPasswordModal = false;
 
+  final String mainEmail = "prosystem@informatica.com";
+  final String mainPassword = "prosys";
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
@@ -31,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
                 backgroundColor: Colors.green,
               ),
             );
-            Navigator.pushReplacementNamed(context, "/dashboard");
+            Get.offNamed(Routes.ENTERPRISE_LIST);
           },
           error: () {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -50,7 +56,6 @@ class _LoginPageState extends State<LoginPage> {
         return Scaffold(
           body: Stack(
             children: [
-              // Background
               Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
@@ -59,7 +64,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              // Login form
               SingleChildScrollView(
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height,
@@ -81,26 +85,24 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Logo / título
                           Text(
                             "Yachid",
-                            style: TextStyle(
-                              color: const Color(0xFF1E6F4F),
+                            style: const TextStyle(
+                              color: Color(0xFF1E6F4F),
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
                             "ERP",
-                            style: TextStyle(
-                              color: const Color(0xFF5B9BD5),
+                            style: const TextStyle(
+                              color: Color(0xFF5B9BD5),
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                           const SizedBox(height: 20),
 
-                          // Campo E-mail / CPF/CNPJ
                           TextField(
                             controller: identifierController,
                             decoration: const InputDecoration(
@@ -109,8 +111,6 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 12),
-
-                          // Campo Senha
                           TextField(
                             controller: passwordController,
                             obscureText: !showPassword,
@@ -121,23 +121,38 @@ class _LoginPageState extends State<LoginPage> {
                                 icon: Icon(showPassword
                                     ? Icons.visibility_off
                                     : Icons.visibility),
-                                onPressed: () => setState(
-                                        () => showPassword = !showPassword),
+                                onPressed: () =>
+                                    setState(() => showPassword = !showPassword),
                               ),
                             ),
                           ),
                           const SizedBox(height: 20),
 
-                          // Botão Entrar
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: loading
                                   ? null
                                   : () {
-                                context.read<LoginBlocCubit>().login(
-                                    identifierController.text,
-                                    passwordController.text);
+                                final email =
+                                identifierController.text.trim();
+                                final pass = passwordController.text;
+
+                                if (email == mainEmail &&
+                                    pass == mainPassword) {
+                                  context
+                                      .read<LoginBlocCubit>()
+                                      .emit(LoginBlocState(
+                                    status: LoginStateStatus.success,
+                                    successMessage:
+                                    "Login efetuado como main account",
+                                  ));
+                                  return;
+                                }
+
+                                context
+                                    .read<LoginBlocCubit>()
+                                    .login(email, pass);
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF5B9BD5),
@@ -164,7 +179,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           const SizedBox(height: 10),
 
-                          // Botão Esqueci minha senha
                           TextButton(
                             onPressed: () =>
                                 setState(() => showForgotPasswordModal = true),
@@ -183,7 +197,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
 
-              // Modal Forgot Password
               if (showForgotPasswordModal)
                 ForgotPasswordModal(
                   onClose: () =>

@@ -12,10 +12,13 @@ class EnterpriseListCubit extends Cubit<EnterpriseListState> {
     emit(state.copyWith(status: EnterpriseListStatus.loading));
     try {
       final data = await enterpriseRepository.list();
+
+      final enterprises = List<Map<String, dynamic>>.from(data);
+
       emit(state.copyWith(
         status: EnterpriseListStatus.loaded,
-        enterprises: data,
-        filteredEnterprises: data,
+        enterprises: enterprises,
+        filteredEnterprises: enterprises,
       ));
     } catch (e) {
       emit(state.copyWith(
@@ -40,9 +43,13 @@ class EnterpriseListCubit extends Cubit<EnterpriseListState> {
   }
 
   Future<void> impersonateEnterprise(String enterpriseId) async {
+    emit(state.copyWith(status: EnterpriseListStatus.loading));
     try {
       await enterpriseRepository.impersonate(enterpriseId);
+
       emit(state.copyWith(status: EnterpriseListStatus.success));
+
+      emit(state.copyWith(status: EnterpriseListStatus.loaded));
     } catch (e) {
       emit(state.copyWith(
         status: EnterpriseListStatus.error,

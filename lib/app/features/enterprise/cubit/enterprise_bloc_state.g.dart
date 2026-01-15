@@ -11,7 +11,8 @@ extension EnterpriseListStatusMatch on EnterpriseListStatus {
       {required T Function() initial,
       required T Function() loading,
       required T Function() loaded,
-      required T Function() error}) {
+      required T Function() error,
+      required T Function() success}) {
     final v = this;
     if (v == EnterpriseListStatus.initial) {
       return initial();
@@ -29,6 +30,10 @@ extension EnterpriseListStatusMatch on EnterpriseListStatus {
       return error();
     }
 
+    if (v == EnterpriseListStatus.success) {
+      return success();
+    }
+
     throw Exception(
         'EnterpriseListStatus.match failed, found no match for: $this');
   }
@@ -38,7 +43,8 @@ extension EnterpriseListStatusMatch on EnterpriseListStatus {
       T Function()? initial,
       T Function()? loading,
       T Function()? loaded,
-      T Function()? error}) {
+      T Function()? error,
+      T Function()? success}) {
     final v = this;
     if (v == EnterpriseListStatus.initial && initial != null) {
       return initial();
@@ -54,6 +60,10 @@ extension EnterpriseListStatusMatch on EnterpriseListStatus {
 
     if (v == EnterpriseListStatus.error && error != null) {
       return error();
+    }
+
+    if (v == EnterpriseListStatus.success && success != null) {
+      return success();
     }
 
     return any();

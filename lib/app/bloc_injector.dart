@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:yachid/app/repositories/enterprise/create_enterprise_repository.dart';
 
 import 'app_widget.dart';
 import 'core/rest/http/http_rest_client.dart';
 import 'core/rest/rest_client.dart';
+import 'features/enterprise/createCubit/entrerprise_bloc_cubit.dart';
 import 'features/enterprise/cubit/enterprise_bloc_cubit.dart';
 import 'repositories/login/login_repository.dart';
 import 'repositories/enterprise/enterprise_repository.dart';
@@ -45,6 +47,11 @@ class _BlocInjectionState extends State<BlocInjection> {
           create: (_) =>
               EnterpriseListCubit(enterpriseRepository: _enterpriseRepository),
         ),
+              BlocProvider(
+                 create: (_) => CreateEnterpriseCubit(
+                    repository: CreateEnterpriseRepository(_apiRestClient),
+        ),
+              ),
       ],
       child: const AppWidget(),
     );
