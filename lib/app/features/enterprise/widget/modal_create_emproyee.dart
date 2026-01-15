@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../../../repositories/employee/create_employee_repository.dart';
 
@@ -21,27 +22,33 @@ class CreateEmployeeModal extends StatefulWidget {
 
 class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
   final _formKey = GlobalKey<FormState>();
+
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
   final _cnpjCpfController = TextEditingController();
-  final _roleController = TextEditingController(text: "Administrador");
 
+  String _selectedRole = "Administrador";
   bool _isLoading = false;
+
+  final _phoneMask = MaskTextInputFormatter(
+    mask: '(##) #####-####',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
+
+  final _cpfCnpjMask = MaskTextInputFormatter(
+    mask: '###.###.###-##',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
 
   @override
   void dispose() {
-    for (final c in [
-      _nameController,
-      _emailController,
-      _passwordController,
-      _phoneController,
-      _cnpjCpfController,
-      _roleController,
-    ]) {
-      c.dispose();
-    }
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _phoneController.dispose();
+    _cnpjCpfController.dispose();
     super.dispose();
   }
 
@@ -52,11 +59,12 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
       "name": _nameController.text.trim(),
       "email": _emailController.text.trim(),
       "password": _passwordController.text.trim(),
-      "phone": _phoneController.text.trim(),
-      "cnpj_cpf": _cnpjCpfController.text.trim(),
+      "phone": _phoneMask.getUnmaskedText(),
+      "cnpj_cpf": _cpfCnpjMask.getUnmaskedText(),
       "enterpriseId": widget.enterpriseId,
-      "subEnterpriseIds": widget.subEnterpriseId != null ? [widget.subEnterpriseId] : [],
-      "role": _roleController.text.trim(),
+      "subEnterpriseIds":
+      widget.subEnterpriseId != null ? [widget.subEnterpriseId] : [],
+      "role": _selectedRole,
       "status": true,
     };
 
@@ -71,19 +79,24 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro ao criar funcionário: $e")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro ao criar funcionário: $e")),
+        );
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  Widget _input(String label, TextEditingController controller,
-      {TextInputType keyboardType = TextInputType.text,
-        bool obscure = false,
-        List<TextInputFormatter>? inputFormatters,
-        String? Function(String?)? validator}) {
+  Widget _input({
+    required String label,
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscure = false,
+    List<TextInputFormatter>? inputFormatters,
+    String? Function(String?)? validator,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: TextFormField(
@@ -92,10 +105,14 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
         obscureText: obscure,
         inputFormatters: inputFormatters,
         validator: validator ??
-                (v) => (v == null || v.isEmpty) ? "Campo obrigatório" : null,
+                (v) => (v == null || v.trim().isEmpty)
+                ? "Campo obrigatório"
+                : null,
         decoration: InputDecoration(
           labelText: label,
-          border: const OutlineInputBorder(),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         ),
       ),
     );
@@ -103,48 +120,119 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text("Criar Funcionário"),
-      content: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _input("Nome", _nameController),
-              _input("E-mail", _emailController, keyboardType: TextInputType.emailAddress),
-              _input("Senha", _passwordController, obscure: true),
-              _input("Telefone", _phoneController, keyboardType: TextInputType.phone),
-              _input(
-                "CNPJ/CPF",
-                _cnpjCpfController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              ),
-              _input("Cargo", _roleController),
-            ],
+    return WillPopScope(
+      // impede fechar com "voltar"
+      onWillPop: () async => false,
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        titlePadding: const EdgeInsets.only(top: 16, left: 20, right: 20),
+        contentPadding: const EdgeInsets.all(20),
+        title: const Text(
+          "Novo Funcionário",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1E6F4F),
+            fontSize: 20,
           ),
         ),
+        content: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _input(label: "Nome", controller: _nameController),
+                _input(
+                  label: "E-mail",
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return "Campo obrigatório";
+                    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                    if (!emailRegex.hasMatch(v)) return "E-mail inválido";
+                    return null;
+                  },
+                ),
+                _input(
+                  label: "Senha",
+                  controller: _passwordController,
+                  obscure: true,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return "Campo obrigatório";
+                    if (v.length < 6) return "Mínimo de 6 caracteres";
+                    return null;
+                  },
+                ),
+                _input(
+                  label: "Telefone",
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [_phoneMask],
+                ),
+                _input(
+                  label: "CPF/CNPJ",
+                  controller: _cnpjCpfController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [_cpfCnpjMask],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedRole,
+                    items: const [
+                      DropdownMenuItem(
+                          value: "Administrador", child: Text("Administrador")),
+                      DropdownMenuItem(
+                          value: "Representante", child: Text("Representante")),
+                      DropdownMenuItem(
+                          value: "Funcionário", child: Text("Funcionário")),
+                      DropdownMenuItem(value: "Gerente", child: Text("Gerente")),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) setState(() => _selectedRole = value);
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Cargo",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 14),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        actionsPadding:
+        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          ElevatedButton.icon(
+            onPressed: _isLoading ? null : _createEmployee,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1E6F4F),
+              foregroundColor: Colors.white,
+              padding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            icon: _isLoading
+                ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                  color: Colors.white, strokeWidth: 2),
+            )
+                : const Icon(Icons.save),
+            label: Text(
+              _isLoading ? "Salvando..." : "Salvar Funcionário",
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Cancelar"),
-        ),
-        ElevatedButton(
-          onPressed: _isLoading ? null : _createEmployee,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1E6F4F),
-          ),
-          child: _isLoading
-              ? const SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-          )
-              : const Text("Salvar", style: TextStyle(color: Colors.white)),
-        ),
-      ],
     );
   }
 }

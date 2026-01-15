@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:yachid/app/features/enterprise/widget/modal_create_emproyee.dart';
 import '../../repositories/enterprise/create_enterprise_repository.dart';
 import '../../repositories/employee/create_employee_repository.dart';
@@ -20,6 +21,8 @@ class CreateEnterprisePage extends StatefulWidget {
 }
 
 class _CreateEnterprisePageState extends State<CreateEnterprisePage> {
+  final _formKey = GlobalKey<FormState>();
+
   final _nameController = TextEditingController();
   final _cnpjController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -60,8 +63,21 @@ class _CreateEnterprisePageState extends State<CreateEnterprisePage> {
   File? _selectedCertFile;
   String? _base64CertFile;
 
+  final _cnpjMask = MaskTextInputFormatter(
+    mask: '##.###.###/####-##',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
+  final _phoneMask = MaskTextInputFormatter(
+    mask: '(##) #####-####',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
+  final _cepMask = MaskTextInputFormatter(
+    mask: '#####-###',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
+
   Future<void> _buscarEnderecoPorCEP(TextEditingController cepController, bool isContabilidade) async {
-    final cep = cepController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final cep = _cepMask.getUnmaskedText();
     if (cep.length != 8) return;
 
     try {
@@ -170,15 +186,22 @@ class _CreateEnterprisePageState extends State<CreateEnterprisePage> {
     String? hint,
     TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
+    bool requiredField = false,
     VoidCallback? onChanged,
   }) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
-        child: TextField(
+        child: TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
           onChanged: (_) => onChanged?.call(),
+          validator: (value) {
+            if (requiredField && (value == null || value.trim().isEmpty)) {
+              return "Campo obrigatório";
+            }
+            return null;
+          },
           decoration: InputDecoration(
             labelText: label,
             hintText: hint,
@@ -201,8 +224,6 @@ class _CreateEnterprisePageState extends State<CreateEnterprisePage> {
 
             final enterpriseId = state.responseData?["enterprise_id"];
             final subEnterpriseId = state.responseData?["sub_enterprise_id"];
-
-            print("enterpriseId: $enterpriseId, subEnterpriseId: $subEnterpriseId");
 
             if (enterpriseId != null) {
               final result = await showDialog<bool>(
@@ -243,189 +264,205 @@ class _CreateEnterprisePageState extends State<CreateEnterprisePage> {
             title: const Text("Criar Empresa"),
             backgroundColor: const Color(0xFF1E6F4F),
           ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                sectionTitle("Logo da Empresa"),
-                Center(
-                  child: Column(
+          body: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  sectionTitle("Logo da Empresa"),
+                  Center(
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: _pickLogo,
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundColor: const Color(0xFF5B9BD5).withOpacity(0.3),
+                            backgroundImage:
+                            _selectedLogo != null ? FileImage(_selectedLogo!) : null,
+                            child: _selectedLogo == null
+                                ? const Icon(Icons.add_a_photo, size: 40, color: Color(0xFF1E6F4F))
+                                : null,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "Clique para selecionar o logo",
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+                  sectionTitle("Informações Gerais"),
+                  inputField(
+                    controller: _nameController,
+                    label: "Razão Social",
+                    requiredField: true,
+                  ),
+                  inputField(
+                    controller: _cnpjController,
+                    label: "CNPJ/CPF",
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [_cnpjMask],
+                    requiredField: true,
+                  ),
+                  inputField(
+                    controller: _phoneController,
+                    label: "Telefone",
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [_phoneMask],
+                  ),
+                  DropdownButtonFormField<String>(
+                    value: _tipoRegime,
+                    decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Tipo de Regime"),
+                    items: const [
+                      DropdownMenuItem(value: "Simples Nacional", child: Text("Simples Nacional")),
+                      DropdownMenuItem(value: "Normal", child: Text("Normal")),
+                    ],
+                    onChanged: (val) => setState(() => _tipoRegime = val!),
+                  ),
+                  inputField(controller: _codigoCidadeController, label: "Código da Cidade"),
+                  inputField(controller: _inscricaoEstadualController, label: "Inscrição Estadual"),
+                  inputField(controller: _inscricaoMunicipalController, label: "Inscrição Municipal"),
+
+                  sectionTitle("Endereço"),
+                  inputField(
+                    controller: _CEPController,
+                    label: "CEP",
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [_cepMask],
+                    onChanged: () => _buscarEnderecoPorCEP(_CEPController, false),
+                  ),
+                  inputField(controller: _xLgrController, label: "Logradouro"),
+                  inputField(controller: _nroController, label: "Número"),
+                  inputField(controller: _xBairroController, label: "Bairro"),
+                  inputField(controller: _xMunController, label: "Cidade"),
+                  inputField(controller: _UFController, label: "UF"),
+
+                  sectionTitle("Contabilidade"),
+                  inputField(controller: _contabilidadeController, label: "Nome"),
+                  inputField(controller: _contCnpjController, label: "CNPJ", keyboardType: TextInputType.number, inputFormatters: [_cnpjMask]),
+                  inputField(
+                    controller: _contCepController,
+                    label: "CEP",
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [_cepMask],
+                    onChanged: () => _buscarEnderecoPorCEP(_contCepController, true),
+                  ),
+                  inputField(controller: _contEnderecoController, label: "Endereço"),
+                  inputField(controller: _contBairroController, label: "Bairro"),
+                  inputField(controller: _contNumeroController, label: "Número"),
+                  inputField(controller: _contCidadeController, label: "Cidade"),
+
+                  sectionTitle("Certificado Digital (.pfx)"),
+                  Row(
                     children: [
-                      GestureDetector(
-                        onTap: _pickLogo,
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: const Color(0xFF5B9BD5).withOpacity(0.3),
-                          backgroundImage:
-                          _selectedLogo != null ? FileImage(_selectedLogo!) : null,
-                          child: _selectedLogo == null
-                              ? const Icon(Icons.add_a_photo, size: 40, color: Color(0xFF1E6F4F))
-                              : null,
+                      Expanded(
+                        child: TextField(
+                          controller: _certFileController,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            labelText: "Arquivo .pfx",
+                            border: OutlineInputBorder(),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Clique para selecionar o logo",
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      const SizedBox(width: 10),
+                      ElevatedButton.icon(
+                        onPressed: _pickCertificateFile,
+                        icon: const Icon(Icons.upload_file),
+                        label: const Text("Selecionar"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF5B9BD5),
+                          foregroundColor: Colors.white,
+                        ),
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 10),
+                  inputField(controller: _certPasswordController, label: "Senha do Certificado", keyboardType: TextInputType.visiblePassword),
 
-                const SizedBox(height: 20),
-                sectionTitle("Informações Gerais"),
-                inputField(controller: _nameController, label: "Nome"),
-                inputField(
-                  controller: _cnpjController,
-                  label: "CNPJ/CPF",
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                ),
-                inputField(controller: _phoneController, label: "Telefone", keyboardType: TextInputType.phone),
-                DropdownButtonFormField<String>(
-                  value: _tipoRegime,
-                  decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Tipo de Regime"),
-                  items: const [
-                    DropdownMenuItem(value: "Simples Nacional", child: Text("Simples Nacional")),
-                    DropdownMenuItem(value: "Normal", child: Text("Normal")),
-                  ],
-                  onChanged: (val) => setState(() => _tipoRegime = val!),
-                ),
-                inputField(controller: _codigoCidadeController, label: "Código da Cidade"),
-                inputField(controller: _inscricaoEstadualController, label: "Inscrição Estadual"),
-                inputField(controller: _inscricaoMunicipalController, label: "Inscrição Municipal"),
+                  sectionTitle("CSC"),
+                  inputField(controller: _cscIdController, label: "CSC ID"),
+                  inputField(controller: _cscTokenController, label: "CSC Token"),
 
-                sectionTitle("Endereço"),
-                inputField(
-                  controller: _CEPController,
-                  label: "CEP",
-                  keyboardType: TextInputType.number,
-                  onChanged: () => _buscarEnderecoPorCEP(_CEPController, false),
-                ),
-                inputField(controller: _xLgrController, label: "Logradouro"),
-                inputField(controller: _nroController, label: "Número"),
-                inputField(controller: _xBairroController, label: "Bairro"),
-                inputField(controller: _xMunController, label: "Cidade"),
-                inputField(controller: _UFController, label: "UF"),
+                  sectionTitle("Receita"),
+                  inputField(controller: _receitaBrutaController, label: "Receita Bruta 12m", keyboardType: TextInputType.number),
+                  inputField(controller: _aliquotaController, label: "Alíquota (%)", keyboardType: TextInputType.number),
+                  inputField(controller: _pisController, label: "PIS", keyboardType: TextInputType.number),
+                  inputField(controller: _cofinsController, label: "COFINS", keyboardType: TextInputType.number),
+                  inputField(controller: _icmsController, label: "ICMS", keyboardType: TextInputType.number),
 
-                sectionTitle("Contabilidade"),
-                inputField(controller: _contabilidadeController, label: "Nome"),
-                inputField(controller: _contCnpjController, label: "CNPJ", keyboardType: TextInputType.number),
-                inputField(
-                  controller: _contCepController,
-                  label: "CEP",
-                  keyboardType: TextInputType.number,
-                  onChanged: () => _buscarEnderecoPorCEP(_contCepController, true),
-                ),
-                inputField(controller: _contEnderecoController, label: "Endereço"),
-                inputField(controller: _contBairroController, label: "Bairro"),
-                inputField(controller: _contNumeroController, label: "Número"),
-                inputField(controller: _contCidadeController, label: "Cidade"),
-
-                sectionTitle("Certificado Digital (.pfx)"),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _certFileController,
-                        readOnly: true,
-                        decoration: const InputDecoration(
-                          labelText: "Arquivo .pfx",
-                          border: OutlineInputBorder(),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: SizedBox(
+                      width: 220,
+                      child: ElevatedButton(
+                        onPressed: loading
+                            ? null
+                            : () {
+                          if (!_formKey.currentState!.validate()) return;
+                          final data = {
+                            "name": _nameController.text.trim(),
+                            "cnpj_cpf": _cnpjMask.getUnmaskedText(),
+                            "phone": _phoneMask.getUnmaskedText(),
+                            "logo": _base64Logo,
+                            "tipo_regime": _tipoRegime,
+                            "codigo_cidade": _codigoCidadeController.text.trim(),
+                            "inscricao_estadual": _inscricaoEstadualController.text.trim(),
+                            "inscricao_municipal": _inscricaoMunicipalController.text.trim(),
+                            "cert_filename": _certFileController.text.trim(),
+                            "cert_file_base64": _base64CertFile,
+                            "cert_password": _certPasswordController.text.trim(),
+                            "csc_id": _cscIdController.text.trim(),
+                            "csc_token": _cscTokenController.text.trim(),
+                            "address": {
+                              "CEP": _cepMask.getUnmaskedText(),
+                              "xLgr": _xLgrController.text.trim(),
+                              "nro": _nroController.text.trim(),
+                              "xBairro": _xBairroController.text.trim(),
+                              "xMun": _xMunController.text.trim(),
+                              "UF": _UFController.text.trim(),
+                              "cPais": "BR",
+                            },
+                            "contabilidade": {
+                              "contabilidade": _contabilidadeController.text.trim(),
+                              "cnpj": _contCnpjController.text.trim(),
+                              "cep": _contCepController.text.trim(),
+                              "endereco": _contEnderecoController.text.trim(),
+                              "bairro": _contBairroController.text.trim(),
+                              "numero": _contNumeroController.text.trim(),
+                              "cidade": _contCidadeController.text.trim(),
+                            },
+                            "receita": {
+                              "receita_bruta_12m": double.tryParse(_receitaBrutaController.text) ?? 0,
+                              "aliquota": double.tryParse(_aliquotaController.text) ?? 0,
+                              "pis": double.tryParse(_pisController.text) ?? 0,
+                              "cofins": double.tryParse(_cofinsController.text) ?? 0,
+                              "icms": double.tryParse(_icmsController.text) ?? 0,
+                            },
+                          };
+                          cubit.createEnterprise(data);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF5B9BD5),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: loading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text(
+                          "Criar Empresa",
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton.icon(
-                      onPressed: _pickCertificateFile,
-                      icon: const Icon(Icons.upload_file),
-                      label: const Text("Selecionar"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF5B9BD5),
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                inputField(controller: _certPasswordController, label: "Senha do Certificado", keyboardType: TextInputType.visiblePassword),
-
-                sectionTitle("CSC"),
-                inputField(controller: _cscIdController, label: "CSC ID"),
-                inputField(controller: _cscTokenController, label: "CSC Token"),
-
-                sectionTitle("Receita"),
-                inputField(controller: _receitaBrutaController, label: "Receita Bruta 12m", keyboardType: TextInputType.number),
-                inputField(controller: _aliquotaController, label: "Alíquota (%)", keyboardType: TextInputType.number),
-                inputField(controller: _pisController, label: "PIS", keyboardType: TextInputType.number),
-                inputField(controller: _cofinsController, label: "COFINS", keyboardType: TextInputType.number),
-                inputField(controller: _icmsController, label: "ICMS", keyboardType: TextInputType.number),
-
-                const SizedBox(height: 20),
-                Center(
-                  child: SizedBox(
-                    width: 220,
-                    child: ElevatedButton(
-                      onPressed: loading
-                          ? null
-                          : () {
-                        final data = {
-                          "name": _nameController.text.trim(),
-                          "cnpj_cpf": _cnpjController.text.trim(),
-                          "phone": _phoneController.text.trim(),
-                          "logo": _base64Logo,
-                          "tipo_regime": _tipoRegime,
-                          "codigo_cidade": _codigoCidadeController.text.trim(),
-                          "inscricao_estadual": _inscricaoEstadualController.text.trim(),
-                          "inscricao_municipal": _inscricaoMunicipalController.text.trim(),
-                          "cert_filename": _certFileController.text.trim(),
-                          "cert_file_base64": _base64CertFile,
-                          "cert_password": _certPasswordController.text.trim(),
-                          "csc_id": _cscIdController.text.trim(),
-                          "csc_token": _cscTokenController.text.trim(),
-                          "address": {
-                            "CEP": _CEPController.text.trim(),
-                            "xLgr": _xLgrController.text.trim(),
-                            "nro": _nroController.text.trim(),
-                            "xBairro": _xBairroController.text.trim(),
-                            "xMun": _xMunController.text.trim(),
-                            "UF": _UFController.text.trim(),
-                            "cPais": "BR",
-                          },
-                          "contabilidade": {
-                            "contabilidade": _contabilidadeController.text.trim(),
-                            "cnpj": _contCnpjController.text.trim(),
-                            "cep": _contCepController.text.trim(),
-                            "endereco": _contEnderecoController.text.trim(),
-                            "bairro": _contBairroController.text.trim(),
-                            "numero": _contNumeroController.text.trim(),
-                            "cidade": _contCidadeController.text.trim(),
-                          },
-                          "receita": {
-                            "receita_bruta_12m": double.tryParse(_receitaBrutaController.text) ?? 0,
-                            "aliquota": double.tryParse(_aliquotaController.text) ?? 0,
-                            "pis": double.tryParse(_pisController.text) ?? 0,
-                            "cofins": double.tryParse(_cofinsController.text) ?? 0,
-                            "icms": double.tryParse(_icmsController.text) ?? 0,
-                          },
-                        };
-                        cubit.createEnterprise(data);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF5B9BD5),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: loading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                        "Criar Empresa",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
