@@ -39,9 +39,7 @@ class _BlocInjectionState extends State<BlocInjection> {
       providers: [
         BlocProvider(
           create: (_) => LoginBlocCubit(
-            loginRepository: _loginRepository,
-            enterpriseRepository: _enterpriseRepository,
-          ),
+            loginRepository: _loginRepository,),
         ),
         BlocProvider(
           create: (_) =>
