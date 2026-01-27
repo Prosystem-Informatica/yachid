@@ -24,7 +24,7 @@ class HttpRestClient implements RestClient {
     Map<String, dynamic>? queryParameters,
     Map<String, String>? headers,
   }) async {
-    final uri = Uri.http(baseUrl, path, queryParameters);
+    final uri = Uri.https(baseUrl, path, queryParameters);
     final response = await rest.get(uri, headers: joinHeaders(headers));
     return RestClientResponse.fromHttp(response);
   }
