@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+import '../../core/ui/ui.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -11,7 +13,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: [
-          _SideMenu(),
+          SideBarWidget(),
           Expanded(
             child: Container(
               color: const Color(0xFFF5F7FA),
@@ -45,58 +47,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// ===================== SIDEBAR =====================
-class _SideMenu extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 220,
-      color: const Color(0xFF1E6F4F),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Yachid ERP',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 32),
-          _item(Icons.dashboard, 'Dashboard'),
-          _item(Icons.people, 'Clientes'),
-          _item(Icons.inventory, 'Produtos'),
-          _item(Icons.shopping_cart, 'Vendas'),
-          _item(Icons.receipt, 'NF-e'),
-          const Spacer(),
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.logout),
-            label: const Text('Sair'),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.white24),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _item(IconData icon, String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.white70),
-          const SizedBox(width: 12),
-          Text(label, style: const TextStyle(color: Colors.white70)),
-        ],
-      ),
-    );
-  }
-}
-
-// ===================== HEADER =====================
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -113,7 +63,6 @@ class _Header extends StatelessWidget {
   }
 }
 
-// ===================== CARDS =====================
 class _CardsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -180,7 +129,6 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
-// ===================== BAR CHART =====================
 class _SalesChart extends StatelessWidget {
   const _SalesChart();
 
@@ -204,7 +152,6 @@ class _SalesChart extends StatelessWidget {
   }
 }
 
-// ===================== PIE CHART =====================
 class _ProductsPie extends StatelessWidget {
   const _ProductsPie();
 
@@ -227,7 +174,6 @@ class _ProductsPie extends StatelessWidget {
   }
 }
 
-// ===================== TABLE =====================
 class _LastInvoices extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -263,7 +209,6 @@ class _LastInvoices extends StatelessWidget {
   }
 }
 
-// ===================== CARD WRAPPER =====================
 Widget _card(String title, Widget child) {
   return Container(
     padding: const EdgeInsets.all(16),
