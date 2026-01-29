@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:yachid/app/app_routes.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 
+import '../../core/ui/ui.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -16,7 +18,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: [
-          _SideMenu(),
+          const SideBarWidget(),
           Expanded(
             child: Container(
               color: const Color(0xFFF5F7FA),
@@ -50,66 +52,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// ===================== SIDEBAR =====================
-class _SideMenu extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 220,
-      color: const Color(0xFF1E6F4F),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Yachid ERP',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 32),
-          _item(context, Icons.dashboard, 'Dashboard'),
-          _item(context, Icons.people, 'Clientes'),
-          _item(context, Icons.inventory, 'Produtos'),
-          _item(context, Icons.shopping_cart, 'Vendas'),
-          _item(context, Icons.receipt, 'NF-e'),
-          _item(context, Icons.person_add, 'Funcionários'),
-          const Spacer(),
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.logout),
-            label: const Text('Sair'),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.white24),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _item(BuildContext context, IconData icon, String label) {
-    final route = label == 'Funcionários' ? Routes.EMPLOYEE : Routes.HOME;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: GestureDetector(
-        onTap: () => Get.toNamed(route),
-        child: MouseRegion(
-          cursor: kIsWeb ? SystemMouseCursors.click : MouseCursor.defer,
-          child: Row(
-            children: [
-              Icon(icon, color: Colors.white70),
-              const SizedBox(width: 12),
-              Text(label, style: const TextStyle(color: Colors.white70)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ===================== HEADER =====================
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -126,7 +68,6 @@ class _Header extends StatelessWidget {
   }
 }
 
-// ===================== CARDS =====================
 class _CardsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -193,7 +134,6 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
-// ===================== BAR CHART =====================
 class _SalesChart extends StatelessWidget {
   const _SalesChart();
 
@@ -217,7 +157,6 @@ class _SalesChart extends StatelessWidget {
   }
 }
 
-// ===================== PIE CHART =====================
 class _ProductsPie extends StatelessWidget {
   const _ProductsPie();
 
@@ -240,7 +179,6 @@ class _ProductsPie extends StatelessWidget {
   }
 }
 
-// ===================== TABLE =====================
 class _LastInvoices extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -276,7 +214,6 @@ class _LastInvoices extends StatelessWidget {
   }
 }
 
-// ===================== CARD WRAPPER =====================
 Widget _card(String title, Widget child) {
   return Container(
     padding: const EdgeInsets.all(16),
