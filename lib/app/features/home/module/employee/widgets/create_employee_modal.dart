@@ -218,35 +218,31 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
                       ),
                       const SizedBox(height: 12),
                       row([
-                        Expanded(
-                          child: TextFormField(
-                            controller: _emailController,
-                            decoration: _dec('Email *'),
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Email é obrigatório';
-                              }
-                              if (!value.contains('@')) {
-                                return 'Email inválido';
-                              }
-                              return null;
-                            },
-                          ),
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: _dec('Email *'),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Email é obrigatório';
+                            }
+                            if (!value.contains('@')) {
+                              return 'Email inválido';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(width: 12),
-                        Expanded(
-                          child: TextFormField(
-                            controller: _phoneController,
-                            decoration: _dec('Telefone *'),
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Telefone é obrigatório';
-                              }
-                              return null;
-                            },
-                          ),
+                        TextFormField(
+                          controller: _phoneController,
+                          decoration: _dec('Telefone *'),
+                          keyboardType: TextInputType.phone,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Telefone é obrigatório';
+                            }
+                            return null;
+                          },
                         ),
                       ]),
                       const SizedBox(height: 12),
@@ -284,74 +280,79 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
                         },
                       ),
                       const SizedBox(height: 12),
-                      row([
-                        Expanded(
-                          child: TextFormField(
-                            controller: _documentController,
-                            decoration: _dec('CPF/CNPJ *'),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Documento é obrigatório';
-                              }
-                              return null;
-                            },
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: TextFormField(
+                              controller: _documentController,
+                              decoration: _dec('CPF/CNPJ *'),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Documento é obrigatório';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: DropdownButtonFormField<EmployeeStatus>(
-                            decoration: _dec('Status *'),
-                            value: _selectedStatus,
-                            items:
-                                EmployeeStatus.values
-                                    .map(
-                                      (status) => DropdownMenuItem(
-                                        value: status,
-                                        child: Text(status.name),
-                                      ),
-                                    )
-                                    .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedStatus = value;
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Status é obrigatório';
-                              }
-                              return null;
-                            },
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 1,
+                            child: DropdownButtonFormField<EmployeeStatus>(
+                              decoration: _dec('Status *'),
+                              value: _selectedStatus,
+                              items:
+                                  EmployeeStatus.values
+                                      .map(
+                                        (status) => DropdownMenuItem(
+                                          value: status,
+                                          child: Text(status.name),
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedStatus = value;
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Status é obrigatório';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: DropdownButtonFormField<EmployeeRole>(
-                            decoration: _dec('Cargo *'),
-                            value: _selectedRole,
-                            items:
-                                EmployeeRole.values
-                                    .map(
-                                      (role) => DropdownMenuItem(
-                                        value: role,
-                                        child: Text(role.value),
-                                      ),
-                                    )
-                                    .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedRole = value;
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Cargo é obrigatório';
-                              }
-                              return null;
-                            },
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 1,
+                            child: DropdownButtonFormField<EmployeeRole>(
+                              decoration: _dec('Cargo *'),
+                              value: _selectedRole,
+                              items:
+                                  EmployeeRole.values
+                                      .map(
+                                        (role) => DropdownMenuItem(
+                                          value: role,
+                                          child: Text(role.value),
+                                        ),
+                                      )
+                                      .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedRole = value;
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Cargo é obrigatório';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
-                        ),
-                      ]),
+                        ],
+                      ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _passwordController,
