@@ -9,8 +9,11 @@ class RestClientResponse<T> {
 
   factory RestClientResponse.fromHttp(http.Response response) {
     try {
-      final res = jsonDecode(response.body);
-      return RestClientResponse(data: res, statusCode: response.statusCode);
+      if (response.statusCode != 204) {
+        final res = jsonDecode(response.body);
+        return RestClientResponse(data: res, statusCode: response.statusCode);
+      }
+      return RestClientResponse(data: null, statusCode: response.statusCode);
     } on Exception catch (e) {
       rethrow;
     }

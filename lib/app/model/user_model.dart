@@ -1,6 +1,7 @@
 import 'models.dart';
 
 class User {
+  final String? branchId;
   final String? email;
   final String? role;
   final String? id;
@@ -13,6 +14,7 @@ class User {
   final List<EnterpriseModel>? enterpriseModel;
 
   User({
+    this.branchId,
     this.email,
     this.role,
     this.id,
@@ -28,6 +30,7 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       email: json['email'] as String?,
+      branchId: json['branchId'] as String?,
       role: json['role'] as String?,
       id: json['id'] as String?,
       createdAt: json['createdAt'] as String?,
@@ -50,6 +53,7 @@ class User {
   Map<String, dynamic> toJson() {
     return {
       'email': email,
+      'branchId': branchId,
       'role': role,
       'id': id,
       'createdAt': createdAt,

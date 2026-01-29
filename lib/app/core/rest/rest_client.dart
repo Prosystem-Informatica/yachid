@@ -4,7 +4,7 @@ abstract class RestClient {
   RestClient auth();
   RestClient unAuth();
 
-  Future<RestClientResponse<T>> post<T>(
+  Future<RestClientResponse<T?>> post<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,

@@ -1,5 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:yachid/app/app_routes.dart';
+import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -65,11 +70,12 @@ class _SideMenu extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 32),
-          _item(Icons.dashboard, 'Dashboard'),
-          _item(Icons.people, 'Clientes'),
-          _item(Icons.inventory, 'Produtos'),
-          _item(Icons.shopping_cart, 'Vendas'),
-          _item(Icons.receipt, 'NF-e'),
+          _item(context, Icons.dashboard, 'Dashboard'),
+          _item(context, Icons.people, 'Clientes'),
+          _item(context, Icons.inventory, 'Produtos'),
+          _item(context, Icons.shopping_cart, 'Vendas'),
+          _item(context, Icons.receipt, 'NF-e'),
+          _item(context, Icons.person_add, 'Funcionários'),
           const Spacer(),
           ElevatedButton.icon(
             onPressed: () {},
@@ -82,15 +88,22 @@ class _SideMenu extends StatelessWidget {
     );
   }
 
-  Widget _item(IconData icon, String label) {
+  Widget _item(BuildContext context, IconData icon, String label) {
+    final route = label == 'Funcionários' ? Routes.EMPLOYEE : Routes.HOME;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.white70),
-          const SizedBox(width: 12),
-          Text(label, style: const TextStyle(color: Colors.white70)),
-        ],
+      child: GestureDetector(
+        onTap: () => Get.toNamed(route),
+        child: MouseRegion(
+          cursor: kIsWeb ? SystemMouseCursors.click : MouseCursor.defer,
+          child: Row(
+            children: [
+              Icon(icon, color: Colors.white70),
+              const SizedBox(width: 12),
+              Text(label, style: const TextStyle(color: Colors.white70)),
+            ],
+          ),
+        ),
       ),
     );
   }
