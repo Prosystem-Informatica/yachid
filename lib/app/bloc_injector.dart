@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/home/module/employee/cubit/employee_cubit.dart';
+import 'package:yachid/app/features/home/module/partners/cubit/partners_cubit.dart';
 import 'package:yachid/app/repository/auth/auth_repository.dart';
 import 'package:yachid/app/repository/employee/employee_repository.dart';
 
@@ -20,6 +21,8 @@ class BlocInjection extends StatefulWidget {
 class _BlocInjectionState extends State<BlocInjection> {
   final RestClient _apiRestClient = HttpRestClient(
     baseUrl: Environments.get('BASE_URL') ?? "",
+    env: Environments.get('ENV') ?? "",
+    port: Environments.get('PORT') ?? "",
   );
 
   @override
@@ -38,6 +41,7 @@ class _BlocInjectionState extends State<BlocInjection> {
                 repository: EmployeeRepository(rest: _apiRestClient),
               ),
         ),
+        BlocProvider(create: (_) => PartnersCubit()),
       ],
       child: const AppWidget(),
     );

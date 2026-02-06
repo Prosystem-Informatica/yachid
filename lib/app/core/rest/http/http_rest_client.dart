@@ -6,9 +6,24 @@ import '../rest_client_response.dart';
 class HttpRestClient implements RestClient {
   late final http.Client rest;
   final String baseUrl;
+  final String env;
+  final String port;
   final Map<String, String> defaultHeaders;
 
-  HttpRestClient({required this.baseUrl})
+  Uri buildUri(String path, {Map<String, dynamic>? queryParameters}) {
+    final scheme = env == 'development' ? 'http' : 'https';
+    return Uri(
+      scheme: scheme,
+      host: baseUrl,
+      path: path,
+      port: int.parse(port),
+      queryParameters: queryParameters?.map(
+        (k, v) => MapEntry(k, v?.toString()),
+      ),
+    );
+  }
+
+  HttpRestClient({required this.baseUrl, required this.env, required this.port})
     : rest = http.Client(),
       defaultHeaders = {'content-type': 'application/json'};
 
@@ -24,8 +39,10 @@ class HttpRestClient implements RestClient {
     Map<String, dynamic>? queryParameters,
     Map<String, String>? headers,
   }) async {
-    final uri = Uri.https(baseUrl, path, queryParameters);
-    final response = await rest.get(uri, headers: joinHeaders(headers));
+    final response = await rest.get(
+      buildUri(path, queryParameters: queryParameters),
+      headers: joinHeaders(headers),
+    );
     return RestClientResponse.fromHttp(response);
   }
 
@@ -37,9 +54,9 @@ class HttpRestClient implements RestClient {
     Map<String, String>? headers,
   }) async {
     try {
-      final uri = Uri.https(baseUrl, path, queryParameters);
+      print(buildUri(path, queryParameters: queryParameters).toString());
       final response = await rest.post(
-        uri,
+        buildUri(path, queryParameters: queryParameters),
         body: data,
         headers: joinHeaders(headers),
       );
@@ -57,9 +74,8 @@ class HttpRestClient implements RestClient {
     Map<String, String>? headers,
   }) async {
     try {
-      final uri = Uri.https(baseUrl, path, queryParameters);
       final response = await rest.patch(
-        uri,
+        buildUri(path, queryParameters: queryParameters),
         body: data,
         headers: joinHeaders(headers),
       );

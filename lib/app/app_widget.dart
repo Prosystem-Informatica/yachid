@@ -26,6 +26,13 @@ class AppWidget extends StatelessWidget {
           outline: AppColors.gray300,
           shadow: AppColors.gray500,
         ),
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(
+            fontFamily: 'Frutiger',
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+          ),
+        ),
         appBarTheme: AppBarTheme(
           backgroundColor: AppColors.primaryColor,
           foregroundColor: AppColors.textOnPrimary,

@@ -1,10 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
-import 'package:yachid/app/app_routes.dart';
-import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 
 import '../../core/ui/ui.dart';
 
