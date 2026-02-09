@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../model/models.dart';
 import '../../../repository/repositories.dart';
 import 'auth_bloc_state.dart';
 
@@ -23,7 +24,6 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
         password: password,
       );
       if (authValidation.isSuccess) {
-        prefs.setString("authModel", jsonEncode(authValidation));
         emit(
           state.copyWith(
             status: AuthStateStatus.success,
@@ -40,6 +40,28 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
           ),
         );
       }
+    } on Exception {
+      emit(
+        state.copyWith(
+          status: AuthStateStatus.error,
+          errorMessage: "Erro ao efetuar Login",
+        ),
+      );
+    }
+  }
+
+  Future<void> createCompanies({
+    required CreateEnterpriseModel companie,
+  }) async {
+    try {
+      prefs = await SharedPreferences.getInstance();
+
+      emit(state.copyWith(status: AuthStateStatus.loading));
+      final res = await authRepository.createCompanies(companie: companie);
+      prefs.setString("authModel", jsonEncode(res));
+      emit(
+        state.copyWith(status: AuthStateStatus.success, enterpriseModel: res),
+      );
     } on Exception {
       emit(
         state.copyWith(

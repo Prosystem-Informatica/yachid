@@ -18,34 +18,45 @@ class AuthBlocState extends Equatable {
   final String? errorMessage;
   final String? successMessage;
   final AuthModel authModel;
+  final EnterpriseModel? enterpriseModel;
 
   const AuthBlocState({
     required this.status,
     this.errorMessage,
     this.successMessage,
     required this.authModel,
+    this.enterpriseModel,
   });
 
   AuthBlocState.initial()
     : status = AuthStateStatus.initial,
       errorMessage = null,
       successMessage = null,
-      authModel = AuthModel();
+      authModel = AuthModel(),
+      enterpriseModel = EnterpriseModel();
 
   @override
-  List<Object?> get props => [status, errorMessage, successMessage, authModel];
+  List<Object?> get props => [
+    status,
+    errorMessage,
+    successMessage,
+    authModel,
+    enterpriseModel,
+  ];
 
   AuthBlocState copyWith({
     AuthStateStatus? status,
     String? errorMessage,
     String? successMessage,
     AuthModel? authModel,
+    EnterpriseModel? enterpriseModel,
   }) {
     return AuthBlocState(
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
       successMessage: successMessage ?? this.successMessage,
       authModel: authModel ?? this.authModel,
+      enterpriseModel: enterpriseModel ?? this.enterpriseModel,
     );
   }
 }

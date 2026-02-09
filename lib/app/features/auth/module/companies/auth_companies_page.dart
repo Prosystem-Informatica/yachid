@@ -21,6 +21,8 @@ class AuthCompaniesPage extends StatefulWidget {
 class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
   List<EnterpriseModel> companies = [];
   late SharedPreferences prefs;
+  bool isLoadingPrefs = true;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -33,12 +35,15 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
     final colors = Theme.of(context).colorScheme;
 
     return BlocConsumer<AuthBlocCubit, AuthBlocState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        state.status.matchAny(initial: () {}, any: () {});
+      },
       builder: (context, state) {
-        if (state.status == AuthStateStatus.loading) {
-          return const Scaffold(body: Center(child: Text('Carregando')));
+        if (state.status == AuthStateStatus.loading || isLoadingPrefs) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
-
         return Scaffold(
           body: YachidBackgroundWidget(
             child: Center(
@@ -230,12 +235,30 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
     );
   }
 
-  void _loadState() async {
+  Future<void> _loadState() async {
     prefs = await SharedPreferences.getInstance();
-    var auth = prefs.getString("authModel");
-    var jsonDecoded = jsonDecode(auth ?? "");
-    var authModel = AuthModel.fromJson(jsonDecoded);
+    final jsonString = prefs.getString("companies");
 
-    companies = authModel.user?.enterpriseModel?.toList() ?? [];
+    print("String do json ${jsonString}");
+
+    if (jsonString != null) {
+      final List decoded = jsonDecode(jsonString);
+
+      final List<EnterpriseModel> companiesList =
+          decoded
+              .map(
+                (e) => EnterpriseModel.fromJson(Map<String, dynamic>.from(e)),
+              )
+              .toList();
+
+      setState(() {
+        companies = companiesList;
+        isLoadingPrefs = false;
+      });
+    } else {
+      setState(() {
+        isLoadingPrefs = false;
+      });
+    }
   }
 }

@@ -37,7 +37,6 @@ class HttpRestClient implements RestClient {
     Map<String, String>? headers,
   }) async {
     try {
-      print("Oq tem aq $baseUrl");
       final uri = Uri.https(baseUrl, path, queryParameters);
       final response = await rest.post(
         uri,

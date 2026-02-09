@@ -25,6 +25,34 @@ class AuthRepository {
       var jsonData = AuthModel.fromJson(response.data);
 
       prefs.setString("token", jsonData.token ?? "");
+      prefs.setString(
+        'companies',
+        jsonEncode(
+          jsonData.user?.enterpriseModel?.map((e) => e.toJson()).toList() ?? [],
+        ),
+      );
+
+      return jsonData;
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<EnterpriseModel> createCompanies({
+    required CreateEnterpriseModel companie,
+  }) async {
+    try {
+      prefs = await SharedPreferences.getInstance();
+
+      var entrepreneurId = prefs.getString("entrepreneurId");
+
+      var response = await _rest.post(
+        '/enterprise/$entrepreneurId',
+        data: companie.toJson(),
+      );
+
+      var jsonData = EnterpriseModel.fromJson(response.data);
 
       return jsonData;
     } catch (e) {
