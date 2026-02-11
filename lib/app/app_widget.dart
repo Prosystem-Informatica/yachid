@@ -13,6 +13,7 @@ class AppWidget extends StatelessWidget {
       title: "Help Desk ProSystem",
       initialRoute: Routes.INITIAL,
       getPages: AppPages.pages,
+      debugShowCheckedModeBanner: false,
       supportedLocales: const [Locale('pt', 'BR')],
       locale: const Locale('pt', 'BR'),
       theme: ThemeData(
@@ -26,8 +27,15 @@ class AppWidget extends StatelessWidget {
           outline: AppColors.gray300,
           shadow: AppColors.gray500,
         ),
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(
+            fontFamily: 'Frutiger',
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+          ),
+        ),
         appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.primaryColor,
+          backgroundColor: AppColors.backgroundColor,
           foregroundColor: AppColors.textOnPrimary,
         ),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
