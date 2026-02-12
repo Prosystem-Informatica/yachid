@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:yachid/app/app_routes.dart';
 import 'package:yachid/app/core/ui/side_bar_item_widget.dart';
 
 class SideBarWidget extends StatelessWidget {
+  const SideBarWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -20,11 +23,36 @@ class SideBarWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 32),
-          SideBarItemWidget(Icons.dashboard, 'Dashboard'),
-          SideBarItemWidget(Icons.people, 'Clientes'),
-          SideBarItemWidget(Icons.inventory, 'Produtos'),
-          SideBarItemWidget(Icons.shopping_cart, 'Vendas'),
-          SideBarItemWidget(Icons.receipt, 'NF-e'),
+          SideBarItemWidget(
+            icon: Icons.dashboard,
+            label: 'Dashboard',
+            route: Routes.HOME,
+          ),
+          SideBarItemWidget(
+            icon: Icons.people,
+            label: 'Parceiros',
+            route: Routes.PARTNERS,
+          ),
+          SideBarItemWidget(
+            icon: Icons.inventory,
+            label: 'Produtos',
+            route: Routes.HOME,
+          ),
+          SideBarItemWidget(
+            icon: Icons.shopping_cart,
+            label: 'Vendas',
+            route: Routes.HOME,
+          ),
+          SideBarItemWidget(
+            icon: Icons.receipt,
+            label: 'NF-e',
+            route: Routes.HOME,
+          ),
+          SideBarItemWidget(
+            icon: Icons.person_add,
+            label: 'Funcionários',
+            route: Routes.EMPLOYEE,
+          ),
           const Spacer(),
           ElevatedButton.icon(
             onPressed: () {},

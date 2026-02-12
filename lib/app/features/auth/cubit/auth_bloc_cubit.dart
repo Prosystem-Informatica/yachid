@@ -14,6 +14,10 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
   AuthBlocCubit({required this.authRepository})
     : super(AuthBlocState.initial());
 
+  void resetState() {
+    emit(AuthBlocState.initial());
+  }
+
   Future<void> login({required email, required password}) async {
     try {
       prefs = await SharedPreferences.getInstance();
@@ -58,7 +62,21 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
 
       emit(state.copyWith(status: AuthStateStatus.loading));
       final res = await authRepository.createCompanies(companie: companie);
-      //prefs.setString("authModel", jsonEncode(res));
+      
+      // Adiciona a nova empresa à lista no SharedPreferences
+      final companiesString = prefs.getString("companies");
+      List<Map<String, dynamic>> companiesList = [];
+      
+      if (companiesString != null) {
+        companiesList = List<Map<String, dynamic>>.from(jsonDecode(companiesString));
+      }
+      
+      // Adiciona a nova empresa à lista
+      companiesList.add(res.toJson());
+      
+      // Salva a lista atualizada
+      prefs.setString("companies", jsonEncode(companiesList));
+      
       emit(
         state.copyWith(status: AuthStateStatus.success, enterpriseModel: res),
       );
@@ -66,7 +84,7 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
       emit(
         state.copyWith(
           status: AuthStateStatus.error,
-          errorMessage: "Erro ao efetuar Login",
+          errorMessage: "Erro ao criar empresa",
         ),
       );
     }

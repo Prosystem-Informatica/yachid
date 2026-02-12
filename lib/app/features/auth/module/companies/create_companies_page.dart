@@ -668,6 +668,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                             controller: receitaBrutaCtrl,
                             decoration: _dec('Receita Bruta Anual'),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: [ValueInputFormatter()],
                           ),
                         ],
                         if (isExcessoOuNormal) ...[
@@ -771,7 +772,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                                         cofins: _removePercentage(cofinsCtrl.text),
                                         pis: _removePercentage(pisCtrl.text),
                                         icms: _removePercentage(icmsCtrl.text),
-                                        receitaBrutaAnual: receitaBrutaCtrl.text.replaceAll(RegExp(r'[^\d,.]'), '').replaceAll(',', '.'),
+                                        receitaBrutaAnual: ValueInputFormatter.getValueAsString(receitaBrutaCtrl.text),
                                       )
                                       : RevenueTaxDetailsModel(
                                         bcIrpj: _removePercentage(bcIrpjCtrl.text),

@@ -9,6 +9,7 @@ class AuthRepository {
   late SharedPreferences prefs;
 
   AuthRepository({required RestClient rest}) : _rest = rest;
+  var headers = {'Content-Type': 'application/json'};
 
   Future<AuthModel> auth({
     required String email,
@@ -20,6 +21,7 @@ class AuthRepository {
       var response = await _rest.post(
         '/auth/login',
         data: jsonEncode({"email": email, "password": password}),
+        headers: headers
       );
 
       var jsonData = AuthModel.fromJson(response.data);
@@ -54,7 +56,8 @@ class AuthRepository {
 
       var response = await _rest.post(
         '/enterprise/$entrepreneurId',
-        data: companie.toJson(),
+        data: jsonEncode(companie.toJson()),
+        headers: headers
       );
 
       print('Oq aconteceu no create ? ${response.data}');
