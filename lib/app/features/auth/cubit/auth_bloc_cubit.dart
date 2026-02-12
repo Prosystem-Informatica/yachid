@@ -58,7 +58,7 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
 
       emit(state.copyWith(status: AuthStateStatus.loading));
       final res = await authRepository.createCompanies(companie: companie);
-      prefs.setString("authModel", jsonEncode(res));
+      //prefs.setString("authModel", jsonEncode(res));
       emit(
         state.copyWith(status: AuthStateStatus.success, enterpriseModel: res),
       );

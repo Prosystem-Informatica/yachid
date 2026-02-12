@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../rest_client.dart';
 import '../rest_client_response.dart';
@@ -38,10 +38,13 @@ class HttpRestClient implements RestClient {
   }) async {
     try {
       final uri = Uri.https(baseUrl, path, queryParameters);
+      final headersMap = joinHeaders(headers);
+      final bodyData = _prepareBody(data, headersMap);
+      
       final response = await rest.post(
         uri,
-        body: data,
-        headers: joinHeaders(headers),
+        body: bodyData,
+        headers: headersMap,
       );
       return RestClientResponse.fromHttp(response);
     } on Exception {
@@ -58,10 +61,13 @@ class HttpRestClient implements RestClient {
   }) async {
     try {
       final uri = Uri.https(baseUrl, path, queryParameters);
+      final headersMap = joinHeaders(headers);
+      final bodyData = _prepareBody(data, headersMap);
+      
       final response = await rest.patch(
         uri,
-        body: data,
-        headers: joinHeaders(headers),
+        body: bodyData,
+        headers: headersMap,
       );
       return RestClientResponse.fromHttp(response);
     } on Exception {
@@ -76,10 +82,27 @@ class HttpRestClient implements RestClient {
   }
 
   Map<String, String> joinHeaders(Map<String, String>? h) {
-    Map<String, String> headers = defaultHeaders;
+    Map<String, String> headers = Map<String, String>.from(defaultHeaders);
     h?.forEach((key, value) {
       headers[key] = value;
     });
     return headers;
+  }
+
+  dynamic _prepareBody(dynamic data, Map<String, String> headers) {
+    if (data == null) return null;
+    
+    final contentType = headers['content-type']?.toLowerCase() ?? 
+                       headers['Content-Type']?.toLowerCase() ?? '';
+    
+    if (contentType.contains('application/json')) {
+      if (data is String) {
+        return data;
+      } else if (data is Map || data is List) {
+        return jsonEncode(data);
+      }
+    }
+    
+    return data;
   }
 }

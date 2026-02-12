@@ -25,7 +25,6 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _loadState();
   }

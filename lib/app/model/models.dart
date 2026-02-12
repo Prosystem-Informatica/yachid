@@ -1,6 +1,7 @@
 export 'auth_model.dart';
 export 'user_model.dart';
 export 'address_model.dart';
+export 'cnpj_response_model.dart';
 export 'enterprise_model.dart';
 export 'revenue_tax_details_model.dart';
 export 'tax_regime_model.dart';
