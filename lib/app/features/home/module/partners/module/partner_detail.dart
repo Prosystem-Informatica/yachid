@@ -10,6 +10,7 @@ import 'package:yachid/app/features/home/module/partners/module/widgets/local_co
 import 'package:yachid/app/features/home/module/partners/module/widgets/local_entrega.dart';
 import 'package:yachid/app/features/home/module/partners/module/widgets/partner_data.dart';
 import 'package:yachid/app/features/home/module/partners/module/widgets/partner_detail_header.dart';
+import 'package:yachid/app/features/home/module/partners/module/widgets/partner_statistics.dart';
 import 'package:yachid/app/features/home/module/partners/module/widgets/partners_tab_bar.dart';
 
 class PartnerDetailsPage extends StatefulWidget {
@@ -148,6 +149,9 @@ class _TabContent extends StatelessWidget {
           onDeliveryAddressSaved:
               (address) => _onDeliveryAddressSaved(context, address),
         );
+      case 3:
+        return PartnerStatistics();
+
       default:
         return DadosTab(partner: partner);
     }
