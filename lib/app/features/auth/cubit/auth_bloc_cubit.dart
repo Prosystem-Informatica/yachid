@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../model/models.dart';
 import '../../../repository/repositories.dart';
 import 'auth_bloc_state.dart';
 
@@ -12,6 +13,10 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
 
   AuthBlocCubit({required this.authRepository})
     : super(AuthBlocState.initial());
+
+  void resetState() {
+    emit(AuthBlocState.initial());
+  }
 
   Future<void> login({required email, required password}) async {
     try {
@@ -23,7 +28,6 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
         password: password,
       );
       if (authValidation.isSuccess) {
-        prefs.setString("authModel", jsonEncode(authValidation));
         emit(
           state.copyWith(
             status: AuthStateStatus.success,
@@ -45,6 +49,42 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
         state.copyWith(
           status: AuthStateStatus.error,
           errorMessage: "Erro ao efetuar Login",
+        ),
+      );
+    }
+  }
+
+  Future<void> createCompanies({
+    required CreateEnterpriseModel companie,
+  }) async {
+    try {
+      prefs = await SharedPreferences.getInstance();
+
+      emit(state.copyWith(status: AuthStateStatus.loading));
+      final res = await authRepository.createCompanies(companie: companie);
+      
+      // Adiciona a nova empresa à lista no SharedPreferences
+      final companiesString = prefs.getString("companies");
+      List<Map<String, dynamic>> companiesList = [];
+      
+      if (companiesString != null) {
+        companiesList = List<Map<String, dynamic>>.from(jsonDecode(companiesString));
+      }
+      
+      // Adiciona a nova empresa à lista
+      companiesList.add(res.toJson());
+      
+      // Salva a lista atualizada
+      prefs.setString("companies", jsonEncode(companiesList));
+      
+      emit(
+        state.copyWith(status: AuthStateStatus.success, enterpriseModel: res),
+      );
+    } on Exception {
+      emit(
+        state.copyWith(
+          status: AuthStateStatus.error,
+          errorMessage: "Erro ao criar empresa",
         ),
       );
     }

@@ -1,10 +1,6 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'auth_bloc_state.dart';
 
-// **************************************************************************
-// MatchExtensionGenerator
-// **************************************************************************
 
 extension AuthStateStatusMatch on AuthStateStatus {
   T match<T>(

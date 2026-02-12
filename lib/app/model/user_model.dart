@@ -43,10 +43,11 @@ class User {
           json['enterprises'] != null
               ? (json['enterprises'] as List)
                   .map(
-                    (e) => EnterpriseModel.fromJson(e as Map<String, dynamic>),
+                    (e) =>
+                        EnterpriseModel.fromJson(Map<String, dynamic>.from(e)),
                   )
                   .toList()
-              : <EnterpriseModel>[],
+              : [],
     );
   }
 
@@ -65,9 +66,4 @@ class User {
       'enterprises': enterpriseModel,
     };
   }
-
-  // @override
-  // String toString() {
-  //   return 'User{email: $email, role: $role, id: $id, createdAt: $createdAt, updatedAt: $updatedAt, name: $name, phone: $phone, document: $document, status: $status, enterpriseModel: $enterpriseModel}';
-  // }
 }
