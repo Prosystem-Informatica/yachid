@@ -30,8 +30,8 @@ class SideBarWidget extends StatelessWidget {
           ),
           SideBarItemWidget(
             icon: Icons.people,
-            label: 'Clientes',
-            route: Routes.HOME,
+            label: 'Parceiros',
+            route: Routes.PARTNERS,
           ),
           SideBarItemWidget(
             icon: Icons.inventory,

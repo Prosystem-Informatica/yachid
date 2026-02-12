@@ -1,5 +1,4 @@
 class Address {
-  final String? id;
   final String? cep;
   final String? street;
   final String? number;
@@ -12,7 +11,6 @@ class Address {
   final String? uf;
 
   const Address({
-    this.id,
     this.cep,
     this.street,
     this.number,
@@ -27,7 +25,6 @@ class Address {
 
   factory Address.fromJson(Map<String, dynamic> json) {
     return Address(
-      id: json['id'] as String?,
       cep: json['cep'] as String?,
       street: json['street'] as String?,
       number: json['number'] as String?,
@@ -43,7 +40,6 @@ class Address {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'cep': cep,
       'street': street,
       'number': number,
@@ -59,6 +55,6 @@ class Address {
 
   @override
   String toString() {
-    return 'Address{id: $id, cep: $cep, street: $street, number: $number, complement: $complement, neighborhood: $neighborhood, city: $city, cityIbgeCode: $cityIbgeCode, country: $country, state: $state, uf: $uf}';
+    return 'Address{cep: $cep, street: $street, number: $number, complement: $complement, neighborhood: $neighborhood, city: $city, cityIbgeCode: $cityIbgeCode, country: $country, state: $state, uf: $uf}';
   }
 }

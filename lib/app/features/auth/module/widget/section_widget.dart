@@ -45,7 +45,7 @@ Widget sectionDropdown({
           crossFadeState:
               isOpen ? CrossFadeState.showFirst : CrossFadeState.showSecond,
           firstChild: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
             child: Column(children: children),
           ),
           secondChild: const SizedBox.shrink(),
