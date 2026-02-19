@@ -11,7 +11,7 @@ import 'features/home/home_page.dart';
 
 class Routes {
   static const INITIAL = '/auth';
-  static const COMPANIES = '/companies';
+  static const COMPANIES = '/companies/:id';
   static const HOME = '/home';
   static const EMPLOYEE = '/employee';
   static const PARTNERS = '/partners';

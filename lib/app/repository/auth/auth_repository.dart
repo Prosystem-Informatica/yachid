@@ -21,21 +21,36 @@ class AuthRepository {
       var response = await _rest.post(
         '/auth/login',
         data: jsonEncode({"email": email, "password": password}),
-        headers: headers
+        headers: headers,
       );
+
+      print('response: ${response.data}');
 
       var jsonData = AuthModel.fromJson(response.data);
 
       prefs.setString("token", jsonData.token ?? "");
-      prefs.setString("entrepreneurId", jsonData.user!.id ?? '');
-      prefs.setString(
-        'companies',
-        jsonEncode(
-          jsonData.user?.enterpriseModel?.map((e) => e.toJson()).toList() ?? [],
-        ),
-      );
 
       return jsonData;
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<List<EnterpriseModel>> getCompanies(
+    String entrepreneurId,
+    String token,
+  ) async {
+    try {
+      final response = await _rest.get(
+        '/enterprise/$entrepreneurId',
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      print('response: ${response.data}');
+
+      var res = EnterpriseModel.fromJsonList(response.data);
+
+      return res;
     } catch (e) {
       log(e.toString());
       rethrow;
@@ -52,15 +67,11 @@ class AuthRepository {
 
       print("ID do cara > ${entrepreneurId}");
 
-      print('Body ${companie.toJson()}');
-
       var response = await _rest.post(
         '/enterprise/$entrepreneurId',
         data: jsonEncode(companie.toJson()),
-        headers: headers
+        headers: headers,
       );
-
-      print('Oq aconteceu no create ? ${response.data}');
 
       var jsonData = EnterpriseModel.fromJson(response.data);
 

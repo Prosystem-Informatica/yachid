@@ -63,7 +63,7 @@ class _EmployeePageState extends State<EmployeePage> {
     return Scaffold(
       body: Row(
         children: [
-          const SideBarWidget(),
+          SideBarWidget(),
           Expanded(
             child: BlocListener<EmployeeCubit, EmployeeState>(
               listener: (context, state) {},

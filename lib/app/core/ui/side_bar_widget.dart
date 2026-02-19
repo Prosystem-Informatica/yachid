@@ -1,9 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yachid/app/app_routes.dart';
 import 'package:yachid/app/core/ui/side_bar_item_widget.dart';
 
-class SideBarWidget extends StatelessWidget {
+class SideBarWidget extends StatefulWidget {
   const SideBarWidget({super.key});
+
+  @override
+  State<SideBarWidget> createState() => _SideBarWidgetState();
+}
+
+class _SideBarWidgetState extends State<SideBarWidget> {
+  late SharedPreferences prefs;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadPrefs();
+  }
+
+  void _loadPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    prefs.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +82,10 @@ class SideBarWidget extends StatelessWidget {
           ),
           const Spacer(),
           ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              prefs.clear();
+              Get.toNamed(Routes.INITIAL);
+            },
             icon: const Icon(Icons.logout),
             label: const Text('Sair'),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.white24),

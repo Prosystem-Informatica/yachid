@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: [
-          const SideBarWidget(),
+          SideBarWidget(),
           Expanded(
             child: Container(
               color: const Color(0xFFF5F7FA),

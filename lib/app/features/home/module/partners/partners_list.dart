@@ -71,7 +71,7 @@ class _PartnersListState extends State<PartnersList> {
       backgroundColor: AppColors.textOnPrimary,
       body: Row(
         children: [
-          const SideBarWidget(),
+          SideBarWidget(),
           Expanded(
             child: Center(
               child: Column(

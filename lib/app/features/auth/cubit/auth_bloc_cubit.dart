@@ -32,6 +32,7 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
           state.copyWith(
             status: AuthStateStatus.success,
             authModel: authValidation,
+            enterprisesModels: authValidation.user?.enterpriseModel ?? [],
           ),
         );
       }
@@ -40,7 +41,7 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
           state.copyWith(
             status: AuthStateStatus.error,
             errorMessage: authValidation.message ?? "Erro ao efetuar login",
-            authModel: authValidation,
+            enterprisesModels: [],
           ),
         );
       }
@@ -49,6 +50,26 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
         state.copyWith(
           status: AuthStateStatus.error,
           errorMessage: "Erro ao efetuar Login",
+          enterprisesModels: [],
+        ),
+      );
+    }
+  }
+
+  Future<void> getCompanies({required entrepreneurId, required token}) async {
+    try {
+      prefs = await SharedPreferences.getInstance();
+
+      emit(state.copyWith(status: AuthStateStatus.loading));
+      final res = await authRepository.getCompanies(entrepreneurId, token);
+      emit(
+        state.copyWith(status: AuthStateStatus.success, enterprisesModels: res),
+      );
+    } on Exception {
+      emit(
+        state.copyWith(
+          status: AuthStateStatus.error,
+          errorMessage: "Erro ao efetuar a busca",
         ),
       );
     }
@@ -62,24 +83,12 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
 
       emit(state.copyWith(status: AuthStateStatus.loading));
       final res = await authRepository.createCompanies(companie: companie);
-      
-      // Adiciona a nova empresa à lista no SharedPreferences
-      final companiesString = prefs.getString("companies");
-      List<Map<String, dynamic>> companiesList = [];
-      
-      if (companiesString != null) {
-        companiesList = List<Map<String, dynamic>>.from(jsonDecode(companiesString));
+
+      if (res.isSuccess) {
+        emit(state.copyWith(status: AuthStateStatus.success));
+      } else if (!res.isSuccess) {
+        emit(state.copyWith(status: AuthStateStatus.error));
       }
-      
-      // Adiciona a nova empresa à lista
-      companiesList.add(res.toJson());
-      
-      // Salva a lista atualizada
-      prefs.setString("companies", jsonEncode(companiesList));
-      
-      emit(
-        state.copyWith(status: AuthStateStatus.success, enterpriseModel: res),
-      );
     } on Exception {
       emit(
         state.copyWith(

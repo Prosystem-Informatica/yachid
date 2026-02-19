@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:yachid/app/app_routes.dart';
 import 'package:yachid/app/core/widgets/yachid_background_widget.dart';
-import 'package:yachid/app/features/auth/module/companies/auth_companies_page.dart';
-
 import '../../core/ui/messages.dart';
 import 'cubit/auth_bloc_cubit.dart';
 import 'cubit/auth_bloc_state.dart';
@@ -29,9 +27,16 @@ class _AuthPageState extends State<AuthPage> with Messages<AuthPage> {
       listener: (context, state) {
         state.status.matchAny(
           success: () {
-            Get.toNamed(Routes.COMPANIES);
+            Get.toNamed(
+              Routes.COMPANIES.replaceFirst(
+                ':id',
+                state.authModel.user?.id ?? '',
+              ),
+            );
           },
-          error: () => showError(state.errorMessage ?? "Erro não informado"),
+          error: () {
+            showError(state.errorMessage ?? 'Erro ao efetuar login');
+          },
           any: () {},
         );
       },
