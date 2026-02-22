@@ -2,6 +2,7 @@ export 'auth/auth_page.dart';
 export 'auth/module/companies/auth_companies_page.dart';
 export 'auth/module/companies/create_companies_page.dart';
 export 'home/home_page.dart';
+export 'home/home_clean_page.dart';
 export 'home/module/dashboard/dashboard_page.dart';
 export 'home/module/employee/employee.dart';
 export 'home/module/partners/partners_list.dart';

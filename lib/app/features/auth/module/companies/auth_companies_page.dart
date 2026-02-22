@@ -1,14 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yachid/app/app_routes.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_state.dart';
 
 import '../../../../core/widgets/widgets.dart';
-import '../../../../model/models.dart';
 import 'create_companies_page.dart';
 
 class AuthCompaniesPage extends StatefulWidget {
@@ -37,7 +34,14 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
     final colors = Theme.of(context).colorScheme;
 
     return BlocConsumer<AuthBlocCubit, AuthBlocState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        state.status.matchAny(
+          any: () {},
+          selectedSucess: () {
+            Get.offNamed(Routes.HOME, arguments: state.authModel);
+          },
+        );
+      },
       builder: (context, state) {
         if (state.status == AuthStateStatus.success) {
           return Scaffold(
@@ -138,10 +142,8 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
                                     'Entrar',
                                   ],
                                   onTap: () {
-                                    state.copyWith(selectedCompanie: e);
-                                    Get.toNamed(
-                                      '/home',
-                                      arguments: state.authModel,
+                                    context.read<AuthBlocCubit>().selectCompany(
+                                      e,
                                     );
                                   },
                                 ),

@@ -7,7 +7,7 @@ import '../../../model/models.dart';
 part 'auth_bloc_state.g.dart';
 
 @match
-enum AuthStateStatus { initial, loading, error, success, sectorSuccess }
+enum AuthStateStatus { initial, loading, error, success, sectorSuccess, selectedSucess }
 
 class AuthController extends GetxController {
   late AuthModel authModel;

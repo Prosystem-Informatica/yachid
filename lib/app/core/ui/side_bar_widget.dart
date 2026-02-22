@@ -6,7 +6,6 @@ import 'package:yachid/app/app_routes.dart';
 import 'package:yachid/app/core/ui/side_bar_item_widget.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_state.dart';
-import 'package:yachid/app/model/enterprise_model.dart';
 
 import '../enums/enum.dart';
 
@@ -26,22 +25,21 @@ class SideBarWidget extends StatefulWidget {
 
 class _SideBarWidgetState extends State<SideBarWidget> {
   late SharedPreferences prefs;
-  String? selectedCompany;
+  String? selectedCompanyId;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _loadPrefs();
   }
 
   void _loadPrefs() async {
     prefs = await SharedPreferences.getInstance();
-    selectedCompany =
-        context.read<AuthBlocCubit>().state.selectedCompanie!.fantasyName ?? '';
+    final selectedCompanie = context.read<AuthBlocCubit>().state.selectedCompanie;
+    selectedCompanyId = selectedCompanie?.id;
 
     print(
-      "Oq tem no inicio > ${context.read<AuthBlocCubit>().state.selectedCompanie!.fantasyName}",
+      "Oq tem no inicio > ${selectedCompanie?.fantasyName}",
     );
   }
 
@@ -56,9 +54,18 @@ class _SideBarWidgetState extends State<SideBarWidget> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBlocCubit, AuthBlocState>(
       listener: (context, state) {
+        // Atualiza o selectedCompanyId quando o selectedCompanie mudar
+        if (state.selectedCompanie?.id != selectedCompanyId) {
+          setState(() {
+            selectedCompanyId = state.selectedCompanie?.id;
+          });
+        }
         state.status.matchAny(success: () {}, any: () {});
       },
       builder: (context, state) {
+        // Garante que o selectedCompanyId está sincronizado com o estado
+        final currentSelectedId = state.selectedCompanie?.id ?? selectedCompanyId;
+        
         return Container(
           width: 220,
           color: const Color(0xFF1E6F4F),
@@ -84,7 +91,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     dropdownColor: const Color(0xFF1E6F4F),
-                    value: selectedCompany,
+                    value: currentSelectedId,
                     hint: const Text(
                       'Selecionar Empresa',
                       style: TextStyle(color: Colors.white),
@@ -95,23 +102,30 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                     ),
                     isExpanded: true,
                     style: const TextStyle(color: Colors.white),
-                    items:
-                        state.enterprisesModels!.map((company) {
+                    items: state.enterprisesModels?.map((company) {
                           return DropdownMenuItem<String>(
-                            value: company.fantasyName,
+                            value: company.id,
                             child: Text(company.fantasyName ?? ''),
                           );
-                        }).toList(),
+                        }).toList() ?? [],
                     onChanged: (value) async {
+                      if (value == null) return;
+                      
                       setState(() {
-                        selectedCompany = value;
+                        selectedCompanyId = value;
                       });
 
-                      // Opcional: salvar empresa selecionada
-                      await prefs.setString('selected_company', value!);
+                      final selectedCompany = state.enterprisesModels?.firstWhere(
+                        (company) => company.id == value,
+                      );
+                      
+                      if (selectedCompany != null) {
+                        context.read<AuthBlocCubit>().selectCompany(selectedCompany);
+                      }
 
-                      // Aqui você pode disparar atualização global
-                      print('Empresa selecionada: $value');
+                      await prefs.setString('selected_company', value);
+
+                      print('Empresa selecionada: ${selectedCompany?.fantasyName}');
                     },
                   ),
                 ),
@@ -130,7 +144,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                 isSelected: widget.selectedSection == HomeSectionEnum.partners,
                 onTap: () => widget.onItemSelected(HomeSectionEnum.partners),
               ),
-              SideBarItemWidget(
+              /*SideBarItemWidget(
                 icon: Icons.inventory,
                 label: 'Produtos',
                 isSelected: widget.selectedSection == HomeSectionEnum.partners,
@@ -147,7 +161,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                 label: 'NF-e',
                 isSelected: widget.selectedSection == HomeSectionEnum.partners,
                 onTap: () => widget.onItemSelected(HomeSectionEnum.partners),
-              ),
+              ),*/
               SideBarItemWidget(
                 icon: Icons.person_add,
                 label: 'Funcionários',

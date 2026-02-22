@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 import '../../core/enums/enum.dart';
 import '../../core/ui/ui.dart';
@@ -17,6 +16,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildContent() {
     switch (selectedSection) {
+      case HomeSectionEnum.home:
+        return HomeCleanPage();
       case HomeSectionEnum.dashboard:
         return DashboardPage();
       case HomeSectionEnum.partners:
@@ -35,26 +36,24 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Expanded(
-        child: Row(
-          children: [
-            SideBarWidget(
-              selectedSection: selectedSection,
-              onItemSelected: (section) {
-                setState(() {
-                  selectedSection = section;
-                });
-              },
+      body: Row(
+        children: [
+          SideBarWidget(
+            selectedSection: selectedSection,
+            onItemSelected: (section) {
+              setState(() {
+                selectedSection = section;
+              });
+            },
+          ),
+          Expanded(
+            child: Container(
+              color: const Color(0xFFF5F7FA),
+              padding: const EdgeInsets.all(24),
+              child: _buildContent(),
             ),
-            Expanded(
-              child: Container(
-                color: const Color(0xFFF5F7FA),
-                padding: const EdgeInsets.all(24),
-                child: _buildContent(),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
