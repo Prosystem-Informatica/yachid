@@ -68,7 +68,6 @@ class _PartnerDetailsPageState extends State<PartnerDetailsPage> {
     return Scaffold(
       body: Row(
         children: [
-          SideBarWidget(),
           BlocBuilder<PartnerDetailsCubit, PartnerDetailsState>(
             builder: (context, state) {
               if (state is PartnerDetailsInitial) {

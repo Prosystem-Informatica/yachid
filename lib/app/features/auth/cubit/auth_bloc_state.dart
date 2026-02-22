@@ -19,6 +19,7 @@ class AuthBlocState extends Equatable {
   final String? successMessage;
   final AuthModel authModel;
   final List<EnterpriseModel>? enterprisesModels;
+  final EnterpriseModel? selectedCompanie;
 
   const AuthBlocState({
     required this.status,
@@ -26,6 +27,7 @@ class AuthBlocState extends Equatable {
     this.successMessage,
     required this.authModel,
     this.enterprisesModels,
+    this.selectedCompanie,
   });
 
   AuthBlocState.initial()
@@ -33,7 +35,8 @@ class AuthBlocState extends Equatable {
       errorMessage = null,
       successMessage = null,
       authModel = AuthModel(),
-      enterprisesModels = null;
+      enterprisesModels = null,
+      selectedCompanie = EnterpriseModel();
 
   @override
   List<Object?> get props => [
@@ -42,6 +45,7 @@ class AuthBlocState extends Equatable {
     successMessage,
     authModel,
     enterprisesModels,
+    selectedCompanie,
   ];
 
   AuthBlocState copyWith({
@@ -50,6 +54,7 @@ class AuthBlocState extends Equatable {
     String? successMessage,
     AuthModel? authModel,
     List<EnterpriseModel>? enterprisesModels,
+    EnterpriseModel? selectedCompanie,
   }) {
     return AuthBlocState(
       status: status ?? this.status,
@@ -57,6 +62,7 @@ class AuthBlocState extends Equatable {
       successMessage: successMessage ?? this.successMessage,
       authModel: authModel ?? this.authModel,
       enterprisesModels: enterprisesModels ?? this.enterprisesModels,
+      selectedCompanie: selectedCompanie ?? this.selectedCompanie,
     );
   }
 }

@@ -112,26 +112,39 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
                           ),
                         ),
                         children: [
-                          _row([
-                            'ID',
-                            'Nome',
-                            'Email',
-                            'CNPJ/CPF',
-                            'Status',
-                            'Ação',
-                          ], header: true),
+                          _row(
+                            [
+                              'ID',
+                              'Nome',
+                              'Email',
+                              'CNPJ/CPF',
+                              'Status',
+                              'Ação',
+                            ],
+                            header: true,
+                            onTap: () {},
+                          ),
                           ...state.enterprisesModels?.map(
-                                (e) => _row([
-                                  state.enterprisesModels!.isEmpty
-                                      ? '-'
-                                      : state.enterprisesModels!.length
-                                          .toString(),
-                                  e.fantasyName ?? '-',
-                                  e.email ?? '-',
-                                  e.document ?? '-',
-                                  e.status ?? '-',
-                                  'Entrar',
-                                ]),
+                                (e) => _row(
+                                  [
+                                    state.enterprisesModels!.isEmpty
+                                        ? '-'
+                                        : state.enterprisesModels!.length
+                                            .toString(),
+                                    e.fantasyName ?? '-',
+                                    e.email ?? '-',
+                                    e.document ?? '-',
+                                    e.status ?? '-',
+                                    'Entrar',
+                                  ],
+                                  onTap: () {
+                                    state.copyWith(selectedCompanie: e);
+                                    Get.toNamed(
+                                      '/home',
+                                      arguments: state.authModel,
+                                    );
+                                  },
+                                ),
                               ) ??
                               [],
                         ],
@@ -199,7 +212,11 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
     );
   }
 
-  static TableRow _row(List<String> cells, {bool header = false}) {
+  static TableRow _row(
+    List<String> cells, {
+    bool header = false,
+    required void Function()? onTap,
+  }) {
     return TableRow(
       children:
           cells.map((c) {
@@ -210,9 +227,7 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
               child:
                   isAction
                       ? InkWell(
-                        onTap: () {
-                          Get.toNamed('/home');
-                        },
+                        onTap: onTap,
                         child: Text(
                           c,
                           textAlign: TextAlign.center,

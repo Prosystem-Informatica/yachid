@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
-import 'package:yachid/app/features/auth/module/widget/row_widget.dart';
-import 'package:yachid/app/features/auth/module/widget/section_widget.dart';
 import 'package:yachid/app/features/home/module/partners/model/payment_address.dart';
 import 'package:yachid/app/model/address_model.dart';
 
+import '../../../../../../core/widgets/widgets.dart';
 import '../../cubit/partners_cubit.dart';
 import '../../model/partner_model.dart';
 

@@ -4,12 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/formatters/input_formatters.dart';
 import '../../../../core/ui/ui.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../../model/models.dart';
 import '../../../../repository/cnpj/cnpj_repository.dart';
 import '../../cubit/auth_bloc_cubit.dart';
 import '../../cubit/auth_bloc_state.dart';
-import '../widget/row_widget.dart';
-import '../widget/section_widget.dart';
 
 class CreateCompaniesPage extends StatefulWidget {
   const CreateCompaniesPage({super.key});
@@ -89,7 +88,8 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
 
   bool get isSimplesNacional => regimeTributario == 'SIMPLES_NACIONAL';
   bool get isExcessoOuNormal =>
-      regimeTributario == 'SIMPLES_EXCESSO_RECEITA' || regimeTributario == 'NORMAL';
+      regimeTributario == 'SIMPLES_EXCESSO_RECEITA' ||
+      regimeTributario == 'NORMAL';
 
   final Map<String, bool> openSections = {
     'dados': true,
@@ -117,22 +117,29 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
   Widget _spacing() => const SizedBox(height: 15);
 
   String _removePercentage(String text) {
-    return text.replaceAll('%', '').replaceAll(RegExp(r'[^\d,.]'), '').replaceAll(',', '.');
+    return text
+        .replaceAll('%', '')
+        .replaceAll(RegExp(r'[^\d,.]'), '')
+        .replaceAll(',', '.');
   }
 
   String _removeCurrency(String text) {
-    return text.replaceAll('R\$', '').replaceAll(' ', '').replaceAll(RegExp(r'[^\d,.]'), '').replaceAll(',', '.');
+    return text
+        .replaceAll('R\$', '')
+        .replaceAll(' ', '')
+        .replaceAll(RegExp(r'[^\d,.]'), '')
+        .replaceAll(',', '.');
   }
 
   String _validarRegimeTributario() {
     if (regimeTributario == 'SIMPLES_NACIONAL') {
       return 'SIMPLES_NACIONAL';
     }
-    
+
     if (regimeTributario == 'SIMPLES_EXCESSO_RECEITA') {
       return 'SIMPLES_EXCESSO_RECEITA';
     }
-    
+
     if (regimeTributario == 'NORMAL') {
       return 'NORMAL';
     }
@@ -215,8 +222,10 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
       }
 
       if (cnpjData.registrations != null) {
-        final enabledRegistration = cnpjData.registrations!
-            .firstWhere((r) => r.enabled == true, orElse: () => cnpjData.registrations!.first);
+        final enabledRegistration = cnpjData.registrations!.firstWhere(
+          (r) => r.enabled == true,
+          orElse: () => cnpjData.registrations!.first,
+        );
         if (enabledRegistration.number != null) {
           inscrEstadualCtrl.text = enabledRegistration.number!;
         }
@@ -248,13 +257,13 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
     cnpjCtrl.addListener(() {
       final cnpj = cnpjCtrl.text;
       final cnpjLimpo = cnpj.replaceAll(RegExp(r'[^\d]'), '');
-      
+
       if (_cnpjErrorMessage != null) {
         setState(() {
           _cnpjErrorMessage = null;
         });
       }
-      
+
       if (cnpjLimpo.length == 14 && !_isLoadingCnpj) {
         _buscarCnpj(cnpj);
       }
@@ -361,22 +370,26 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                         TextFormField(
                           controller: cnpjCtrl,
                           decoration: _dec('CNPJ').copyWith(
-                            suffixIcon: _isLoadingCnpj
-                                ? const Padding(
-                                    padding: EdgeInsets.all(12.0),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
+                            suffixIcon:
+                                _isLoadingCnpj
+                                    ? const Padding(
+                                      padding: EdgeInsets.all(12.0),
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                : null,
+                                    )
+                                    : null,
                             hintText: '00.000.000/0000-00',
                             helperText: _cnpjErrorMessage,
                             helperMaxLines: 2,
-                            errorText: _cnpjErrorMessage != null ? _cnpjErrorMessage : null,
+                            errorText:
+                                _cnpjErrorMessage != null
+                                    ? _cnpjErrorMessage
+                                    : null,
                             errorMaxLines: 2,
                           ),
                           keyboardType: TextInputType.number,
@@ -640,25 +653,37 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                             TextFormField(
                               controller: aliquotaCtrl,
                               decoration: _dec('Alíquota'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                             TextFormField(
                               controller: cofinsCtrl,
                               decoration: _dec('Cofins'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                             TextFormField(
                               controller: pisCtrl,
                               decoration: _dec('PIS'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                             TextFormField(
                               controller: icmsCtrl,
                               decoration: _dec('ICMS'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                           ]),
@@ -667,7 +692,9 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                           TextFormField(
                             controller: receitaBrutaCtrl,
                             decoration: _dec('Receita Bruta Anual'),
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
                             inputFormatters: [ValueInputFormatter()],
                           ),
                         ],
@@ -676,13 +703,19 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                             TextFormField(
                               controller: bcIrpjCtrl,
                               decoration: _dec('BC IRPJ %'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                             TextFormField(
                               controller: aliqIrpjCtrl,
                               decoration: _dec('Alíquota IRPJ %'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                           ]),
@@ -691,13 +724,19 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                             TextFormField(
                               controller: valorExcedenteCtrl,
                               decoration: _dec('Valor Excedente R\$'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [CurrencyInputFormatter()],
                             ),
                             TextFormField(
                               controller: excedentePercCtrl,
                               decoration: _dec('Excedente %'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                           ]),
@@ -706,13 +745,19 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                             TextFormField(
                               controller: bcCsllCtrl,
                               decoration: _dec('BC CSLL %'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                             TextFormField(
                               controller: aliqCsllCtrl,
                               decoration: _dec('Alíquota CSLL %'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                           ]),
@@ -721,19 +766,28 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                             TextFormField(
                               controller: ibsUfCtrl,
                               decoration: _dec('IBS UF %'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                             TextFormField(
                               controller: ibsMunCtrl,
                               decoration: _dec('IBS Mun %'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                             TextFormField(
                               controller: cbsCtrl,
                               decoration: _dec('CBS %'),
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
                               inputFormatters: [PercentageInputFormatter()],
                             ),
                           ]),
@@ -768,33 +822,65 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                               final revenueTaxDetails =
                                   regimeTributario == 'SIMPLES_NACIONAL'
                                       ? RevenueTaxDetailsModel(
-                                        aliquota: _removePercentage(aliquotaCtrl.text),
-                                        cofins: _removePercentage(cofinsCtrl.text),
+                                        aliquota: _removePercentage(
+                                          aliquotaCtrl.text,
+                                        ),
+                                        cofins: _removePercentage(
+                                          cofinsCtrl.text,
+                                        ),
                                         pis: _removePercentage(pisCtrl.text),
                                         icms: _removePercentage(icmsCtrl.text),
-                                        receitaBrutaAnual: ValueInputFormatter.getValueAsString(receitaBrutaCtrl.text),
+                                        receitaBrutaAnual:
+                                            ValueInputFormatter.getValueAsString(
+                                              receitaBrutaCtrl.text,
+                                            ),
                                       )
                                       : RevenueTaxDetailsModel(
-                                        bcIrpj: _removePercentage(bcIrpjCtrl.text),
-                                        bcCsll: _removePercentage(bcCsllCtrl.text),
-                                        aliquotaIrpj: _removePercentage(aliqIrpjCtrl.text),
-                                        aliquotaCsll: _removePercentage(aliqCsllCtrl.text),
-                                        ibsUf: _removePercentage(ibsUfCtrl.text),
-                                        ibsMun: _removePercentage(ibsMunCtrl.text),
+                                        bcIrpj: _removePercentage(
+                                          bcIrpjCtrl.text,
+                                        ),
+                                        bcCsll: _removePercentage(
+                                          bcCsllCtrl.text,
+                                        ),
+                                        aliquotaIrpj: _removePercentage(
+                                          aliqIrpjCtrl.text,
+                                        ),
+                                        aliquotaCsll: _removePercentage(
+                                          aliqCsllCtrl.text,
+                                        ),
+                                        ibsUf: _removePercentage(
+                                          ibsUfCtrl.text,
+                                        ),
+                                        ibsMun: _removePercentage(
+                                          ibsMunCtrl.text,
+                                        ),
                                         cbs: _removePercentage(cbsCtrl.text),
-                                        over: _removePercentage(excedentePercCtrl.text),
-                                        valueOver: _removeCurrency(valorExcedenteCtrl.text),
+                                        over: _removePercentage(
+                                          excedentePercCtrl.text,
+                                        ),
+                                        valueOver: _removeCurrency(
+                                          valorExcedenteCtrl.text,
+                                        ),
                                       );
                               var companie = CreateEnterpriseModel(
-                                document: cnpjCtrl.text.replaceAll(RegExp(r'[^\d]'), ''),
+                                document: cnpjCtrl.text.replaceAll(
+                                  RegExp(r'[^\d]'),
+                                  '',
+                                ),
                                 socialReason: razaoSocialCtrl.text,
                                 fantasyName: nomeFantasiaCtrl.text,
                                 status: situacao,
-                                phone: telefoneCtrl.text.replaceAll(RegExp(r'[^\d]'), ''),
+                                phone: telefoneCtrl.text.replaceAll(
+                                  RegExp(r'[^\d]'),
+                                  '',
+                                ),
                                 email: emailCtrl.text,
                                 website: siteCtrl.text,
                                 address: Address(
-                                  cep: cepCtrl.text.replaceAll(RegExp(r'[^\d]'), ''),
+                                  cep: cepCtrl.text.replaceAll(
+                                    RegExp(r'[^\d]'),
+                                    '',
+                                  ),
                                   street: enderecoCtrl.text,
                                   number: numeroCtrl.text,
                                   neighborhood: bairroCtrl.text,
@@ -802,7 +888,10 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                                   country: 'Brasil',
                                   state: estadoCtrl.text,
                                   uf: uf,
-                                  cityIbgeCode: ibgeCtrl.text.replaceAll(RegExp(r'[^\d]'), ''),
+                                  cityIbgeCode: ibgeCtrl.text.replaceAll(
+                                    RegExp(r'[^\d]'),
+                                    '',
+                                  ),
                                 ),
                                 taxRegime: TaxRegimeModel(
                                   taxRegime: _validarRegimeTributario(),

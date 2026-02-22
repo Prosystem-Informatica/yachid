@@ -1,1 +1,10 @@
 export 'yachid_background_widget.dart';
+export 'card_widget.dart';
+export 'cards_row_widget.dart';
+export 'header_widget.dart';
+export 'info_card_widget.dart';
+export 'last_invoice_widget.dart';
+export 'products_pie_widget.dart';
+export 'sales_chart_widget.dart';
+export 'section_widget.dart';
+export 'row_widget.dart';

@@ -4,9 +4,8 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
-import 'package:yachid/app/features/auth/module/widget/row_widget.dart';
-import 'package:yachid/app/features/auth/module/widget/section_widget.dart';
 
+import '../../../../../core/widgets/widgets.dart';
 import '../cubit/employee_cubit.dart';
 import '../model/create_employee_dto.dart';
 import '../model/employee_enums.dart';
