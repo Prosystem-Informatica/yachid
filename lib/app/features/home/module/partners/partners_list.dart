@@ -196,11 +196,9 @@ class _PartnersListState extends State<PartnersList> {
                             vertical: 24,
                           ),
                           child: SingleChildScrollView(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: PartnersTable(
-                                partners: state.filteredPartners,
-                              ),
+                            scrollDirection: Axis.horizontal,
+                            child: PartnersTable(
+                              partners: state.filteredPartners,
                             ),
                           ),
                         );

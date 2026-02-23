@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yachid/app/core/rest/rest_client_response.dart';
 import '../../core/rest/rest_client.dart';
 import '../../model/models.dart';
 
@@ -21,13 +22,13 @@ class AuthRepository {
       var response = await _rest.post(
         '/auth/login',
         data: jsonEncode({"email": email, "password": password}),
-        headers: headers
+        headers: headers,
       );
 
       var jsonData = AuthModel.fromJson(response.data);
 
       prefs.setString("token", jsonData.token ?? "");
-      prefs.setString("entrepreneurId", jsonData.user!.id ?? '');
+      prefs.setString("entrepreneurId", jsonData.user?.id ?? '');
       prefs.setString(
         'companies',
         jsonEncode(
@@ -42,7 +43,7 @@ class AuthRepository {
     }
   }
 
-  Future<EnterpriseModel> createCompanies({
+  Future<RestClientResponse<dynamic>> createCompanies({
     required CreateEnterpriseModel companie,
   }) async {
     try {
@@ -50,21 +51,13 @@ class AuthRepository {
 
       var entrepreneurId = prefs.getString("entrepreneurId");
 
-      print("ID do cara > ${entrepreneurId}");
-
-      print('Body ${companie.toJson()}');
-
       var response = await _rest.post(
         '/enterprise/$entrepreneurId',
         data: jsonEncode(companie.toJson()),
-        headers: headers
+        headers: headers,
       );
 
-      print('Oq aconteceu no create ? ${response.data}');
-
-      var jsonData = EnterpriseModel.fromJson(response.data);
-
-      return jsonData;
+      return response;
     } catch (e) {
       log(e.toString());
       rethrow;

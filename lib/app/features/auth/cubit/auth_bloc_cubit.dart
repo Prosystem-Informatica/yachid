@@ -62,29 +62,38 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
 
       emit(state.copyWith(status: AuthStateStatus.loading));
       final res = await authRepository.createCompanies(companie: companie);
-      
-      // Adiciona a nova empresa à lista no SharedPreferences
-      final companiesString = prefs.getString("companies");
-      List<Map<String, dynamic>> companiesList = [];
-      
-      if (companiesString != null) {
-        companiesList = List<Map<String, dynamic>>.from(jsonDecode(companiesString));
+
+      if (res.statusCode == 201) {
+        var jsonData = EnterpriseModel.fromJson(res.data);
+
+        final companiesString = prefs.getString("companies");
+        List<Map<String, dynamic>> companiesList = [];
+
+        if (companiesString != null) {
+          companiesList = List<Map<String, dynamic>>.from(
+            jsonDecode(companiesString),
+          );
+        }
+
+        // Adiciona a nova empresa à lista
+        companiesList.add(jsonData.toJson());
+
+        // Salva a lista atualizada
+        prefs.setString("companies", jsonEncode(companiesList));
+      } else {
+        emit(
+          state.copyWith(
+            status: AuthStateStatus.error,
+            errorMessage: res.data['message'].toString(),
+          ),
+        );
       }
-      
-      // Adiciona a nova empresa à lista
-      companiesList.add(res.toJson());
-      
-      // Salva a lista atualizada
-      prefs.setString("companies", jsonEncode(companiesList));
-      
-      emit(
-        state.copyWith(status: AuthStateStatus.success, enterpriseModel: res),
-      );
-    } on Exception {
+    } on Exception catch (e) {
+      print(e.toString());
       emit(
         state.copyWith(
           status: AuthStateStatus.error,
-          errorMessage: "Erro ao criar empresa",
+          errorMessage: e.toString(),
         ),
       );
     }

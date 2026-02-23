@@ -36,7 +36,8 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
     return BlocConsumer<AuthBlocCubit, AuthBlocState>(
       listener: (context, state) {
         // Quando uma empresa é criada com sucesso, recarrega a lista
-        if (state.status == AuthStateStatus.success && state.enterpriseModel != null) {
+        if (state.status == AuthStateStatus.success &&
+            state.enterpriseModel != null) {
           _loadState();
           // Reseta o estado após atualizar a lista para evitar múltiplas execuções
           Future.microtask(() {

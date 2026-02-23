@@ -1,5 +1,4 @@
 import 'package:yachid/app/features/home/module/partners/model/address.dart';
-import 'package:yachid/app/features/home/module/partners/model/partner_model.dart';
 
 class PartnerDetails {
   final String id;
@@ -60,7 +59,6 @@ class PartnerDetails {
   });
 
   factory PartnerDetails.fromJson(Map<String, dynamic> json) {
-    print('json: $json');
     return PartnerDetails(
       id: json['id'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),

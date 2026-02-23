@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
+import 'package:yachid/app/core/ui/yachid_form.dart';
 
 class DataField extends StatelessWidget {
+  final TextEditingController? controller;
+  final bool isEditing;
+  final bool enabled;
   const DataField({
     super.key,
+    this.isEditing = false,
+    this.enabled = true,
     required this.label,
     this.value,
     this.icon,
     this.crossAxisAlignment = CrossAxisAlignment.start,
+    this.controller,
   });
 
   final String label;
@@ -53,20 +60,30 @@ class DataField extends StatelessWidget {
               const SizedBox(width: 8),
             ],
             Expanded(
-              flex: 2,
-              child: TextFormField(enabled: false, decoration: _dec(display)),
+              flex: 1,
+              child:
+                  isEditing
+                      ? YachidFormField(
+                        enabled: enabled,
+                        label: label,
+                        textCapitalization: null,
+                        keyboardType: null,
+                        textInputAction: null,
+                        validator: null,
+                        controller: controller,
+                        hint: '',
+                      )
+                      : Text(
+                        display,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.gray600,
+                        ),
+                      ),
             ),
           ],
         ),
       ],
-    );
-  }
-
-  InputDecoration _dec(String label) {
-    return InputDecoration(
-      labelText: label,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-      isDense: true,
     );
   }
 }

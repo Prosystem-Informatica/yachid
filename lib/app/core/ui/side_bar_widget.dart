@@ -36,7 +36,7 @@ class SideBarWidget extends StatelessWidget {
           SideBarItemWidget(
             icon: Icons.inventory,
             label: 'Produtos',
-            route: Routes.HOME,
+            route: Routes.PRODUCTS,
           ),
           SideBarItemWidget(
             icon: Icons.shopping_cart,
@@ -52,6 +52,16 @@ class SideBarWidget extends StatelessWidget {
             icon: Icons.person_add,
             label: 'Funcionários',
             route: Routes.EMPLOYEE,
+          ),
+          SideBarItemWidget(
+            icon: Icons.badge_outlined,
+            label: 'Representantes',
+            route: Routes.REPRESENTATIVES,
+          ),
+          SideBarItemWidget(
+            icon: Icons.account_balance,
+            label: 'Bancos',
+            route: Routes.BANKS,
           ),
           const Spacer(),
           ElevatedButton.icon(

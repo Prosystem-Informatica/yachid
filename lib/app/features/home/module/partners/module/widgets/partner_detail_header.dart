@@ -7,13 +7,11 @@ class PartnerDetailHeader extends StatelessWidget {
     super.key,
     required this.partner,
     this.onBack,
-    this.onEdit,
     this.onMoreOptions,
   });
 
   final PartnerDetails partner;
   final VoidCallback? onBack;
-  final VoidCallback? onEdit;
   final VoidCallback? onMoreOptions;
 
   @override
@@ -196,22 +194,6 @@ class PartnerDetailHeader extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          OutlinedButton.icon(
-            onPressed: onEdit,
-            style: ButtonStyle(
-              shape: _returnRoundedRectangleBorder,
-              backgroundColor: _returnBackgroundColor,
-              foregroundColor: _returnForegroundColor,
-              side: WidgetStateProperty.all(
-                BorderSide(color: AppColors.gray400),
-              ),
-              padding: WidgetStateProperty.all(
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              ),
-            ),
-            icon: const Icon(Icons.edit, size: 18),
-            label: const Text('Editar'),
-          ),
           const SizedBox(width: 8),
           SizedBox(
             width: 34,
