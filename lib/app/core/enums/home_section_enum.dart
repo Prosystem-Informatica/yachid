@@ -2,5 +2,9 @@ enum HomeSectionEnum {
   home,
   dashboard,
   partners,
-  /* products, sales, nfe,*/ employees,
+  products,
+  representatives,
+  bank,
+  employees,
+  //nfe,
 }

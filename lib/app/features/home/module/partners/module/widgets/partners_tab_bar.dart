@@ -16,6 +16,7 @@ class PartnersTabBar extends StatelessWidget {
     'Dados',
     'Local de cobrança',
     'Local de entrega',
+    'Estatisticas',
   ];
 
   @override
@@ -28,12 +29,7 @@ class PartnersTabBar extends StatelessWidget {
       height: 48,
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.gray300,
-            width: 1,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.gray300, width: 1)),
       ),
       child: Row(
         children: List.generate(
@@ -46,9 +42,10 @@ class PartnersTabBar extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: selectedIndex == index
-                          ? AppColors.primaryColor
-                          : Colors.transparent,
+                      color:
+                          selectedIndex == index
+                              ? AppColors.primaryColor
+                              : Colors.transparent,
                       width: 3,
                     ),
                   ),
@@ -57,11 +54,14 @@ class PartnersTabBar extends StatelessWidget {
                   _tabLabels[index],
                   style: TextStyle(
                     fontWeight:
-                        selectedIndex == index ? FontWeight.w600 : FontWeight.w500,
+                        selectedIndex == index
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                     fontSize: 14,
-                    color: selectedIndex == index
-                        ? AppColors.primaryColor
-                        : AppColors.gray600,
+                    color:
+                        selectedIndex == index
+                            ? AppColors.primaryColor
+                            : AppColors.gray600,
                   ),
                 ),
               ),

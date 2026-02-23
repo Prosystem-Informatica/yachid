@@ -71,9 +71,18 @@ class PartnerModelDto {
 
   factory PartnerModelDto.fromJson(Map<String, dynamic> json) {
     return PartnerModelDto(
-      address: json['address'] != null
-          ? Address.fromJson(json['address'] as Map<String, dynamic>)
-          : Address(cep: '', street: '', number: '', city: '', neighborhood: '', uf: '', complement: ''),
+      address:
+          json['address'] != null
+              ? Address.fromJson(json['address'] as Map<String, dynamic>)
+              : Address(
+                cep: '',
+                street: '',
+                number: '',
+                city: '',
+                neighborhood: '',
+                uf: '',
+                complement: '',
+              ),
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
       document: json['document'] as String? ?? '',
@@ -93,11 +102,12 @@ class PartnerModelDto {
       email: json['email'] as String? ?? '',
       site: json['site'] as String? ?? '',
       suframa: json['suframa'] as String? ?? '',
-      paymentAddress: json['payment_address'] != null
-          ? PaymentAddressDto.fromJson(
-              json['payment_address'] as Map<String, dynamic>,
-            )
-          : null,
+      paymentAddress:
+          json['payment_address'] != null
+              ? PaymentAddressDto.fromJson(
+                json['payment_address'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 

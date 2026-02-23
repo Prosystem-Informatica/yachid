@@ -6,6 +6,10 @@ import 'package:yachid/app/features/home/module/dashboard/dashboard_page.dart';
 import 'package:yachid/app/features/home/module/employee/employee.dart';
 import 'package:yachid/app/features/home/module/partners/module/partner_detail.dart';
 import 'package:yachid/app/features/home/module/partners/partners_list.dart';
+import 'package:yachid/app/features/home/module/products/module/product_detail_page.dart';
+import 'package:yachid/app/features/home/module/products/products_list.dart';
+import 'package:yachid/app/features/home/module/representatives/representatives_list.dart';
+import 'package:yachid/app/features/home/module/banks/banks_list.dart';
 
 import 'features/auth/auth_page.dart';
 import 'features/home/home_page.dart';
@@ -18,6 +22,10 @@ class Routes {
   static const EMPLOYEE = '/employee';
   static const PARTNERS = '/partners';
   static const PARTNER_DETAILS = '/partner-details/:id';
+  static const PRODUCTS = '/products';
+  static const PRODUCT_DETAILS = '/product-details/:id';
+  static const REPRESENTATIVES = '/representatives';
+  static const BANKS = '/banks';
 }
 
 class AppPages {
@@ -32,5 +40,12 @@ class AppPages {
       name: Routes.PARTNER_DETAILS,
       page: () => const PartnerDetailsPage(),
     ),
+    GetPage(name: Routes.PRODUCTS, page: () => const ProductsList()),
+    GetPage(
+      name: Routes.PRODUCT_DETAILS,
+      page: () => const ProductDetailPage(),
+    ),
+    GetPage(name: Routes.REPRESENTATIVES, page: () => const RepresentativesList()),
+    GetPage(name: Routes.BANKS, page: () => const BanksList()),
   ];
 }

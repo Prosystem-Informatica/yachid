@@ -30,60 +30,26 @@ class PartnerDetailsCubit extends Cubit<PartnerDetailsState> {
     }
   }
 
-  Future<void> addDeliveryAddress(DeliveryAddress address, String token) async {
-    if (state is! PartnerDetailsLoaded) return;
-
-    try {
-      final response = await _repository.createDeliveryAddress(
-        address,
-        (state as PartnerDetailsLoaded).partnerId ?? '',
-        token,
-      );
-      if (response.statusCode == 201) {
-        final current = state as PartnerDetailsLoaded;
-        final updated = [...current.deliveryAddresses, address];
-        emit(current.copyWith(deliveryAddresses: updated));
-      } else {
-        print('error: ${response.data['message']}');
-        emit(PartnerDetailsError(message: response.data['message']));
-      }
-    } catch (e, s) {
-      print('error: $e');
-      print('stack trace: $s');
-      emit(PartnerDetailsError(message: e.toString()));
-    }
-  }
-
   Future<void> getPartnerDetails(String partnerId, String token) async {
     try {
       final response = await _repository.getPartnerDetails(partnerId, token);
       if (response.statusCode == 200) {
-        List<DeliveryAddress> deliveryAddresses = [];
-        if (response.data['deliveryAddresses'] != null) {
-          for (final element in response.data['deliveryAddresses']) {
-            deliveryAddresses.add(DeliveryAddress.fromJson(element));
-          }
-        }
         emit(
           PartnerDetailsLoaded(
-            partner: PartnerDetails.fromJson(response.data),
+            partner: PartnerDetails.fromJson(response.data as Map<String, dynamic>),
             selectedIndex: 0,
-            deliveryAddresses: deliveryAddresses,
             partnerId: partnerId,
           ),
         );
       } else {
-        emit(
-          PartnerDetailsError(
-            message:
-                response.data['message'] ??
-                'Erro ao buscar detalhes do parceiro',
-          ),
-        );
+        final msg = (response.data is Map
+                ? response.data['message']
+                : response.data)
+            ?.toString() ??
+            'Erro ao buscar detalhes do parceiro';
+        emit(PartnerDetailsError(message: msg));
       }
-    } catch (e, s) {
-      print('error: $e');
-      print('stack trace: $s');
+    } catch (e) {
       emit(PartnerDetailsError(message: e.toString()));
     }
   }

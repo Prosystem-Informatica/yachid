@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
+import 'package:yachid/app/core/ui/yachid_form.dart';
 import 'package:yachid/app/features/home/module/partners/module/model/delivery_address.dart';
 
 class DeliveryAddressRegisterCard extends StatefulWidget {
@@ -100,6 +101,8 @@ class _DeliveryAddressRegisterCardState
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 160),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -274,19 +277,15 @@ class _DeliveryAddressRegisterCardState
                 ),
                 _field(
                   width > 720 ? 100 : (width > 520 ? 140 : null),
-                  child: TextFormField(
+                  child: YachidFormField(
                     controller: _ufController,
-                    decoration: _decoration('UF'),
+                    label: 'UF',
+                    hint: '',
+                    keyboardType: TextInputType.text,
                     textCapitalization: TextCapitalization.characters,
                     maxLength: 2,
                     textInputAction: TextInputAction.next,
-                    buildCounter:
-                        (
-                          _, {
-                          required currentLength,
-                          required isFocused,
-                          maxLength,
-                        }) => null,
+
                     validator:
                         (v) =>
                             (v == null || v.trim().isEmpty)

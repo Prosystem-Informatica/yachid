@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:yachid/app/app_routes.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
 import 'package:yachid/app/features/home/module/partners/model/partner_model.dart';
 import 'package:yachid/app/features/home/module/partners/model/partner_model_list.dart';
-import 'package:yachid/app/features/home/module/partners/module/cubit/partner_details_cubit.dart';
 import 'package:yachid/app/features/home/module/partners/widgets/table/widgets/table_cell.dart';
 import 'package:yachid/app/features/home/module/partners/widgets/table/widgets/table_header.dart';
 

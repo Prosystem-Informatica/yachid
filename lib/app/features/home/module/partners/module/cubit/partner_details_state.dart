@@ -14,21 +14,14 @@ final class PartnerDetailsLoaded extends PartnerDetailsState {
   final String? partnerId;
   final PartnerDetails partner;
   final int selectedIndex;
-  final List<DeliveryAddress> deliveryAddresses;
   const PartnerDetailsLoaded({
     this.partnerId,
     required this.partner,
     required this.selectedIndex,
-    required this.deliveryAddresses,
   });
 
   @override
-  List<Object?> get props => [
-    partner,
-    selectedIndex,
-    deliveryAddresses,
-    partnerId,
-  ];
+  List<Object?> get props => [partner, selectedIndex, partnerId];
 
   PartnerDetailsLoaded copyWith({
     PartnerDetails? partner,
@@ -39,7 +32,6 @@ final class PartnerDetailsLoaded extends PartnerDetailsState {
     return PartnerDetailsLoaded(
       partner: partner ?? this.partner,
       selectedIndex: selectedIndex ?? this.selectedIndex,
-      deliveryAddresses: deliveryAddresses ?? this.deliveryAddresses,
       partnerId: partnerId ?? this.partnerId,
     );
   }
