@@ -7,3 +7,6 @@ export 'home/module/dashboard/dashboard_page.dart';
 export 'home/module/employee/employee.dart';
 export 'home/module/partners/partners_list.dart';
 export 'home/module/partners/module/partner_detail.dart';
+export 'home/module/products/products_list.dart';
+export 'home/module/representatives/representatives_list.dart';
+export 'home/module/banks/banks_list.dart';

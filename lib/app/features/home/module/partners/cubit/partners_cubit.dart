@@ -186,44 +186,42 @@ class PartnersCubit extends Cubit<PartnersState> {
         token,
       );
       if (response.statusCode == 201) {
-        print('Parceiro criado com sucesso');
-      } else {
-        print(response.data['message']);
-        emit(
-          PartnersError(response.data['message'] ?? 'Erro ao criar parceiro'),
+        final List<PartnerModelList> newList = [
+          ...current.partners,
+          PartnerModelList.fromJson(partner.toJson()),
+        ];
+        final filtered = _applyFilters(
+          newList,
+          document: current.filterDocument,
+          city: current.filterCity,
+          phone: current.filterPhone,
+          uf: current.filterUf,
+          cep: current.filterCep,
+          status: current.filterStatus,
         );
+        emit(
+          PartnersLoaded(
+            partners: newList,
+            filteredPartners: filtered,
+            filterDocument: current.filterDocument,
+            filterCity: current.filterCity,
+            filterPhone: current.filterPhone,
+            filterUf: current.filterUf,
+            filterCep: current.filterCep,
+            filterStatus: current.filterStatus,
+          ),
+        );
+      } else {
+        final msg = (response.data is Map
+                ? response.data['message']
+                : response.data)
+            ?.toString() ??
+            'Erro ao criar parceiro';
+        emit(PartnersError(msg));
       }
     } catch (e) {
       emit(PartnersError(e.toString()));
     }
-
-    final List<PartnerModelList> newList = [
-      ...current.partners,
-      PartnerModelList.fromJson(partner.toJson()),
-    ];
-
-    final filtered = _applyFilters(
-      newList,
-      document: current.filterDocument,
-      city: current.filterCity,
-      phone: current.filterPhone,
-      uf: current.filterUf,
-      cep: current.filterCep,
-      status: current.filterStatus,
-    );
-
-    emit(
-      PartnersLoaded(
-        partners: newList,
-        filteredPartners: filtered,
-        filterDocument: current.filterDocument,
-        filterCity: current.filterCity,
-        filterPhone: current.filterPhone,
-        filterUf: current.filterUf,
-        filterCep: current.filterCep,
-        filterStatus: current.filterStatus,
-      ),
-    );
   }
 
   Future<void> getPartnerDetails(String partnerId, String token) async {

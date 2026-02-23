@@ -100,6 +100,11 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
   }
 
   void selectCompany(EnterpriseModel companie) {
-    emit(state.copyWith(selectedCompanie: companie, status: AuthStateStatus.selectedSucess));
+    emit(
+      state.copyWith(
+        selectedCompanie: companie,
+        status: AuthStateStatus.selectedSucess,
+      ),
+    );
   }
 }

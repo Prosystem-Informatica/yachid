@@ -22,14 +22,16 @@ class _HomePageState extends State<HomePage> {
         return DashboardPage();
       case HomeSectionEnum.partners:
         return PartnersList();
-      /*case HomeSectionEnum.products:
-        return ProductsPage();
-      case HomeSectionEnum.sales:
-        return SalesPage();
-      case HomeSectionEnum.nfe:
-        return NfePage();*/
+      case HomeSectionEnum.products:
+        return ProductsList();
+      case HomeSectionEnum.representatives:
+        return RepresentativesList();
       case HomeSectionEnum.employees:
         return EmployeePage();
+      case HomeSectionEnum.bank:
+        return BanksList();
+      /*case HomeSectionEnum.nfe:
+        return NfePage();*/
     }
   }
 

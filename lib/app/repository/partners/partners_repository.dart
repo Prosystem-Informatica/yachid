@@ -5,6 +5,7 @@ import 'package:yachid/app/core/rest/rest_client.dart';
 import 'package:yachid/app/core/rest/rest_client_response.dart';
 import 'package:yachid/app/features/home/module/partners/model/partner_model.dart';
 import 'package:yachid/app/features/home/module/partners/model/partner_model_list.dart';
+import 'package:yachid/app/features/home/module/partners/model/update_partner_dto.dart';
 import 'package:yachid/app/features/home/module/partners/module/model/delivery_address.dart';
 
 class PartnersRepository {
@@ -87,6 +88,23 @@ class PartnersRepository {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
+      );
+      return response;
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<RestClientResponse<dynamic>> updatePartner(
+    String partnerId,
+    UpdatePartnerDto updatePartnerDto,
+    String token,
+  ) async {
+    try {
+      final response = await _rest.patch(
+        '/partners/$partnerId',
+        data: jsonEncode(updatePartnerDto.toJson()),
       );
       return response;
     } catch (e) {

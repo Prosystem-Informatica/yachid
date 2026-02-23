@@ -139,24 +139,27 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                 isSelected: widget.selectedSection == HomeSectionEnum.partners,
                 onTap: () => widget.onItemSelected(HomeSectionEnum.partners),
               ),
-              /*SideBarItemWidget(
+              SideBarItemWidget(
                 icon: Icons.inventory,
                 label: 'Produtos',
-                isSelected: widget.selectedSection == HomeSectionEnum.partners,
-                onTap: () => widget.onItemSelected(HomeSectionEnum.partners),
+                isSelected: widget.selectedSection == HomeSectionEnum.products,
+                onTap: () => widget.onItemSelected(HomeSectionEnum.products),
               ),
               SideBarItemWidget(
                 icon: Icons.shopping_cart,
-                label: 'Vendas',
-                isSelected: widget.selectedSection == HomeSectionEnum.partners,
-                onTap: () => widget.onItemSelected(HomeSectionEnum.partners),
+                label: 'Banco',
+                isSelected: widget.selectedSection == HomeSectionEnum.bank,
+                onTap: () => widget.onItemSelected(HomeSectionEnum.bank),
               ),
               SideBarItemWidget(
                 icon: Icons.receipt,
-                label: 'NF-e',
-                isSelected: widget.selectedSection == HomeSectionEnum.partners,
-                onTap: () => widget.onItemSelected(HomeSectionEnum.partners),
-              ),*/
+                label: 'Representantes',
+                isSelected:
+                    widget.selectedSection == HomeSectionEnum.representatives,
+                onTap:
+                    () =>
+                        widget.onItemSelected(HomeSectionEnum.representatives),
+              ),
               SideBarItemWidget(
                 icon: Icons.person_add,
                 label: 'Funcionários',
