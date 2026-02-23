@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yachid/app/app_routes.dart';
 import 'package:yachid/app/core/ui/side_bar_item_widget.dart';
@@ -26,11 +27,20 @@ class SideBarWidget extends StatefulWidget {
 class _SideBarWidgetState extends State<SideBarWidget> {
   late SharedPreferences prefs;
   String? selectedCompanyId;
+  String _version = '';
 
   @override
   void initState() {
     super.initState();
     _loadPrefs();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() => _version = 'v${info.version}');
+    }
   }
 
   void _loadPrefs() async {
@@ -178,6 +188,16 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                   backgroundColor: Colors.white24,
                 ),
               ),
+              if (_version.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _version,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ],
           ),
         );
