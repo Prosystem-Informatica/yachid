@@ -162,7 +162,7 @@ class PartnersFilters extends StatelessWidget {
                     //     loaded!.allStatuses.isNotEmpty)
                     if (true)
                       Expanded(
-                        flex: 3,
+                        flex: 4,
                         child: DropdownButtonFormField<PartnerStatus?>(
                           isDense: true,
 

@@ -145,7 +145,7 @@ class _SideBarWidgetState extends State<SideBarWidget> {
               ),
               SideBarItemWidget(
                 icon: Icons.people,
-                label: 'Parceiros',
+                label: 'Clientes / Parceiros',
                 isSelected: widget.selectedSection == HomeSectionEnum.partners,
                 onTap: () => widget.onItemSelected(HomeSectionEnum.partners),
               ),
