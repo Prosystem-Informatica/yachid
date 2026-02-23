@@ -21,7 +21,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
     with Messages<CreateCompaniesPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final codigoCtrl = TextEditingController();
   final cnpjCtrl = TextEditingController();
   final razaoSocialCtrl = TextEditingController();
   final nomeFantasiaCtrl = TextEditingController();
@@ -272,7 +271,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
 
   @override
   void dispose() {
-    codigoCtrl.dispose();
     cnpjCtrl.dispose();
     razaoSocialCtrl.dispose();
     nomeFantasiaCtrl.dispose();
@@ -345,28 +343,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                       keyName: 'dados',
                       title: 'Dados Cadastrais',
                       children: [
-                        row([
-                          TextFormField(
-                            controller: codigoCtrl,
-                            decoration: _dec('Código'),
-                          ),
-                          DropdownButtonFormField(
-                            value: situacao,
-                            decoration: _dec('Situação'),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'ACTIVE',
-                                child: Text('ATIVO'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'INACTIVE',
-                                child: Text('INATIVO'),
-                              ),
-                            ],
-                            onChanged: (v) => setState(() => situacao = v!),
-                          ),
-                        ]),
-                        _spacing(),
                         TextFormField(
                           controller: cnpjCtrl,
                           decoration: _dec('CNPJ').copyWith(
@@ -538,7 +514,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                       openSections: openSections,
                       toggle: toggle,
                     ),
-                    sectionDropdown(
+                    /*sectionDropdown(
                       keyName: 'fiscal',
                       title: 'Fiscal / Sistema',
                       children: [
@@ -601,7 +577,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                       ],
                       openSections: openSections,
                       toggle: toggle,
-                    ),
+                    ),*/
                     sectionDropdown(
                       keyName: 'tributario',
                       title: 'Regime Tributário',

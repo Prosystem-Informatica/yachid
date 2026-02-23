@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  HomeSectionEnum selectedSection = HomeSectionEnum.dashboard;
+  HomeSectionEnum selectedSection = HomeSectionEnum.home;
 
   Widget _buildContent() {
     switch (selectedSection) {

@@ -35,12 +35,9 @@ class _SideBarWidgetState extends State<SideBarWidget> {
 
   void _loadPrefs() async {
     prefs = await SharedPreferences.getInstance();
-    final selectedCompanie = context.read<AuthBlocCubit>().state.selectedCompanie;
+    final selectedCompanie =
+        context.read<AuthBlocCubit>().state.selectedCompanie;
     selectedCompanyId = selectedCompanie?.id;
-
-    print(
-      "Oq tem no inicio > ${selectedCompanie?.fantasyName}",
-    );
   }
 
   @override
@@ -54,7 +51,6 @@ class _SideBarWidgetState extends State<SideBarWidget> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBlocCubit, AuthBlocState>(
       listener: (context, state) {
-        // Atualiza o selectedCompanyId quando o selectedCompanie mudar
         if (state.selectedCompanie?.id != selectedCompanyId) {
           setState(() {
             selectedCompanyId = state.selectedCompanie?.id;
@@ -63,9 +59,9 @@ class _SideBarWidgetState extends State<SideBarWidget> {
         state.status.matchAny(success: () {}, any: () {});
       },
       builder: (context, state) {
-        // Garante que o selectedCompanyId está sincronizado com o estado
-        final currentSelectedId = state.selectedCompanie?.id ?? selectedCompanyId;
-        
+        final currentSelectedId =
+            state.selectedCompanie?.id ?? selectedCompanyId;
+
         return Container(
           width: 220,
           color: const Color(0xFF1E6F4F),
@@ -102,30 +98,29 @@ class _SideBarWidgetState extends State<SideBarWidget> {
                     ),
                     isExpanded: true,
                     style: const TextStyle(color: Colors.white),
-                    items: state.enterprisesModels?.map((company) {
+                    items:
+                        state.enterprisesModels?.map((company) {
                           return DropdownMenuItem<String>(
                             value: company.id,
                             child: Text(company.fantasyName ?? ''),
                           );
-                        }).toList() ?? [],
+                        }).toList() ??
+                        [],
                     onChanged: (value) async {
                       if (value == null) return;
-                      
+
                       setState(() {
                         selectedCompanyId = value;
                       });
 
-                      final selectedCompany = state.enterprisesModels?.firstWhere(
-                        (company) => company.id == value,
-                      );
-                      
+                      final selectedCompany = state.enterprisesModels
+                          ?.firstWhere((company) => company.id == value);
+
                       if (selectedCompany != null) {
-                        context.read<AuthBlocCubit>().selectCompany(selectedCompany);
+                        context.read<AuthBlocCubit>().selectCompany(
+                          selectedCompany,
+                        );
                       }
-
-                      await prefs.setString('selected_company', value);
-
-                      print('Empresa selecionada: ${selectedCompany?.fantasyName}');
                     },
                   ),
                 ),
