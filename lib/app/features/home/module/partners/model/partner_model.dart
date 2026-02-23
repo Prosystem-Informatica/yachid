@@ -21,7 +21,6 @@ enum PartnerType {
 
 class PartnerModelDto {
   final String? id;
-  final String codigo;
   final PartnerType personType;
   final String document;
   final String name;
@@ -45,7 +44,6 @@ class PartnerModelDto {
 
   PartnerModelDto({
     this.id,
-    required this.codigo,
     required this.name,
     required this.document,
     required this.fantasyName,
@@ -77,7 +75,6 @@ class PartnerModelDto {
           ? Address.fromJson(json['address'] as Map<String, dynamic>)
           : Address(cep: '', street: '', number: '', city: '', neighborhood: '', uf: '', complement: ''),
       id: json['id'] as String? ?? '',
-      codigo: json['codigo'] as String? ?? '',
       name: json['name'] as String? ?? '',
       document: json['document'] as String? ?? '',
       fantasyName: json['fantasy_name'] as String? ?? '',
@@ -129,7 +126,6 @@ class PartnerModelDto {
   Map<String, dynamic> toJson() {
     try {
       return {
-        'codigo': codigo,
         'name': name,
         'document': document,
         'fantasy_name': fantasyName,

@@ -59,7 +59,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
   final icmsCtrl = TextEditingController();
   final receitaBrutaCtrl = TextEditingController();
 
-  final estadoCtrl = TextEditingController();
   final ibgeCtrl = TextEditingController();
 
   final bcIrpjCtrl = TextEditingController();
@@ -78,6 +77,9 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
   final _cnpjRepository = CnpjRepository();
   bool _isLoadingCnpj = false;
   String? _cnpjErrorMessage;
+  
+  // Rastreia quais campos foram preenchidos pela busca do CNPJ
+  final Set<String> _camposPreenchidosCnpj = {};
 
   String situacao = 'ACTIVE';
   String uf = 'SP';
@@ -114,6 +116,43 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
   }
 
   Widget _spacing() => const SizedBox(height: 15);
+  
+  bool _isCampoBloqueado(String campo) {
+    return _camposPreenchidosCnpj.contains(campo);
+  }
+  
+  String _getNomeEstado(String uf) {
+    const estados = {
+      'AC': 'Acre',
+      'AL': 'Alagoas',
+      'AP': 'Amapá',
+      'AM': 'Amazonas',
+      'BA': 'Bahia',
+      'CE': 'Ceará',
+      'DF': 'Distrito Federal',
+      'ES': 'Espírito Santo',
+      'GO': 'Goiás',
+      'MA': 'Maranhão',
+      'MT': 'Mato Grosso',
+      'MS': 'Mato Grosso do Sul',
+      'MG': 'Minas Gerais',
+      'PA': 'Pará',
+      'PB': 'Paraíba',
+      'PR': 'Paraná',
+      'PE': 'Pernambuco',
+      'PI': 'Piauí',
+      'RJ': 'Rio de Janeiro',
+      'RN': 'Rio Grande do Norte',
+      'RS': 'Rio Grande do Sul',
+      'RO': 'Rondônia',
+      'RR': 'Roraima',
+      'SC': 'Santa Catarina',
+      'SP': 'São Paulo',
+      'SE': 'Sergipe',
+      'TO': 'Tocantins',
+    };
+    return estados[uf] ?? '';
+  }
 
   String _removePercentage(String text) {
     return text
@@ -163,10 +202,17 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
 
     try {
       final cnpjData = await _cnpjRepository.consultarCnpj(cnpj: cnpjLimpo);
+      
+      // Limpa os campos preenchidos anteriormente
+      _camposPreenchidosCnpj.clear();
 
-      razaoSocialCtrl.text = cnpjData.name;
+      if (cnpjData.name.isNotEmpty) {
+        razaoSocialCtrl.text = cnpjData.name;
+        _camposPreenchidosCnpj.add('razaoSocial');
+      }
       if (cnpjData.alias != null && cnpjData.alias!.isNotEmpty) {
         nomeFantasiaCtrl.text = cnpjData.alias!;
+        _camposPreenchidosCnpj.add('nomeFantasia');
       }
 
       if (cnpjData.status != null) {
@@ -174,10 +220,12 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
         if (statusUpper.contains('ATIVA')) {
           setState(() {
             situacao = 'ACTIVE';
+            _camposPreenchidosCnpj.add('situacao');
           });
         } else if (statusUpper.contains('INATIVA')) {
           setState(() {
             situacao = 'INACTIVE';
+            _camposPreenchidosCnpj.add('situacao');
           });
         }
       }
@@ -185,39 +233,48 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
       if (cnpjData.simplesOptant) {
         setState(() {
           regimeTributario = 'SIMPLES_NACIONAL';
+          _camposPreenchidosCnpj.add('regimeTributario');
         });
       }
 
       if (cnpjData.address != null) {
         final address = cnpjData.address!;
-        if (address.zip != null) {
+        if (address.zip != null && address.zip!.isNotEmpty) {
           cepCtrl.text = address.zip!;
+          _camposPreenchidosCnpj.add('cep');
         }
-        if (address.street != null) {
+        if (address.street != null && address.street!.isNotEmpty) {
           enderecoCtrl.text = address.street!;
+          _camposPreenchidosCnpj.add('endereco');
         }
-        if (address.number != null) {
+        if (address.number != null && address.number!.isNotEmpty) {
           numeroCtrl.text = address.number!;
+          _camposPreenchidosCnpj.add('numero');
         }
-        if (address.district != null) {
+        if (address.district != null && address.district!.isNotEmpty) {
           bairroCtrl.text = address.district!;
+          _camposPreenchidosCnpj.add('bairro');
         }
-        if (address.city != null) {
+        if (address.city != null && address.city!.isNotEmpty) {
           cidadeCtrl.text = address.city!;
+          _camposPreenchidosCnpj.add('cidade');
         }
-        if (address.state != null) {
+        if (address.state != null && address.state!.isNotEmpty) {
           setState(() {
             uf = address.state!;
+            _camposPreenchidosCnpj.add('uf');
           });
         }
       }
 
       if (cnpjData.phones != null && cnpjData.phones!.isNotEmpty) {
         telefoneCtrl.text = cnpjData.phones!.first.formatted;
+        _camposPreenchidosCnpj.add('telefone');
       }
 
       if (cnpjData.emails != null && cnpjData.emails!.isNotEmpty) {
         emailCtrl.text = cnpjData.emails!.first.address ?? '';
+        _camposPreenchidosCnpj.add('email');
       }
 
       if (cnpjData.registrations != null) {
@@ -225,8 +282,9 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
           (r) => r.enabled == true,
           orElse: () => cnpjData.registrations!.first,
         );
-        if (enabledRegistration.number != null) {
+        if (enabledRegistration.number != null && enabledRegistration.number!.isNotEmpty) {
           inscrEstadualCtrl.text = enabledRegistration.number!;
+          _camposPreenchidosCnpj.add('inscrEstadual');
         }
       }
 
@@ -256,13 +314,20 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
     cnpjCtrl.addListener(() {
       final cnpj = cnpjCtrl.text;
       final cnpjLimpo = cnpj.replaceAll(RegExp(r'[^\d]'), '');
-
+      
       if (_cnpjErrorMessage != null) {
         setState(() {
           _cnpjErrorMessage = null;
         });
       }
-
+      
+      // Se o CNPJ foi limpo ou alterado, desbloqueia todos os campos
+      if (cnpjLimpo.length < 14) {
+        setState(() {
+          _camposPreenchidosCnpj.clear();
+        });
+      }
+      
       if (cnpjLimpo.length == 14 && !_isLoadingCnpj) {
         _buscarCnpj(cnpj);
       }
@@ -302,7 +367,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
     pisCtrl.dispose();
     icmsCtrl.dispose();
     receitaBrutaCtrl.dispose();
-    estadoCtrl.dispose();
     ibgeCtrl.dispose();
     bcIrpjCtrl.dispose();
     aliqIrpjCtrl.dispose();
@@ -376,17 +440,20 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                         TextFormField(
                           controller: razaoSocialCtrl,
                           decoration: _dec('Razão Social'),
+                          readOnly: _isCampoBloqueado('razaoSocial'),
                         ),
                         _spacing(),
                         TextFormField(
                           controller: nomeFantasiaCtrl,
                           decoration: _dec('Nome Fantasia'),
+                          readOnly: _isCampoBloqueado('nomeFantasia'),
                         ),
                         _spacing(),
                         row([
                           TextFormField(
                             controller: inscrEstadualCtrl,
                             decoration: _dec('Inscrição Estadual'),
+                            readOnly: _isCampoBloqueado('inscrEstadual'),
                           ),
                           TextFormField(
                             controller: inscrMunicipalCtrl,
@@ -413,14 +480,17 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                             keyboardType: TextInputType.number,
                             inputFormatters: [CepInputFormatter()],
                             maxLength: 9,
+                            readOnly: _isCampoBloqueado('cep'),
                           ),
                           TextFormField(
                             controller: enderecoCtrl,
                             decoration: _dec('Endereço'),
+                            readOnly: _isCampoBloqueado('endereco'),
                           ),
                           TextFormField(
                             controller: numeroCtrl,
                             decoration: _dec('Número'),
+                            readOnly: _isCampoBloqueado('numero'),
                           ),
                         ]),
                         _spacing(),
@@ -432,6 +502,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                           TextFormField(
                             controller: bairroCtrl,
                             decoration: _dec('Bairro'),
+                            readOnly: _isCampoBloqueado('bairro'),
                           ),
                         ]),
                         _spacing(),
@@ -439,6 +510,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                           TextFormField(
                             controller: cidadeCtrl,
                             decoration: _dec('Cidade'),
+                            readOnly: _isCampoBloqueado('cidade'),
                           ),
                           TextFormField(
                             controller: ibgeCtrl,
@@ -446,21 +518,41 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                             keyboardType: TextInputType.number,
                             inputFormatters: [NumbersOnlyFormatter()],
                           ),
-                          DropdownButtonFormField(
+                          DropdownButtonFormField<String>(
                             value: uf,
-                            decoration: _dec('UF'),
+                            decoration: _dec('UF - Estado'),
                             items: const [
-                              DropdownMenuItem(value: 'SP', child: Text('SP')),
-                              DropdownMenuItem(value: 'RJ', child: Text('RJ')),
+                              DropdownMenuItem(value: 'AC', child: Text('AC - Acre')),
+                              DropdownMenuItem(value: 'AL', child: Text('AL - Alagoas')),
+                              DropdownMenuItem(value: 'AP', child: Text('AP - Amapá')),
+                              DropdownMenuItem(value: 'AM', child: Text('AM - Amazonas')),
+                              DropdownMenuItem(value: 'BA', child: Text('BA - Bahia')),
+                              DropdownMenuItem(value: 'CE', child: Text('CE - Ceará')),
+                              DropdownMenuItem(value: 'DF', child: Text('DF - Distrito Federal')),
+                              DropdownMenuItem(value: 'ES', child: Text('ES - Espírito Santo')),
+                              DropdownMenuItem(value: 'GO', child: Text('GO - Goiás')),
+                              DropdownMenuItem(value: 'MA', child: Text('MA - Maranhão')),
+                              DropdownMenuItem(value: 'MT', child: Text('MT - Mato Grosso')),
+                              DropdownMenuItem(value: 'MS', child: Text('MS - Mato Grosso do Sul')),
+                              DropdownMenuItem(value: 'MG', child: Text('MG - Minas Gerais')),
+                              DropdownMenuItem(value: 'PA', child: Text('PA - Pará')),
+                              DropdownMenuItem(value: 'PB', child: Text('PB - Paraíba')),
+                              DropdownMenuItem(value: 'PR', child: Text('PR - Paraná')),
+                              DropdownMenuItem(value: 'PE', child: Text('PE - Pernambuco')),
+                              DropdownMenuItem(value: 'PI', child: Text('PI - Piauí')),
+                              DropdownMenuItem(value: 'RJ', child: Text('RJ - Rio de Janeiro')),
+                              DropdownMenuItem(value: 'RN', child: Text('RN - Rio Grande do Norte')),
+                              DropdownMenuItem(value: 'RS', child: Text('RS - Rio Grande do Sul')),
+                              DropdownMenuItem(value: 'RO', child: Text('RO - Rondônia')),
+                              DropdownMenuItem(value: 'RR', child: Text('RR - Roraima')),
+                              DropdownMenuItem(value: 'SC', child: Text('SC - Santa Catarina')),
+                              DropdownMenuItem(value: 'SP', child: Text('SP - São Paulo')),
+                              DropdownMenuItem(value: 'SE', child: Text('SE - Sergipe')),
+                              DropdownMenuItem(value: 'TO', child: Text('TO - Tocantins')),
                             ],
-                            onChanged: (v) => setState(() => uf = v!),
+                            onChanged: _isCampoBloqueado('uf') ? null : (v) => setState(() => uf = v ?? 'SP'),
                           ),
                         ]),
-                        _spacing(),
-                        TextFormField(
-                          controller: estadoCtrl,
-                          decoration: _dec('Estado'),
-                        ),
                         _spacing(),
                         TextFormField(
                           controller: paisCtrl,
@@ -481,6 +573,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                             keyboardType: TextInputType.phone,
                             inputFormatters: [PhoneInputFormatter()],
                             maxLength: 15,
+                            readOnly: _isCampoBloqueado('telefone'),
                           ),
                           TextFormField(
                             controller: faxCtrl,
@@ -494,6 +587,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                         TextFormField(
                           controller: emailCtrl,
                           decoration: _dec('Email'),
+                          readOnly: _isCampoBloqueado('email'),
                         ),
                         _spacing(),
                         TextFormField(
@@ -585,24 +679,27 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                         RadioListTile(
                           value: 'SIMPLES_NACIONAL',
                           groupValue: regimeTributario,
-                          onChanged:
-                              (v) => setState(() => regimeTributario = v!),
+                          onChanged: _isCampoBloqueado('regimeTributario')
+                              ? null
+                              : (v) => setState(() => regimeTributario = v as String),
                           title: const Text('Simples Nacional'),
                         ),
                         _spacing(),
                         RadioListTile(
                           value: 'SIMPLES_EXCESSO_RECEITA',
                           groupValue: regimeTributario,
-                          onChanged:
-                              (v) => setState(() => regimeTributario = v!),
+                          onChanged: _isCampoBloqueado('regimeTributario')
+                              ? null
+                              : (v) => setState(() => regimeTributario = v as String),
                           title: const Text('Simples com Excesso de Receita'),
                         ),
                         _spacing(),
                         RadioListTile(
                           value: 'NORMAL',
                           groupValue: regimeTributario,
-                          onChanged:
-                              (v) => setState(() => regimeTributario = v!),
+                          onChanged: _isCampoBloqueado('regimeTributario')
+                              ? null
+                              : (v) => setState(() => regimeTributario = v as String),
                           title: const Text('Regime Normal'),
                         ),
                         _spacing(),
@@ -862,7 +959,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                                   neighborhood: bairroCtrl.text,
                                   city: cidadeCtrl.text,
                                   country: 'Brasil',
-                                  state: estadoCtrl.text,
+                                  state: _getNomeEstado(uf),
                                   uf: uf,
                                   cityIbgeCode: ibgeCtrl.text.replaceAll(
                                     RegExp(r'[^\d]'),
