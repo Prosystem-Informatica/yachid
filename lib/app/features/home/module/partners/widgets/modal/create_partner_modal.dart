@@ -118,6 +118,7 @@ class _CreatePartnerModalState extends State<CreatePartnerModal> {
           paymentAddress: PaymentAddressDto(
             hasCredit: _hasCredit,
             representative: _representative,
+            number: _numberPaymentAddressController.text.trim(),
             cep: _cepPaymentAddressController.text.trim(),
             street: _streetPaymentAddressController.text.trim(),
             neighborhood: _neighborhoodPaymentAddressController.text.trim(),
