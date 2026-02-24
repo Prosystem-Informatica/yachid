@@ -37,28 +37,23 @@ class PaymentAddressDto {
       phone: json['phone'] ?? '',
       email: json['email'] ?? '',
       observations: json['observations'] ?? '',
-      hasCredit: json['has_credit'],
+      hasCredit: json['credit_account'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = {
-      'cep': cep,
-      'street': street,
-      'number': number ?? '',
-      'neighborhood': neighborhood,
-      'city': city,
-      'uf': uf,
-      'phone': phone,
-      'email': email,
-      'observations': observations,
-      'representative': representative ?? '',
-    };
-
-    if (hasCredit != null) {
-      data['has_credit'] = hasCredit;
-    }
-
+    Map<String, dynamic> data = {};
+    data['cep'] = cep;
+    data['street'] = street;
+    data['number'] = number ?? '';
+    data['neighborhood'] = neighborhood;
+    data['city'] = city;
+    data['uf'] = uf;
+    data['phone'] = phone;
+    data['email'] = email;
+    data['observations'] = observations;
+    data['representative'] = representative ?? '';
+    data['credit_account'] = hasCredit;
     return data;
   }
 
