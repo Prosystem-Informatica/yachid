@@ -24,11 +24,12 @@ class AuthRepository {
         headers: headers,
       );
 
-      print('response: ${response.data}');
 
       var jsonData = AuthModel.fromJson(response.data);
 
       prefs.setString("token", jsonData.token ?? "");
+      prefs.setString("entrepreneurId", jsonData.user!.id ?? "");
+
 
       return jsonData;
     } catch (e) {
@@ -46,7 +47,6 @@ class AuthRepository {
         '/enterprise/$entrepreneurId',
         headers: {'Authorization': 'Bearer $token'},
       );
-      print('response: ${response.data}');
 
       var res = EnterpriseModel.fromJsonList(response.data);
 
@@ -57,7 +57,7 @@ class AuthRepository {
     }
   }
 
-  Future<EnterpriseModel> createCompanies({
+  Future<CreateEnterpriseResponse> createCompanies({
     required CreateEnterpriseModel companie,
   }) async {
     try {
@@ -73,9 +73,25 @@ class AuthRepository {
         headers: headers,
       );
 
-      var jsonData = EnterpriseModel.fromJson(response.data);
+      final statusCode = response.statusCode ?? 0;
+      final isSuccess = statusCode == 200 || statusCode == 201 || statusCode == 203 || statusCode == 204;
 
-      return jsonData;
+      print("isSuccess : $isSuccess");
+
+      EnterpriseModel? enterprise;
+      if (response.data != null && response.data is Map) {
+        final data = response.data as Map<String, dynamic>;
+        final enterpriseJson = data['data'] ?? data['enterprise'] ?? data;
+        if (enterpriseJson is Map<String, dynamic>) {
+          enterprise = EnterpriseModel.fromJson(enterpriseJson);
+        }
+      }
+
+      return CreateEnterpriseResponse(
+        statusCode: statusCode,
+        enterprise: enterprise,
+        isSuccess: isSuccess,
+      );
     } catch (e) {
       log(e.toString());
       rethrow;

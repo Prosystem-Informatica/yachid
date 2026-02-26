@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:yachid/app/app_routes.dart';
 import 'package:yachid/app/features/auth/module/companies/widgets/section_address_widget.dart';
 import 'package:yachid/app/features/auth/module/companies/widgets/section_contact_widget.dart';
 import 'package:yachid/app/features/auth/module/companies/widgets/section_data_widget.dart';
@@ -317,7 +319,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
         });
       }
 
-      // Se o CNPJ foi limpo ou alterado, desbloqueia todos os campos
       if (cnpjLimpo.length < 14) {
         setState(() {
           _camposPreenchidosCnpj.clear();
