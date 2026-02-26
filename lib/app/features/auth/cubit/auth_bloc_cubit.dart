@@ -99,6 +99,10 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
     }
   }
 
+  Future<void> forgotPassword({required String email}) async {
+    await authRepository.forgotPassword(email: email);
+  }
+
   void selectCompany(EnterpriseModel companie) {
     emit(
       state.copyWith(

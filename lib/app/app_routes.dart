@@ -12,10 +12,12 @@ import 'package:yachid/app/features/home/module/representatives/representatives_
 import 'package:yachid/app/features/home/module/banks/banks_list.dart';
 
 import 'features/auth/auth_page.dart';
+import 'features/auth/forgot_password_page.dart';
 import 'features/home/home_page.dart';
 
 class Routes {
   static const INITIAL = '/auth';
+  static const FORGOT_PASSWORD = '/forgot-password';
   static const COMPANIES = '/companies/:id';
   static const HOME = '/home';
   static const DASHBOARD = '/dashboard';
@@ -31,6 +33,7 @@ class Routes {
 class AppPages {
   static final pages = [
     GetPage(name: Routes.INITIAL, page: () => const AuthPage()),
+    GetPage(name: Routes.FORGOT_PASSWORD, page: () => const ForgotPasswordPage()),
     GetPage(name: Routes.COMPANIES, page: () => AuthCompaniesPage()),
     GetPage(name: Routes.HOME, page: () => HomePage()),
     GetPage(name: Routes.DASHBOARD, page: () => DashboardPage()),

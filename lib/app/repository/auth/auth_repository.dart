@@ -82,6 +82,19 @@ class AuthRepository {
     }
   }
 
+  Future<void> forgotPassword({required String email}) async {
+    try {
+      await _rest.post(
+        '/auth/forgot-password',
+        data: jsonEncode({'email': email}),
+        headers: headers,
+      );
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
+  }
+
   Future<void> logout() async {
     prefs = await SharedPreferences.getInstance();
   }
