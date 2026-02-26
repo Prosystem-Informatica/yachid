@@ -1,5 +1,6 @@
 class PaymentAddressDto {
   final String? representative;
+  final String? number;
   final String cep;
   final String street;
   final String neighborhood;
@@ -12,6 +13,7 @@ class PaymentAddressDto {
 
   PaymentAddressDto({
     this.representative,
+    this.number,
     required this.cep,
     required this.street,
     required this.neighborhood,
@@ -26,35 +28,32 @@ class PaymentAddressDto {
   factory PaymentAddressDto.fromJson(Map<String, dynamic> json) {
     return PaymentAddressDto(
       representative: json['representative'],
-      cep: json['cep'],
-      street: json['street'],
-      neighborhood: json['neighborhood'],
-      city: json['city'],
-      uf: json['uf'],
-      phone: json['phone'],
-      email: json['email'],
-      observations: json['observations'],
+      number: json['number'],
+      cep: json['cep'] ?? '',
+      street: json['street'] ?? '',
+      neighborhood: json['neighborhood'] ?? '',
+      city: json['city'] ?? '',
+      uf: json['uf'] ?? '',
+      phone: json['phone'] ?? '',
+      email: json['email'] ?? '',
+      observations: json['observations'] ?? '',
       hasCredit: json['has_credit'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> data = {
+    final Map<String, dynamic> data = {
       'cep': cep,
       'street': street,
+      'number': number ?? '',
       'neighborhood': neighborhood,
       'city': city,
       'uf': uf,
       'phone': phone,
       'email': email,
       'observations': observations,
-      'representative': representative,
-      'credit_account': hasCredit,
+      'representative': representative ?? '',
     };
-
-    if (representative != null) {
-      data['representative'] = representative;
-    }
 
     if (hasCredit != null) {
       data['has_credit'] = hasCredit;
@@ -65,6 +64,7 @@ class PaymentAddressDto {
 
   PaymentAddressDto copyWith({
     String? representative,
+    String? number,
     String? cep,
     String? street,
     String? neighborhood,
@@ -76,9 +76,8 @@ class PaymentAddressDto {
     bool? hasCredit,
   }) {
     return PaymentAddressDto(
-      hasCredit: hasCredit ?? this.hasCredit,
-
       representative: representative ?? this.representative,
+      number: number ?? this.number,
       cep: cep ?? this.cep,
       street: street ?? this.street,
       neighborhood: neighborhood ?? this.neighborhood,
@@ -87,6 +86,7 @@ class PaymentAddressDto {
       phone: phone ?? this.phone,
       email: email ?? this.email,
       observations: observations ?? this.observations,
+      hasCredit: hasCredit ?? this.hasCredit,
     );
   }
 }
