@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:bloc/bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,6 +30,7 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
           state.copyWith(
             status: AuthStateStatus.success,
             authModel: authValidation,
+            enterprisesModels: authValidation.user?.enterpriseModel ?? [],
           ),
         );
       }
@@ -40,7 +39,7 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
           state.copyWith(
             status: AuthStateStatus.error,
             errorMessage: authValidation.message ?? "Erro ao efetuar login",
-            authModel: authValidation,
+            enterprisesModels: [],
           ),
         );
       }
@@ -49,6 +48,26 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
         state.copyWith(
           status: AuthStateStatus.error,
           errorMessage: "Erro ao efetuar Login",
+          enterprisesModels: [],
+        ),
+      );
+    }
+  }
+
+  Future<void> getCompanies({required entrepreneurId, required token}) async {
+    try {
+      prefs = await SharedPreferences.getInstance();
+
+      emit(state.copyWith(status: AuthStateStatus.loading));
+      final res = await authRepository.getCompanies(entrepreneurId, token);
+      emit(
+        state.copyWith(status: AuthStateStatus.success, enterprisesModels: res),
+      );
+    } on Exception {
+      emit(
+        state.copyWith(
+          status: AuthStateStatus.error,
+          errorMessage: "Erro ao efetuar a busca",
         ),
       );
     }
@@ -63,39 +82,31 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
       emit(state.copyWith(status: AuthStateStatus.loading));
       final res = await authRepository.createCompanies(companie: companie);
 
-      if (res.statusCode == 201) {
-        var jsonData = EnterpriseModel.fromJson(res.data);
-
-        final companiesString = prefs.getString("companies");
-        List<Map<String, dynamic>> companiesList = [];
-
-        if (companiesString != null) {
-          companiesList = List<Map<String, dynamic>>.from(
-            jsonDecode(companiesString),
-          );
-        }
-
-        // Adiciona a nova empresa à lista
-        companiesList.add(jsonData.toJson());
-
-        // Salva a lista atualizada
-        prefs.setString("companies", jsonEncode(companiesList));
-      } else {
-        emit(
-          state.copyWith(
-            status: AuthStateStatus.error,
-            errorMessage: res.data['message'].toString(),
-          ),
-        );
+      if (res.isSuccess) {
+        final entrepreneurId = prefs.getString("entrepreneurId") ?? '';
+        final token = state.authModel.token ?? '';
+        await getCompanies(entrepreneurId: entrepreneurId, token: token);
       }
-    } on Exception catch (e) {
-      print(e.toString());
+    } on Exception {
       emit(
         state.copyWith(
           status: AuthStateStatus.error,
-          errorMessage: e.toString(),
+          errorMessage: "Erro ao criar empresa",
         ),
       );
     }
+  }
+
+  Future<void> forgotPassword({required String email}) async {
+    await authRepository.forgotPassword(email: email);
+  }
+
+  void selectCompany(EnterpriseModel companie) {
+    emit(
+      state.copyWith(
+        selectedCompanie: companie,
+        status: AuthStateStatus.selectedSucess,
+      ),
+    );
   }
 }

@@ -7,7 +7,7 @@ import '../../../model/models.dart';
 part 'auth_bloc_state.g.dart';
 
 @match
-enum AuthStateStatus { initial, loading, error, success, sectorSuccess }
+enum AuthStateStatus { initial, loading, error, success, sectorSuccess, selectedSucess }
 
 class AuthController extends GetxController {
   late AuthModel authModel;
@@ -18,14 +18,16 @@ class AuthBlocState extends Equatable {
   final String? errorMessage;
   final String? successMessage;
   final AuthModel authModel;
-  final EnterpriseModel? enterpriseModel;
+  final List<EnterpriseModel>? enterprisesModels;
+  final EnterpriseModel? selectedCompanie;
 
   const AuthBlocState({
     required this.status,
     this.errorMessage,
     this.successMessage,
     required this.authModel,
-    this.enterpriseModel,
+    this.enterprisesModels,
+    this.selectedCompanie,
   });
 
   AuthBlocState.initial()
@@ -33,7 +35,8 @@ class AuthBlocState extends Equatable {
       errorMessage = null,
       successMessage = null,
       authModel = AuthModel(),
-      enterpriseModel = EnterpriseModel();
+      enterprisesModels = null,
+      selectedCompanie = EnterpriseModel();
 
   @override
   List<Object?> get props => [
@@ -41,7 +44,8 @@ class AuthBlocState extends Equatable {
     errorMessage,
     successMessage,
     authModel,
-    enterpriseModel,
+    enterprisesModels,
+    selectedCompanie,
   ];
 
   AuthBlocState copyWith({
@@ -49,14 +53,16 @@ class AuthBlocState extends Equatable {
     String? errorMessage,
     String? successMessage,
     AuthModel? authModel,
-    EnterpriseModel? enterpriseModel,
+    List<EnterpriseModel>? enterprisesModels,
+    EnterpriseModel? selectedCompanie,
   }) {
     return AuthBlocState(
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
       successMessage: successMessage ?? this.successMessage,
       authModel: authModel ?? this.authModel,
-      enterpriseModel: enterpriseModel ?? this.enterpriseModel,
+      enterprisesModels: enterprisesModels ?? this.enterprisesModels,
+      selectedCompanie: selectedCompanie ?? this.selectedCompanie,
     );
   }
 }

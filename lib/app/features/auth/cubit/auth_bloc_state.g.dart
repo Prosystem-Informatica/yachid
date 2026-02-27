@@ -1,6 +1,10 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'auth_bloc_state.dart';
 
+// **************************************************************************
+// MatchExtensionGenerator
+// **************************************************************************
 
 extension AuthStateStatusMatch on AuthStateStatus {
   T match<T>(
@@ -8,7 +12,8 @@ extension AuthStateStatusMatch on AuthStateStatus {
       required T Function() loading,
       required T Function() error,
       required T Function() success,
-      required T Function() sectorSuccess}) {
+      required T Function() sectorSuccess,
+      required T Function() selectedSucess}) {
     final v = this;
     if (v == AuthStateStatus.initial) {
       return initial();
@@ -30,6 +35,10 @@ extension AuthStateStatusMatch on AuthStateStatus {
       return sectorSuccess();
     }
 
+    if (v == AuthStateStatus.selectedSucess) {
+      return selectedSucess();
+    }
+
     throw Exception('AuthStateStatus.match failed, found no match for: $this');
   }
 
@@ -39,7 +48,8 @@ extension AuthStateStatusMatch on AuthStateStatus {
       T Function()? loading,
       T Function()? error,
       T Function()? success,
-      T Function()? sectorSuccess}) {
+      T Function()? sectorSuccess,
+      T Function()? selectedSucess}) {
     final v = this;
     if (v == AuthStateStatus.initial && initial != null) {
       return initial();
@@ -59,6 +69,10 @@ extension AuthStateStatusMatch on AuthStateStatus {
 
     if (v == AuthStateStatus.sectorSuccess && sectorSuccess != null) {
       return sectorSuccess();
+    }
+
+    if (v == AuthStateStatus.selectedSucess && selectedSucess != null) {
+      return selectedSucess();
     }
 
     return any();

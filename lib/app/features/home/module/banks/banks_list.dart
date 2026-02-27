@@ -66,7 +66,6 @@ class _BanksListState extends State<BanksList> {
       backgroundColor: AppColors.textOnPrimary,
       body: Row(
         children: [
-          const SideBarWidget(),
           Expanded(
             child: Center(
               child: Column(
@@ -106,9 +105,7 @@ class _BanksListState extends State<BanksList> {
                         Expanded(
                           flex: 9,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 48,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 48),
                             alignment: Alignment.centerRight,
                             child: FilledButton.icon(
                               onPressed: _onCadastrarPressed,
@@ -140,8 +137,7 @@ class _BanksListState extends State<BanksList> {
                       child: TextField(
                         controller: _searchController,
                         decoration: InputDecoration(
-                          hintText:
-                              'Buscar por código, número ou nome...',
+                          hintText: 'Buscar por código, número ou nome...',
                           prefixIcon: const Icon(Icons.search),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -169,8 +165,9 @@ class _BanksListState extends State<BanksList> {
                           );
                         }
                       },
-                      buildWhen: (prev, curr) =>
-                          curr is! BanksError || prev is BanksError,
+                      buildWhen:
+                          (prev, curr) =>
+                              curr is! BanksError || prev is BanksError,
                       builder: (context, state) {
                         if (state is BanksInitial || state is BanksLoading) {
                           return const Center(
@@ -199,15 +196,14 @@ class _BanksListState extends State<BanksList> {
                                 const SizedBox(height: 16),
                                 ElevatedButton(
                                   onPressed: () {
-                                    final authModel = context
-                                        .read<AuthBlocCubit>()
-                                        .state
-                                        .authModel;
-                                    context
-                                        .read<BanksCubit>()
-                                        .loadBanks(
-                                          token: authModel.token ?? '',
-                                        );
+                                    final authModel =
+                                        context
+                                            .read<AuthBlocCubit>()
+                                            .state
+                                            .authModel;
+                                    context.read<BanksCubit>().loadBanks(
+                                      token: authModel.token ?? '',
+                                    );
                                   },
                                   child: const Text('Tentar novamente'),
                                 ),
@@ -257,9 +253,7 @@ class _BanksListState extends State<BanksList> {
                           }
                           return Center(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 32,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 32),
                               child: Column(
                                 children: [
                                   Icon(

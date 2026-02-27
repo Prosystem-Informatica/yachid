@@ -27,7 +27,8 @@ class RepresentativeRegisterCard extends StatefulWidget {
       _RepresentativeRegisterCardState();
 }
 
-class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard> {
+class _RepresentativeRegisterCardState
+    extends State<RepresentativeRegisterCard> {
   final _formKey = GlobalKey<FormState>();
   final _codigoController = TextEditingController();
   final _nomeController = TextEditingController();
@@ -68,7 +69,9 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
   Future<void> _loadDetail() async {
     setState(() => _initialLoading = true);
     final authModel = context.read<AuthBlocCubit>().state.authModel;
-    final detail = await context.read<RepresentativesCubit>().loadRepresentativeDetail(
+    final detail = await context
+        .read<RepresentativesCubit>()
+        .loadRepresentativeDetail(
           id: widget.representativeId!,
           token: authModel?.token ?? '',
         );
@@ -145,14 +148,16 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
         cep: _cepController.text.trim(),
         street: _streetController.text.trim(),
         number: _numberController.text.trim(),
-        complement: _complementController.text.trim().isEmpty
-            ? null
-            : _complementController.text.trim(),
+        complement:
+            _complementController.text.trim().isEmpty
+                ? null
+                : _complementController.text.trim(),
         neighborhood: _neighborhoodController.text.trim(),
         city: _cityController.text.trim(),
-        country: _countryController.text.trim().isEmpty
-            ? 'Brasil'
-            : _countryController.text.trim(),
+        country:
+            _countryController.text.trim().isEmpty
+                ? 'Brasil'
+                : _countryController.text.trim(),
         uf: _ufController.text.trim(),
       );
     }
@@ -164,32 +169,41 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
       final dto = UpdateRepresentativeDto(
         codigo: _codigoController.text.trim(),
         nome: _nomeController.text.trim(),
-        telefone: _telefoneController.text.trim().isEmpty
-            ? null
-            : _telefoneController.text.trim(),
-        celular: _celularController.text.trim().isEmpty
-            ? null
-            : _celularController.text.trim(),
+        telefone:
+            _telefoneController.text.trim().isEmpty
+                ? null
+                : _telefoneController.text.trim(),
+        celular:
+            _celularController.text.trim().isEmpty
+                ? null
+                : _celularController.text.trim(),
         comissao: double.tryParse(
-            _comissaoController.text.replaceAll(',', '.')),
+          _comissaoController.text.replaceAll(',', '.'),
+        ),
         status: _status,
-        documento: _documentoController.text.trim().isEmpty
-            ? null
-            : _documentoController.text.trim(),
-        ieRg: _ieRgController.text.trim().isEmpty
-            ? null
-            : _ieRgController.text.trim(),
-        contato: _contatoController.text.trim().isEmpty
-            ? null
-            : _contatoController.text.trim(),
-        email: _emailController.text.trim().isEmpty
-            ? null
-            : _emailController.text.trim(),
+        documento:
+            _documentoController.text.trim().isEmpty
+                ? null
+                : _documentoController.text.trim(),
+        ieRg:
+            _ieRgController.text.trim().isEmpty
+                ? null
+                : _ieRgController.text.trim(),
+        contato:
+            _contatoController.text.trim().isEmpty
+                ? null
+                : _contatoController.text.trim(),
+        email:
+            _emailController.text.trim().isEmpty
+                ? null
+                : _emailController.text.trim(),
         tipoComissao: _tipoComissao,
         prePedido: _prePedido,
         aplicativo: _aplicativo,
       );
-      final ok = await context.read<RepresentativesCubit>().updateRepresentative(
+      final ok = await context
+          .read<RepresentativesCubit>()
+          .updateRepresentative(
             id: widget.representativeId!,
             dto: dto,
             token: token,
@@ -209,38 +223,42 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
       final dto = CreateRepresentativeDto(
         codigo: _codigoController.text.trim(),
         nome: _nomeController.text.trim(),
-        telefone: _telefoneController.text.trim().isEmpty
-            ? null
-            : _telefoneController.text.trim(),
-        celular: _celularController.text.trim().isEmpty
-            ? null
-            : _celularController.text.trim(),
-        comissao: double.tryParse(
-                _comissaoController.text.replaceAll(',', '.')) ??
-            0,
+        telefone:
+            _telefoneController.text.trim().isEmpty
+                ? null
+                : _telefoneController.text.trim(),
+        celular:
+            _celularController.text.trim().isEmpty
+                ? null
+                : _celularController.text.trim(),
+        comissao:
+            double.tryParse(_comissaoController.text.replaceAll(',', '.')) ?? 0,
         status: _status,
-        documento: _documentoController.text.trim().isEmpty
-            ? null
-            : _documentoController.text.trim(),
-        ieRg: _ieRgController.text.trim().isEmpty
-            ? null
-            : _ieRgController.text.trim(),
-        contato: _contatoController.text.trim().isEmpty
-            ? null
-            : _contatoController.text.trim(),
-        email: _emailController.text.trim().isEmpty
-            ? null
-            : _emailController.text.trim(),
+        documento:
+            _documentoController.text.trim().isEmpty
+                ? null
+                : _documentoController.text.trim(),
+        ieRg:
+            _ieRgController.text.trim().isEmpty
+                ? null
+                : _ieRgController.text.trim(),
+        contato:
+            _contatoController.text.trim().isEmpty
+                ? null
+                : _contatoController.text.trim(),
+        email:
+            _emailController.text.trim().isEmpty
+                ? null
+                : _emailController.text.trim(),
         tipoComissao: _tipoComissao,
         prePedido: _prePedido,
         aplicativo: _aplicativo,
         address: address,
       );
 
-      final ok = await context.read<RepresentativesCubit>().createRepresentative(
-            dto: dto,
-            token: token,
-          );
+      final ok = await context
+          .read<RepresentativesCubit>()
+          .createRepresentative(dto: dto, token: token);
 
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -357,9 +375,11 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
                           child: TextFormField(
                             controller: _codigoController,
                             decoration: _dec('Código *'),
-                            validator: (v) => (v == null || v.trim().isEmpty)
-                                ? 'Obrigatório'
-                                : null,
+                            validator:
+                                (v) =>
+                                    (v == null || v.trim().isEmpty)
+                                        ? 'Obrigatório'
+                                        : null,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -368,9 +388,11 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
                           child: TextFormField(
                             controller: _nomeController,
                             decoration: _dec('Nome *'),
-                            validator: (v) => (v == null || v.trim().isEmpty)
-                                ? 'Obrigatório'
-                                : null,
+                            validator:
+                                (v) =>
+                                    (v == null || v.trim().isEmpty)
+                                        ? 'Obrigatório'
+                                        : null,
                           ),
                         ),
                       ],
@@ -441,7 +463,8 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
                             controller: _comissaoController,
                             decoration: _dec('Comissão (%)'),
                             keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
+                              decimal: true,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -449,12 +472,15 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
                           child: DropdownButtonFormField<TipoComissao>(
                             decoration: _dec('Tipo Comissão'),
                             value: _tipoComissao,
-                            items: TipoComissao.values
-                                .map((e) => DropdownMenuItem(
-                                      value: e,
-                                      child: Text(e.label),
-                                    ))
-                                .toList(),
+                            items:
+                                TipoComissao.values
+                                    .map(
+                                      (e) => DropdownMenuItem(
+                                        value: e,
+                                        child: Text(e.label),
+                                      ),
+                                    )
+                                    .toList(),
                             onChanged: (v) => setState(() => _tipoComissao = v),
                           ),
                         ),
@@ -470,8 +496,8 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
                           children: [
                             Checkbox(
                               value: _status,
-                              onChanged: (v) =>
-                                  setState(() => _status = v ?? true),
+                              onChanged:
+                                  (v) => setState(() => _status = v ?? true),
                             ),
                             const Text('Status Ativo'),
                           ],
@@ -481,8 +507,9 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
                           children: [
                             Checkbox(
                               value: _prePedido,
-                              onChanged: (v) =>
-                                  setState(() => _prePedido = v ?? false),
+                              onChanged:
+                                  (v) =>
+                                      setState(() => _prePedido = v ?? false),
                             ),
                             const Text('Pré-pedido'),
                           ],
@@ -492,8 +519,9 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
                           children: [
                             Checkbox(
                               value: _aplicativo,
-                              onChanged: (v) =>
-                                  setState(() => _aplicativo = v ?? false),
+                              onChanged:
+                                  (v) =>
+                                      setState(() => _aplicativo = v ?? false),
                             ),
                             const Text('Aplicativo'),
                           ],
@@ -503,8 +531,8 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
                     const SizedBox(height: 12),
                     CheckboxListTile(
                       value: _includeAddress,
-                      onChanged: (v) =>
-                          setState(() => _includeAddress = v ?? false),
+                      onChanged:
+                          (v) => setState(() => _includeAddress = v ?? false),
                       title: const Text('Incluir endereço'),
                       contentPadding: EdgeInsets.zero,
                     ),
@@ -579,12 +607,13 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          onPressed: _isLoading
-                              ? null
-                              : () {
-                                  _clearForm();
-                                  widget.onCancel?.call();
-                                },
+                          onPressed:
+                              _isLoading
+                                  ? null
+                                  : () {
+                                    _clearForm();
+                                    widget.onCancel?.call();
+                                  },
                           child: const Text('Cancelar'),
                         ),
                         const SizedBox(width: 12),
@@ -601,18 +630,21 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
+                          child:
+                              _isLoading
+                                  ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                  : Text(
+                                    _isEditMode
+                                        ? 'Atualizar representante'
+                                        : 'Cadastrar representante',
                                   ),
-                                )
-                              : Text(_isEditMode
-                                  ? 'Atualizar representante'
-                                  : 'Cadastrar representante'),
                         ),
                       ],
                     ),
@@ -649,9 +681,7 @@ class _RepresentativeRegisterCardState extends State<RepresentativeRegisterCard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isEditMode
-                      ? 'Editar representante'
-                      : 'Novo representante',
+                  _isEditMode ? 'Editar representante' : 'Novo representante',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,

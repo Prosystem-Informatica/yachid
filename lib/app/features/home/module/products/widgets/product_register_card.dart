@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
-import 'package:yachid/app/features/auth/module/widget/section_widget.dart';
 import 'package:yachid/app/features/home/module/products/model/create_product_dto.dart';
+
+import '../../../../../core/widgets/widgets.dart';
 
 class ProductRegisterCard extends StatefulWidget {
   const ProductRegisterCard({super.key, this.onSaved, this.onCancel});

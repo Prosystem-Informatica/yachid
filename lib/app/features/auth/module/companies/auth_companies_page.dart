@@ -1,14 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yachid/app/app_routes.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_state.dart';
 
 import '../../../../core/widgets/widgets.dart';
-import '../../../../model/models.dart';
 import 'create_companies_page.dart';
 
 class AuthCompaniesPage extends StatefulWidget {
@@ -19,14 +16,17 @@ class AuthCompaniesPage extends StatefulWidget {
 }
 
 class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
-  List<EnterpriseModel> companies = [];
-  late SharedPreferences prefs;
-  bool isLoadingPrefs = true;
-
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    _loadState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authModel = context.read<AuthBlocCubit>().state.authModel;
+      context.read<AuthBlocCubit>().getCompanies(
+        entrepreneurId: Get.parameters['id'] ?? '',
+        token: authModel.token ?? '',
+      );
+    });
   }
 
   @override
@@ -35,30 +35,165 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
 
     return BlocConsumer<AuthBlocCubit, AuthBlocState>(
       listener: (context, state) {
-        // Quando uma empresa é criada com sucesso, recarrega a lista
-        if (state.status == AuthStateStatus.success &&
-            state.enterpriseModel != null) {
-          _loadState();
-          // Reseta o estado após atualizar a lista para evitar múltiplas execuções
-          Future.microtask(() {
-            if (mounted) {
-              context.read<AuthBlocCubit>().resetState();
-            }
-          });
-        }
-        state.status.matchAny(initial: () {}, any: () {});
+        state.status.matchAny(
+          any: () {},
+          selectedSucess: () {
+            Get.offNamed(Routes.HOME, arguments: state.authModel);
+          },
+        );
       },
       builder: (context, state) {
-        if (state.status == AuthStateStatus.loading || isLoadingPrefs) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+        if (state.status == AuthStateStatus.success) {
+          return Scaffold(
+            body: YachidBackgroundWidget(
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.92),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          const Expanded(
+                            child: Center(
+                              child: Text(
+                                'Empresas',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1E6F4F),
+                                ),
+                              ),
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.logout, color: Colors.red),
+                            label: const Text(
+                              'Sair',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Pesquisar empresa...',
+                          prefixIcon: const Icon(Icons.search),
+                          isDense: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      Table(
+                        columnWidths: const {
+                          0: FixedColumnWidth(40),
+                          4: FixedColumnWidth(80),
+                          5: FixedColumnWidth(70),
+                        },
+                        border: TableBorder(
+                          horizontalInside: BorderSide(
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
+                        children: [
+                          _row(
+                            [
+                              'ID',
+                              'Nome',
+                              'Email',
+                              'CNPJ/CPF',
+                              'Status',
+                              'Ação',
+                            ],
+                            header: true,
+                            onTap: () {},
+                          ),
+                          ...state.enterprisesModels?.toList().asMap().entries.map(
+                                (entry) => _row(
+                                  [
+                                    (entry.key + 1).toString(),
+                                    (entry.value.fantasyName ?? '-'),
+                                    entry.value.email ?? '-',
+                                    entry.value.document ?? '-',
+                                    entry.value.status ?? '-',
+                                    'Entrar',
+                                  ],
+                                  onTap: () {
+                                    context.read<AuthBlocCubit>().selectCompany(
+                                      entry.value,
+                                    );
+                                  },
+                                ),
+                              ) ??
+                              [],
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          openCreateCompanyModal(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colors.primary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                        ),
+                        icon: Icon(Icons.add, color: colors.onPrimary),
+                        label: Text(
+                          'Criar Empresa',
+                          style: TextStyle(color: colors.onPrimary),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           );
         }
-        return Scaffold(
-          body: YachidBackgroundWidget(
-            child: Center(
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      },
+    );
+  }
+
+  void openCreateCompanyModal(BuildContext context) {
+    final authCubit = context.read<AuthBlocCubit>();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return BlocProvider.value(
+          value: authCubit,
+          child: Center(
+            child: Material(
+              color: Colors.transparent,
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.8,
+                width: MediaQuery.of(dialogContext).size.width * 0.8,
+                constraints: const BoxConstraints(maxWidth: 1100, maxHeight: 750),
                 padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.92),
@@ -71,105 +206,7 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
                     ),
                   ],
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Center(
-                            child: Text(
-                              'Empresas',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1E6F4F),
-                              ),
-                            ),
-                          ),
-                        ),
-                        TextButton.icon(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.logout, color: Colors.red),
-                          label: const Text(
-                            'Sair',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Pesquisar empresa...',
-                        prefixIcon: const Icon(Icons.search),
-                        isDense: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    Table(
-                      columnWidths: const {
-                        0: FixedColumnWidth(40),
-                        4: FixedColumnWidth(80),
-                        5: FixedColumnWidth(70),
-                      },
-                      border: TableBorder(
-                        horizontalInside: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                      children: [
-                        _row([
-                          'ID',
-                          'Nome',
-                          'Email',
-                          'CNPJ/CPF',
-                          'Status',
-                          'Ação',
-                        ], header: true),
-                        ...companies.map(
-                          (e) => _row([
-                            companies.isEmpty
-                                ? '-'
-                                : companies.length.toString(),
-                            e.fantasyName ?? '-',
-                            e.email ?? '-',
-                            e.document ?? '-',
-                            e.status ?? '-',
-                            'Entrar',
-                          ]),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        openCreateCompanyModal(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colors.primary,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                      ),
-                      icon: Icon(Icons.add, color: colors.onPrimary),
-                      label: Text(
-                        'Criar Empresa',
-                        style: TextStyle(color: colors.onPrimary),
-                      ),
-                    ),
-                  ],
-                ),
+                child: const CreateCompaniesPage(),
               ),
             ),
           ),
@@ -178,38 +215,11 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
     );
   }
 
-  void openCreateCompanyModal(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Center(
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.8,
-              constraints: const BoxConstraints(maxWidth: 1100, maxHeight: 750),
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.92),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: const CreateCompaniesPage(),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  static TableRow _row(List<String> cells, {bool header = false}) {
+  static TableRow _row(
+    List<String> cells, {
+    bool header = false,
+    required void Function()? onTap,
+  }) {
     return TableRow(
       children:
           cells.map((c) {
@@ -220,9 +230,7 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
               child:
                   isAction
                       ? InkWell(
-                        onTap: () {
-                          Get.toNamed('/home');
-                        },
+                        onTap: onTap,
                         child: Text(
                           c,
                           textAlign: TextAlign.center,
@@ -243,32 +251,5 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
             );
           }).toList(),
     );
-  }
-
-  Future<void> _loadState() async {
-    prefs = await SharedPreferences.getInstance();
-    final jsonString = prefs.getString("companies");
-
-    print("String do json ${jsonString}");
-
-    if (jsonString != null) {
-      final List decoded = jsonDecode(jsonString);
-
-      final List<EnterpriseModel> companiesList =
-          decoded
-              .map(
-                (e) => EnterpriseModel.fromJson(Map<String, dynamic>.from(e)),
-              )
-              .toList();
-
-      setState(() {
-        companies = companiesList;
-        isLoadingPrefs = false;
-      });
-    } else {
-      setState(() {
-        isLoadingPrefs = false;
-      });
-    }
   }
 }

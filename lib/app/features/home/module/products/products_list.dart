@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
-import 'package:yachid/app/core/ui/side_bar_widget.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/home/module/products/cubit/products_cubit.dart';
 import 'package:yachid/app/features/home/module/products/widgets/product_register_card.dart';
@@ -57,7 +56,6 @@ class _ProductsListState extends State<ProductsList> {
       backgroundColor: AppColors.textOnPrimary,
       body: Row(
         children: [
-          const SideBarWidget(),
           Expanded(
             child: Center(
               child: Column(

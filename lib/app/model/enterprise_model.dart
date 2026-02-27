@@ -25,6 +25,8 @@ class EnterpriseModel {
     this.address,
   });
 
+  bool get isSuccess => id != null && document != null;
+
   factory EnterpriseModel.fromJson(Map<String, dynamic> json) {
     return EnterpriseModel(
       id: json['id'] as String?,
@@ -56,6 +58,10 @@ class EnterpriseModel {
       'accounting_email': accountingEmail,
       'address': address?.toJson(),
     };
+  }
+
+  static List<EnterpriseModel> fromJsonList(List<dynamic> list) {
+    return list.map((item) => EnterpriseModel.fromJson(item)).toList();
   }
 
   @override

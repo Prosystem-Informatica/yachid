@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Environments {
@@ -7,8 +8,10 @@ class Environments {
     return dotenv.get(param);
   }
 
+  /// Carrega .env.production em release (build web --release) e .env em debug/profile.
   static Future<void> load(String ambiente) async {
-    await dotenv.load(fileName: ".env");
+    final fileName = kReleaseMode ? '.env.production' : '.env';
+    await dotenv.load(fileName: fileName);
   }
 
   static void init() {

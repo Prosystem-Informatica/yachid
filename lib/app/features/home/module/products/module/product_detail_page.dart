@@ -87,7 +87,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     return Scaffold(
       body: Row(
         children: [
-          const SideBarWidget(),
           Expanded(
             child: BlocConsumer<ProductDetailCubit, ProductDetailState>(
               listenWhen: (previous, current) {

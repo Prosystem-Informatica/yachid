@@ -26,8 +26,8 @@ class _RepresentativesListState extends State<RepresentativesList> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authModel = context.read<AuthBlocCubit>().state.authModel;
       context.read<RepresentativesCubit>().loadRepresentatives(
-            token: authModel.token ?? '',
-          );
+        token: authModel.token ?? '',
+      );
     });
   }
 
@@ -68,23 +68,22 @@ class _RepresentativesListState extends State<RepresentativesList> {
       backgroundColor: AppColors.textOnPrimary,
       body: Row(
         children: [
-          const SideBarWidget(),
           Expanded(
             child: Center(
               child: Column(
                 children: [
                   BlocBuilder<RepresentativesCubit, RepresentativesState>(
-                    buildWhen: (prev, curr) =>
-                        curr is RepresentativesLoaded ||
-                        prev is RepresentativesLoaded,
+                    buildWhen:
+                        (prev, curr) =>
+                            curr is RepresentativesLoaded ||
+                            prev is RepresentativesLoaded,
                     builder: (context, state) {
                       return Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border(
                             bottom: BorderSide(
-                              color:
-                                  AppColors.gray300.withValues(alpha: 0.6),
+                              color: AppColors.gray300.withValues(alpha: 0.6),
                             ),
                           ),
                         ),
@@ -119,28 +118,21 @@ class _RepresentativesListState extends State<RepresentativesList> {
                                 ),
                                 alignment: Alignment.centerRight,
                                 child: FilledButton.icon(
-                                        onPressed: _onCadastrarPressed,
-                                        icon: const Icon(
-                                          Icons.add_rounded,
-                                          size: 20,
-                                        ),
-                                        label: const Text(
-                                          'Cadastrar representante',
-                                        ),
-                                        style: FilledButton.styleFrom(
-                                          backgroundColor:
-                                              AppColors.primaryColor,
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 20,
-                                            vertical: 14,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                        ),
-                                      ),
+                                  onPressed: _onCadastrarPressed,
+                                  icon: const Icon(Icons.add_rounded, size: 20),
+                                  label: const Text('Cadastrar representante'),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: AppColors.primaryColor,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 14,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -155,30 +147,32 @@ class _RepresentativesListState extends State<RepresentativesList> {
                         vertical: 16,
                       ),
                       child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText:
-                            'Buscar por código, nome, documento ou email...',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText:
+                              'Buscar por código, nome, documento ou email...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                         ),
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
+                        onChanged: (v) {
+                          context.read<RepresentativesCubit>().setFilterSearch(
+                            v,
+                          );
+                        },
                       ),
-                      onChanged: (v) {
-                        context
-                            .read<RepresentativesCubit>()
-                            .setFilterSearch(v);
-                      },
                     ),
-                  ),
                   Expanded(
-                    child: BlocConsumer<RepresentativesCubit,
-                        RepresentativesState>(
+                    child: BlocConsumer<
+                      RepresentativesCubit,
+                      RepresentativesState
+                    >(
                       listener: (context, state) {
                         if (state is RepresentativesError) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -189,9 +183,10 @@ class _RepresentativesListState extends State<RepresentativesList> {
                           );
                         }
                       },
-                      buildWhen: (prev, curr) =>
-                          curr is! RepresentativesError ||
-                          prev is RepresentativesError,
+                      buildWhen:
+                          (prev, curr) =>
+                              curr is! RepresentativesError ||
+                              prev is RepresentativesError,
                       builder: (context, state) {
                         if (state is RepresentativesInitial ||
                             state is RepresentativesLoading) {
@@ -221,10 +216,11 @@ class _RepresentativesListState extends State<RepresentativesList> {
                                 const SizedBox(height: 16),
                                 ElevatedButton(
                                   onPressed: () {
-                                    final authModel = context
-                                        .read<AuthBlocCubit>()
-                                        .state
-                                        .authModel;
+                                    final authModel =
+                                        context
+                                            .read<AuthBlocCubit>()
+                                            .state
+                                            .authModel;
                                     context
                                         .read<RepresentativesCubit>()
                                         .loadRepresentatives(
@@ -281,9 +277,7 @@ class _RepresentativesListState extends State<RepresentativesList> {
                           }
                           return Center(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 32,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 32),
                               child: Column(
                                 children: [
                                   Icon(

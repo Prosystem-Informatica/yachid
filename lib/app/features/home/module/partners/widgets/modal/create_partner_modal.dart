@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
-import 'package:yachid/app/features/auth/module/widget/row_widget.dart';
-import 'package:yachid/app/features/auth/module/widget/section_widget.dart';
 import 'package:yachid/app/features/home/module/partners/model/payment_address.dart';
 import 'package:yachid/app/model/address_model.dart';
 
+import '../../../../../../core/widgets/widgets.dart';
 import '../../cubit/partners_cubit.dart';
 import '../../model/partner_model.dart';
 
@@ -20,7 +19,6 @@ class CreatePartnerModal extends StatefulWidget {
 
 class _CreatePartnerModalState extends State<CreatePartnerModal> {
   final _formKey = GlobalKey<FormState>();
-  final _codigoController = TextEditingController();
   final _nameController = TextEditingController();
   final _documentController = TextEditingController();
   final _fantasyNameController = TextEditingController();
@@ -111,7 +109,6 @@ class _CreatePartnerModalState extends State<CreatePartnerModal> {
           fixedExpenses: _fixedExpense,
           provision: _provision,
           id: DateTime.now().millisecondsSinceEpoch.toString(),
-          codigo: _codigoController.text.trim(),
           name: _nameController.text.trim(),
           document: _documentController.text.trim(),
           fantasyName: _fantasyNameController.text.trim(),
@@ -121,6 +118,7 @@ class _CreatePartnerModalState extends State<CreatePartnerModal> {
           paymentAddress: PaymentAddressDto(
             hasCredit: _hasCredit,
             representative: _representative,
+            number: _numberPaymentAddressController.text.trim(),
             cep: _cepPaymentAddressController.text.trim(),
             street: _streetPaymentAddressController.text.trim(),
             neighborhood: _neighborhoodPaymentAddressController.text.trim(),
@@ -155,8 +153,9 @@ class _CreatePartnerModalState extends State<CreatePartnerModal> {
       context.read<PartnersCubit>().addPartner(
         partner,
         'Fornecedor',
-        context.read<AuthBlocCubit>().state.authModel?.token ?? '',
+        context.read<AuthBlocCubit>().state.authModel.token ?? '',
       );
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Parceiro cadastrado com sucesso!'),
@@ -169,7 +168,6 @@ class _CreatePartnerModalState extends State<CreatePartnerModal> {
 
   @override
   void dispose() {
-    _codigoController.dispose();
     _nameController.dispose();
     _documentController.dispose();
     _fantasyNameController.dispose();
@@ -188,8 +186,8 @@ class _CreatePartnerModalState extends State<CreatePartnerModal> {
   Widget build(BuildContext context) {
     return Dialog(
       child: Container(
-        width: 700,
-        constraints: const BoxConstraints(maxHeight: 700),
+        width: MediaQuery.of(context).size.width * 0.8,
+        constraints: const BoxConstraints(maxHeight: 900),
         padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
@@ -226,17 +224,6 @@ class _CreatePartnerModalState extends State<CreatePartnerModal> {
                     Row(
                       spacing: 12,
                       children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _codigoController,
-                            decoration: _dec('Código *'),
-                            validator:
-                                (v) =>
-                                    (v == null || v.trim().isEmpty)
-                                        ? 'Obrigatório'
-                                        : null,
-                          ),
-                        ),
                         Expanded(
                           flex: 3,
                           child: DropdownButtonFormField<PartnerType>(

@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:yachid/app/app_routes.dart';
+import 'package:yachid/app/features/auth/module/companies/widgets/section_address_widget.dart';
+import 'package:yachid/app/features/auth/module/companies/widgets/section_contact_widget.dart';
+import 'package:yachid/app/features/auth/module/companies/widgets/section_data_widget.dart';
+import 'package:yachid/app/features/auth/module/companies/widgets/section_regime_tax_widget.dart';
+import 'package:yachid/app/features/auth/module/companies/widgets/section_tax_widget.dart';
 
 import '../../../../core/formatters/input_formatters.dart';
 import '../../../../core/ui/ui.dart';
+import '../../../../core/widgets/widgets.dart';
 import '../../../../model/models.dart';
 import '../../../../repository/cnpj/cnpj_repository.dart';
 import '../../cubit/auth_bloc_cubit.dart';
 import '../../cubit/auth_bloc_state.dart';
-import '../widget/row_widget.dart';
-import '../widget/section_widget.dart';
 
 class CreateCompaniesPage extends StatefulWidget {
   const CreateCompaniesPage({super.key});
@@ -22,7 +28,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
     with Messages<CreateCompaniesPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final codigoCtrl = TextEditingController();
   final cnpjCtrl = TextEditingController();
   final razaoSocialCtrl = TextEditingController();
   final nomeFantasiaCtrl = TextEditingController();
@@ -61,7 +66,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
   final icmsCtrl = TextEditingController();
   final receitaBrutaCtrl = TextEditingController();
 
-  final estadoCtrl = TextEditingController();
   final ibgeCtrl = TextEditingController();
 
   final bcIrpjCtrl = TextEditingController();
@@ -80,6 +84,9 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
   final _cnpjRepository = CnpjRepository();
   bool _isLoadingCnpj = false;
   String? _cnpjErrorMessage;
+
+  // Rastreia quais campos foram preenchidos pela busca do CNPJ
+  final Set<String> _camposPreenchidosCnpj = {};
 
   String situacao = 'ACTIVE';
   String uf = 'SP';
@@ -107,89 +114,42 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
     });
   }
 
-  InputDecoration _dec(String label) {
-    return InputDecoration(
-      labelText: label,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-      isDense: true,
-    );
+  bool _isCampoBloqueado(String campo) {
+    return _camposPreenchidosCnpj.contains(campo);
   }
 
-  String? _validatorObrigatorio(String? value, [String label = 'Campo']) {
-    if (value == null || value.trim().isEmpty) {
-      return '$label é obrigatório';
-    }
-    return null;
+  String _getNomeEstado(String uf) {
+    const estados = {
+      'AC': 'Acre',
+      'AL': 'Alagoas',
+      'AP': 'Amapá',
+      'AM': 'Amazonas',
+      'BA': 'Bahia',
+      'CE': 'Ceará',
+      'DF': 'Distrito Federal',
+      'ES': 'Espírito Santo',
+      'GO': 'Goiás',
+      'MA': 'Maranhão',
+      'MT': 'Mato Grosso',
+      'MS': 'Mato Grosso do Sul',
+      'MG': 'Minas Gerais',
+      'PA': 'Pará',
+      'PB': 'Paraíba',
+      'PR': 'Paraná',
+      'PE': 'Pernambuco',
+      'PI': 'Piauí',
+      'RJ': 'Rio de Janeiro',
+      'RN': 'Rio Grande do Norte',
+      'RS': 'Rio Grande do Sul',
+      'RO': 'Rondônia',
+      'RR': 'Roraima',
+      'SC': 'Santa Catarina',
+      'SP': 'São Paulo',
+      'SE': 'Sergipe',
+      'TO': 'Tocantins',
+    };
+    return estados[uf] ?? '';
   }
-
-  String? _validatorCnpj(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'CNPJ é obrigatório';
-    }
-    final cnpjLimpo = value.replaceAll(RegExp(r'[^\d]'), '');
-    if (cnpjLimpo.length != 14) {
-      return 'CNPJ deve ter 14 dígitos';
-    }
-    return null;
-  }
-
-  String? _validatorEmail(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Email é obrigatório';
-    }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value.trim())) {
-      return 'Informe um email válido';
-    }
-    return null;
-  }
-
-  String? _validatorEmailOpcional(String? value) {
-    if (value == null || value.trim().isEmpty) return null;
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value.trim())) {
-      return 'Informe um email válido';
-    }
-    return null;
-  }
-
-  String? _validatorCep(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'CEP é obrigatório';
-    }
-    final cepLimpo = value.replaceAll(RegExp(r'[^\d]'), '');
-    if (cepLimpo.length != 8) {
-      return 'CEP deve ter 8 dígitos';
-    }
-    return null;
-  }
-
-  String? _validatorUrlOpcional(String? value) {
-    if (value == null || value.trim().isEmpty) return null;
-    final urlRegex = RegExp(
-      r'^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$',
-      caseSensitive: false,
-    );
-    if (!urlRegex.hasMatch(value.trim())) {
-      return 'Informe uma URL válida';
-    }
-    return null;
-  }
-
-  String? _validatorNumeroOpcional(String? value, [String label = 'Campo']) {
-    if (value == null || value.trim().isEmpty) return null;
-    final valorLimpo = value
-        .replaceAll(',', '.')
-        .replaceAll(RegExp(r'[^\d.]'), '');
-    if (valorLimpo.isEmpty) return null;
-    final numero = double.tryParse(valorLimpo);
-    if (numero == null || numero < 0) {
-      return '$label deve ser um número válido';
-    }
-    return null;
-  }
-
-  Widget _spacing() => const SizedBox(height: 15);
 
   String _removePercentage(String text) {
     return text
@@ -240,9 +200,16 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
     try {
       final cnpjData = await _cnpjRepository.consultarCnpj(cnpj: cnpjLimpo);
 
-      razaoSocialCtrl.text = cnpjData.name;
+      // Limpa os campos preenchidos anteriormente
+      _camposPreenchidosCnpj.clear();
+
+      if (cnpjData.name.isNotEmpty) {
+        razaoSocialCtrl.text = cnpjData.name;
+        _camposPreenchidosCnpj.add('razaoSocial');
+      }
       if (cnpjData.alias != null && cnpjData.alias!.isNotEmpty) {
         nomeFantasiaCtrl.text = cnpjData.alias!;
+        _camposPreenchidosCnpj.add('nomeFantasia');
       }
 
       if (cnpjData.status != null) {
@@ -250,10 +217,12 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
         if (statusUpper.contains('ATIVA')) {
           setState(() {
             situacao = 'ACTIVE';
+            _camposPreenchidosCnpj.add('situacao');
           });
         } else if (statusUpper.contains('INATIVA')) {
           setState(() {
             situacao = 'INACTIVE';
+            _camposPreenchidosCnpj.add('situacao');
           });
         }
       }
@@ -261,39 +230,48 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
       if (cnpjData.simplesOptant) {
         setState(() {
           regimeTributario = 'SIMPLES_NACIONAL';
+          _camposPreenchidosCnpj.add('regimeTributario');
         });
       }
 
       if (cnpjData.address != null) {
         final address = cnpjData.address!;
-        if (address.zip != null) {
+        if (address.zip != null && address.zip!.isNotEmpty) {
           cepCtrl.text = address.zip!;
+          _camposPreenchidosCnpj.add('cep');
         }
-        if (address.street != null) {
+        if (address.street != null && address.street!.isNotEmpty) {
           enderecoCtrl.text = address.street!;
+          _camposPreenchidosCnpj.add('endereco');
         }
-        if (address.number != null) {
+        if (address.number != null && address.number!.isNotEmpty) {
           numeroCtrl.text = address.number!;
+          _camposPreenchidosCnpj.add('numero');
         }
-        if (address.district != null) {
+        if (address.district != null && address.district!.isNotEmpty) {
           bairroCtrl.text = address.district!;
+          _camposPreenchidosCnpj.add('bairro');
         }
-        if (address.city != null) {
+        if (address.city != null && address.city!.isNotEmpty) {
           cidadeCtrl.text = address.city!;
+          _camposPreenchidosCnpj.add('cidade');
         }
-        if (address.state != null) {
+        if (address.state != null && address.state!.isNotEmpty) {
           setState(() {
             uf = address.state!;
+            _camposPreenchidosCnpj.add('uf');
           });
         }
       }
 
       if (cnpjData.phones != null && cnpjData.phones!.isNotEmpty) {
         telefoneCtrl.text = cnpjData.phones!.first.formatted;
+        _camposPreenchidosCnpj.add('telefone');
       }
 
       if (cnpjData.emails != null && cnpjData.emails!.isNotEmpty) {
         emailCtrl.text = cnpjData.emails!.first.address ?? '';
+        _camposPreenchidosCnpj.add('email');
       }
 
       if (cnpjData.registrations != null) {
@@ -301,8 +279,10 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
           (r) => r.enabled == true,
           orElse: () => cnpjData.registrations!.first,
         );
-        if (enabledRegistration.number != null) {
+        if (enabledRegistration.number != null &&
+            enabledRegistration.number!.isNotEmpty) {
           inscrEstadualCtrl.text = enabledRegistration.number!;
+          _camposPreenchidosCnpj.add('inscrEstadual');
         }
       }
 
@@ -339,6 +319,12 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
         });
       }
 
+      if (cnpjLimpo.length < 14) {
+        setState(() {
+          _camposPreenchidosCnpj.clear();
+        });
+      }
+
       if (cnpjLimpo.length == 14 && !_isLoadingCnpj) {
         _buscarCnpj(cnpj);
       }
@@ -347,7 +333,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
 
   @override
   void dispose() {
-    codigoCtrl.dispose();
     cnpjCtrl.dispose();
     razaoSocialCtrl.dispose();
     nomeFantasiaCtrl.dispose();
@@ -379,7 +364,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
     pisCtrl.dispose();
     icmsCtrl.dispose();
     receitaBrutaCtrl.dispose();
-    estadoCtrl.dispose();
     ibgeCtrl.dispose();
     bcIrpjCtrl.dispose();
     aliqIrpjCtrl.dispose();
@@ -404,7 +388,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
           Navigator.pop(context);
         }
         if (state.status == AuthStateStatus.error) {
-          showError(state.errorMessage ?? 'Erro ao criar empresa');
+          showError('Erro ao criar empresa');
         }
       },
       builder: (context, state) {
@@ -416,617 +400,81 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    sectionDropdown(
-                      keyName: 'dados',
-                      title: 'Dados Cadastrais',
-                      children: [
-                        row([
-                          TextFormField(
-                            controller: codigoCtrl,
-                            decoration: _dec('Código'),
-                            validator: (v) => null,
-                          ),
-                          DropdownButtonFormField(
-                            decoration: _dec('Situação'),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'ACTIVE',
-                                child: Text('ATIVO'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'INACTIVE',
-                                child: Text('INATIVO'),
-                              ),
-                            ],
-                            onChanged: (v) => setState(() => situacao = v!),
-                          ),
-                        ]),
-                        _spacing(),
-                        TextFormField(
-                          controller: cnpjCtrl,
-                          validator: _validatorCnpj,
-                          decoration: _dec('CNPJ').copyWith(
-                            suffixIcon:
-                                _isLoadingCnpj
-                                    ? const Padding(
-                                      padding: EdgeInsets.all(12.0),
-                                      child: SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      ),
-                                    )
-                                    : null,
-                            hintText: '00.000.000/0000-00',
-                            helperText: _cnpjErrorMessage,
-                            helperMaxLines: 2,
-                            errorText:
-                                _cnpjErrorMessage != null
-                                    ? _cnpjErrorMessage
-                                    : null,
-                            errorMaxLines: 2,
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [CnpjInputFormatter()],
-                          maxLength: 18,
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: razaoSocialCtrl,
-                          decoration: _dec('Razão Social'),
-                          validator:
-                              (v) => _validatorObrigatorio(v, 'Razão Social'),
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: nomeFantasiaCtrl,
-                          decoration: _dec('Nome Fantasia'),
-                          validator:
-                              (v) => _validatorObrigatorio(v, 'Nome Fantasia'),
-                        ),
-                        _spacing(),
-                        row([
-                          TextFormField(
-                            controller: inscrEstadualCtrl,
-                            decoration: _dec('Inscrição Estadual'),
-                            validator: (v) => null,
-                          ),
-                          TextFormField(
-                            controller: inscrMunicipalCtrl,
-                            decoration: _dec('Inscrição Municipal'),
-                            validator: (v) => null,
-                          ),
-                        ]),
-                        _spacing(),
-                        TextFormField(
-                          controller: inscrEstSubTribCtrl,
-                          decoration: _dec('Inscr. Est. Subs. Tributária'),
-                          validator: (v) => null,
-                        ),
-                      ],
+                    SectionDataWidget(
+                      cnpjCtrl: cnpjCtrl,
+                      razaoSocialCtrl: razaoSocialCtrl,
+                      nomeFantasiaCtrl: nomeFantasiaCtrl,
+                      inscrEstadualCtrl: inscrEstadualCtrl,
+                      inscrMunicipalCtrl: inscrMunicipalCtrl,
+                      inscrEstSubTribCtrl: inscrEstSubTribCtrl,
+                      isLoadingCnpj: _isLoadingCnpj,
+                      cnpjErrorMessage: _cnpjErrorMessage,
+                      isCampoBloqueado: _isCampoBloqueado,
                       openSections: openSections,
                       toggle: toggle,
                     ),
-                    sectionDropdown(
-                      keyName: 'endereco',
-                      title: 'Endereço',
-                      children: [
-                        row([
-                          TextFormField(
-                            controller: cepCtrl,
-                            decoration: _dec('CEP'),
-                            validator: _validatorCep,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [CepInputFormatter()],
-                            maxLength: 9,
-                          ),
-                          TextFormField(
-                            controller: enderecoCtrl,
-                            decoration: _dec('Endereço'),
-                            validator:
-                                (v) => _validatorObrigatorio(v, 'Endereço'),
-                          ),
-                          TextFormField(
-                            controller: numeroCtrl,
-                            decoration: _dec('Número'),
-                            validator:
-                                (v) => _validatorObrigatorio(v, 'Número'),
-                          ),
-                        ]),
-                        _spacing(),
-                        row([
-                          TextFormField(
-                            controller: complementoCtrl,
-                            decoration: _dec('Complemento'),
-                            validator: (v) => null,
-                          ),
-                          TextFormField(
-                            controller: bairroCtrl,
-                            decoration: _dec('Bairro'),
-                            validator:
-                                (v) => _validatorObrigatorio(v, 'Bairro'),
-                          ),
-                        ]),
-                        _spacing(),
-                        row([
-                          TextFormField(
-                            controller: cidadeCtrl,
-                            decoration: _dec('Cidade'),
-                            validator:
-                                (v) => _validatorObrigatorio(v, 'Cidade'),
-                          ),
-                          TextFormField(
-                            controller: ibgeCtrl,
-                            decoration: _dec('Código IBGE'),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [NumbersOnlyFormatter()],
-                            validator: (v) => null,
-                          ),
-                          DropdownButtonFormField(
-                            decoration: _dec('UF'),
-                            items: const [
-                              DropdownMenuItem(value: 'SP', child: Text('SP')),
-                              DropdownMenuItem(value: 'RJ', child: Text('RJ')),
-                            ],
-                            onChanged: (v) => setState(() => uf = v!),
-                          ),
-                        ]),
-                        _spacing(),
-                        TextFormField(
-                          controller: estadoCtrl,
-                          decoration: _dec('Estado'),
-                          validator: (v) => null,
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: paisCtrl,
-                          decoration: _dec('País'),
-                          validator: (v) => _validatorObrigatorio(v, 'País'),
-                        ),
-                      ],
+                    SectionAddressWidget(
+                      cepCtrl: cepCtrl,
+                      enderecoCtrl: enderecoCtrl,
+                      numeroCtrl: numeroCtrl,
+                      complementoCtrl: complementoCtrl,
+                      bairroCtrl: bairroCtrl,
+                      cidadeCtrl: cidadeCtrl,
+                      ibgeCtrl: ibgeCtrl,
+                      paisCtrl: paisCtrl,
+                      uf: uf,
+                      onUfChanged: (value) {
+                        setState(() {
+                          uf = value ?? 'SP';
+                        });
+                      },
+                      isCampoBloqueado: _isCampoBloqueado,
                       openSections: openSections,
                       toggle: toggle,
                     ),
-                    sectionDropdown(
-                      keyName: 'contato',
-                      title: 'Contato',
-                      children: [
-                        row([
-                          TextFormField(
-                            controller: telefoneCtrl,
-                            decoration: _dec('Telefone'),
-                            validator:
-                                (v) => _validatorObrigatorio(v, 'Telefone'),
-                            keyboardType: TextInputType.phone,
-                            inputFormatters: [PhoneInputFormatter()],
-                            maxLength: 15,
-                          ),
-                          TextFormField(
-                            controller: faxCtrl,
-                            decoration: _dec('FAX'),
-                            validator: (v) => null,
-                            keyboardType: TextInputType.phone,
-                            inputFormatters: [PhoneInputFormatter()],
-                            maxLength: 15,
-                          ),
-                        ]),
-                        _spacing(),
-                        TextFormField(
-                          controller: emailCtrl,
-                          decoration: _dec('Email'),
-                          validator: _validatorEmail,
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: emailNfeCtrl,
-                          decoration: _dec('Email p/ NFe'),
-                          validator: _validatorEmailOpcional,
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: emailContadorCtrl,
-                          decoration: _dec('Email Contador'),
-                          validator: _validatorEmailOpcional,
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: siteCtrl,
-                          decoration: _dec('Site'),
-                          validator: _validatorUrlOpcional,
-                        ),
-                      ],
+                    SectionContactWidget(
+                      telefoneCtrl: telefoneCtrl,
+                      faxCtrl: faxCtrl,
+                      emailCtrl: emailCtrl,
+                      emailNfeCtrl: emailNfeCtrl,
+                      emailContadorCtrl: emailContadorCtrl,
+                      siteCtrl: siteCtrl,
+                      isCampoBloqueado: _isCampoBloqueado,
                       openSections: openSections,
                       toggle: toggle,
                     ),
-                    sectionDropdown(
-                      keyName: 'fiscal',
-                      title: 'Fiscal / Sistema',
-                      children: [
-                        row([
-                          TextFormField(
-                            controller: usuarioApiCtrl,
-                            decoration: _dec('Usuário API'),
-                            validator: (v) => null,
-                          ),
-                          TextFormField(
-                            controller: senhaApiCtrl,
-                            decoration: _dec('Senha API'),
-                            validator: (v) => null,
-                          ),
-                        ]),
-                        _spacing(),
-                        TextFormField(
-                          controller: pathApiCtrl,
-                          decoration: _dec('Path API'),
-                          validator: (v) => null,
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: atualizadorCtrl,
-                          decoration: _dec('Atualizador'),
-                          validator: (v) => null,
-                        ),
-                        _spacing(),
-                        DropdownButtonFormField(
-                          value: ambiente,
-                          decoration: _dec('Ambiente'),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'HOMOLOGACAO',
-                              child: Text('Homologação'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'PRODUCAO',
-                              child: Text('Produção'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'TESTE',
-                              child: Text('Teste'),
-                            ),
-                          ],
-                          onChanged: (v) => setState(() => ambiente = v!),
-                        ),
-                        _spacing(),
-                        DropdownButtonFormField(
-                          value: pedeCertificado,
-                          decoration: _dec('Pede Certificado'),
-                          items: const [
-                            DropdownMenuItem(value: 'SIM', child: Text('SIM')),
-                            DropdownMenuItem(value: 'NAO', child: Text('NÃO')),
-                          ],
-                          onChanged:
-                              (v) => setState(() => pedeCertificado = v!),
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: certificadoCtrl,
-                          decoration: _dec('Certificado'),
-                          validator: (v) => null,
-                        ),
-                      ],
+                    SectionRegimeTaxWidget(
+                      regimeTributario: regimeTributario,
+                      isCampoBloqueado: _isCampoBloqueado,
+                      onChanged: (value) {
+                        setState(() {
+                          regimeTributario = value;
+                        });
+                      },
+                      regimeIssqnCtrl: regimeIssqnCtrl,
+                      indRetIssqnCtrl: indRetIssqnCtrl,
                       openSections: openSections,
                       toggle: toggle,
                     ),
-                    sectionDropdown(
-                      keyName: 'tributario',
-                      title: 'Regime Tributário',
-                      children: [
-                        RadioListTile(
-                          value: 'SIMPLES_NACIONAL',
-                          groupValue: regimeTributario,
-                          onChanged:
-                              (v) => setState(() => regimeTributario = v!),
-                          title: const Text('Simples Nacional'),
-                        ),
-                        _spacing(),
-                        RadioListTile(
-                          value: 'SIMPLES_EXCESSO_RECEITA',
-                          groupValue: regimeTributario,
-                          onChanged:
-                              (v) => setState(() => regimeTributario = v!),
-                          title: const Text('Simples com Excesso de Receita'),
-                        ),
-                        _spacing(),
-                        RadioListTile(
-                          value: 'NORMAL',
-                          groupValue: regimeTributario,
-                          onChanged:
-                              (v) => setState(() => regimeTributario = v!),
-                          title: const Text('Regime Normal'),
-                        ),
-                        _spacing(),
-                        row([
-                          TextFormField(
-                            controller: regimeIssqnCtrl,
-                            decoration: _dec('Regime Trib. ISSQN'),
-                            validator: (v) => null,
-                          ),
-                          TextFormField(
-                            controller: indRetIssqnCtrl,
-                            decoration: _dec('Ind. Ret. ISSQN'),
-                            validator: (v) => null,
-                          ),
-                        ]),
-                      ],
-                      openSections: openSections,
-                      toggle: toggle,
-                    ),
-                    sectionDropdown(
-                      keyName: 'impostos',
-                      title: 'Alíquotas e Impostos',
-                      children: [
-                        if (isSimplesNacional)
-                          row([
-                            TextFormField(
-                              controller: aliquotaCtrl,
-                              decoration: _dec('Alíquota'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(
-                                      limpo,
-                                      'Alíquota',
-                                    );
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: cofinsCtrl,
-                              decoration: _dec('Cofins'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(limpo, 'Cofins');
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: pisCtrl,
-                              decoration: _dec('PIS'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(limpo, 'PIS');
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: icmsCtrl,
-                              decoration: _dec('ICMS'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(limpo, 'ICMS');
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                          ]),
-                        if (isSimplesNacional) ...[
-                          _spacing(),
-                          TextFormField(
-                            controller: receitaBrutaCtrl,
-                            decoration: _dec('Receita Bruta Anual'),
-                            validator: (v) {
-                              final limpo =
-                                  ValueInputFormatter.getValueAsString(v ?? '');
-                              return limpo.isEmpty || limpo == '0'
-                                  ? null
-                                  : _validatorNumeroOpcional(
-                                    limpo,
-                                    'Receita Bruta Anual',
-                                  );
-                            },
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            inputFormatters: [ValueInputFormatter()],
-                          ),
-                        ],
-                        if (isExcessoOuNormal) ...[
-                          row([
-                            TextFormField(
-                              controller: bcIrpjCtrl,
-                              decoration: _dec('BC IRPJ %'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(
-                                      limpo,
-                                      'BC IRPJ',
-                                    );
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: aliqIrpjCtrl,
-                              decoration: _dec('Alíquota IRPJ %'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(
-                                      limpo,
-                                      'Alíquota IRPJ',
-                                    );
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                          ]),
-                          _spacing(),
-                          row([
-                            TextFormField(
-                              controller: valorExcedenteCtrl,
-                              decoration: _dec('Valor Excedente R\$'),
-                              validator: (v) {
-                                final limpo = _removeCurrency(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(
-                                      limpo,
-                                      'Valor Excedente',
-                                    );
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [CurrencyInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: excedentePercCtrl,
-                              decoration: _dec('Excedente %'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(
-                                      limpo,
-                                      'Excedente',
-                                    );
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                          ]),
-                          _spacing(),
-                          row([
-                            TextFormField(
-                              controller: bcCsllCtrl,
-                              decoration: _dec('BC CSLL %'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(
-                                      limpo,
-                                      'BC CSLL',
-                                    );
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: aliqCsllCtrl,
-                              decoration: _dec('Alíquota CSLL %'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(
-                                      limpo,
-                                      'Alíquota CSLL',
-                                    );
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                          ]),
-                          _spacing(),
-                          row([
-                            TextFormField(
-                              controller: ibsUfCtrl,
-                              decoration: _dec('IBS UF %'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(limpo, 'IBS UF');
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: ibsMunCtrl,
-                              decoration: _dec('IBS Mun %'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(
-                                      limpo,
-                                      'IBS Mun',
-                                    );
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: cbsCtrl,
-                              decoration: _dec('CBS %'),
-                              validator: (v) {
-                                final limpo = _removePercentage(v ?? '');
-                                return limpo.isEmpty
-                                    ? null
-                                    : _validatorNumeroOpcional(limpo, 'CBS');
-                              },
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                          ]),
-                        ],
-                        _spacing(),
-                        row([
-                          TextFormField(
-                            controller: localBackupCtrl,
-                            decoration: _dec('Local Backup'),
-                            validator: (v) => null,
-                          ),
-                          TextFormField(
-                            controller: localRemessaCtrl,
-                            decoration: _dec('Local Remessa'),
-                            validator: (v) => null,
-                          ),
-                        ]),
-                      ],
+                    SectionTaxWidget(
+                      isSimplesNacional: isSimplesNacional,
+                      isExcessoOuNormal: isExcessoOuNormal,
+                      aliquotaCtrl: aliquotaCtrl,
+                      cofinsCtrl: cofinsCtrl,
+                      pisCtrl: pisCtrl,
+                      icmsCtrl: icmsCtrl,
+                      receitaBrutaCtrl: receitaBrutaCtrl,
+                      bcIrpjCtrl: bcIrpjCtrl,
+                      aliqIrpjCtrl: aliqIrpjCtrl,
+                      valorExcedenteCtrl: valorExcedenteCtrl,
+                      excedentePercCtrl: excedentePercCtrl,
+                      bcCsllCtrl: bcCsllCtrl,
+                      aliqCsllCtrl: aliqCsllCtrl,
+                      ibsUfCtrl: ibsUfCtrl,
+                      ibsMunCtrl: ibsMunCtrl,
+                      cbsCtrl: cbsCtrl,
+                      localBackupCtrl: localBackupCtrl,
+                      localRemessaCtrl: localRemessaCtrl,
                       openSections: openSections,
                       toggle: toggle,
                     ),
@@ -1041,7 +489,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                         const SizedBox(width: 12),
                         ElevatedButton(
                           onPressed: () {
-                            if (_formKey.currentState?.validate() ?? false) {
+                            if (_formKey.currentState!.validate()) {
                               final revenueTaxDetails =
                                   regimeTributario == 'SIMPLES_NACIONAL'
                                       ? RevenueTaxDetailsModel(
@@ -1109,7 +557,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                                   neighborhood: bairroCtrl.text,
                                   city: cidadeCtrl.text,
                                   country: 'Brasil',
-                                  state: estadoCtrl.text,
+                                  state: _getNomeEstado(uf),
                                   uf: uf,
                                   cityIbgeCode: ibgeCtrl.text.replaceAll(
                                     RegExp(r'[^\d]'),
