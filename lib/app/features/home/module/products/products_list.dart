@@ -18,13 +18,19 @@ class _ProductsListState extends State<ProductsList> {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   bool _showRegisterCard = false;
+  late String groupId;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authModel = context.read<AuthBlocCubit>().state.authModel;
-      context.read<ProductsCubit>().loadProducts(token: authModel.token ?? '');
+      groupId = authModel.user?.enterpriseModel?.first.groupId ?? '';
+      print('groupId: $groupId');
+      context.read<ProductsCubit>().loadProducts(
+        token: authModel.token ?? '',
+        groupId: groupId,
+      );
     });
   }
 
@@ -223,6 +229,7 @@ class _ProductsListState extends State<ProductsList> {
                                                 .authModel
                                                 .token ??
                                             '',
+                                        groupId,
                                       );
                                       setState(() => _showRegisterCard = false);
                                       ScaffoldMessenger.of(
@@ -276,6 +283,7 @@ class _ProductsListState extends State<ProductsList> {
                                               .authModel
                                               .token ??
                                           '',
+                                      groupId,
                                     );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(

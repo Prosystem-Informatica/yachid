@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:yachid/app/features/home/module/partners/model/group_model.dart';
 import 'package:yachid/app/features/home/module/partners/model/partner_model_list.dart';
 import 'package:yachid/app/features/home/module/partners/model/payment_address.dart';
 import 'package:yachid/app/repository/partners/partners_repository.dart';
@@ -14,17 +15,37 @@ class PartnersCubit extends Cubit<PartnersState> {
     : _repository = repository,
       super(PartnersInitial());
 
+  Future<void> loadGroups(String token) async {
+    try {
+      final groups = await _repository.getGroups(token: token);
+      final selectedGroupId = groups.isNotEmpty ? groups.first.id : null;
+      emit(
+        PartnersLoaded(
+          partners: const [],
+          filteredPartners: const [],
+          groups: groups,
+          selectedGroupId: selectedGroupId,
+        ),
+      );
+      if (selectedGroupId != null) {
+        loadPartners(token: token, groupId: selectedGroupId);
+      }
+    } catch (e) {
+      emit(PartnersError(e.toString()));
+    }
+  }
+
   Future<void> loadPartners({
     required String token,
-    String? branchId,
-    String? enterpriseId,
+    required String groupId,
   }) async {
+    final current = state;
+    final groups = current is PartnersLoaded ? current.groups : <GroupModel>[];
     final List<PartnerModelList> partnersList = [];
     try {
       final partners = await _repository.getPartners(
         token: token,
-        enterpriseId: enterpriseId,
-        branchId: branchId,
+        groupId: groupId,
       );
 
       if (partners.isNotEmpty) {
@@ -35,17 +56,32 @@ class PartnersCubit extends Cubit<PartnersState> {
         PartnersLoaded(
           partners: partnersList,
           filteredPartners: partnersList,
-          filterDocument: '',
-          filterCity: '',
-          filterPhone: '',
-          filterUf: '',
-          filterCep: '',
-          filterStatus: null,
+          groups: groups,
+          selectedGroupId: groupId,
         ),
       );
     } catch (e) {
       emit(PartnersError(e.toString()));
     }
+  }
+
+  void selectGroup(String groupId) {
+    final current = state;
+    if (current is! PartnersLoaded) return;
+    emit(
+      PartnersLoaded(
+        partners: current.partners,
+        filteredPartners: current.filteredPartners,
+        filterDocument: current.filterDocument,
+        filterCity: current.filterCity,
+        filterPhone: current.filterPhone,
+        filterUf: current.filterUf,
+        filterCep: current.filterCep,
+        filterStatus: current.filterStatus,
+        groups: current.groups,
+        selectedGroupId: groupId,
+      ),
+    );
   }
 
   void setFilters({
@@ -84,6 +120,8 @@ class PartnersCubit extends Cubit<PartnersState> {
         filterUf: newUf,
         filterCep: newCep,
         filterStatus: current.filterStatus,
+        groups: current.groups,
+        selectedGroupId: current.selectedGroupId,
       ),
     );
   }
@@ -112,6 +150,8 @@ class PartnersCubit extends Cubit<PartnersState> {
         filterUf: current.filterUf,
         filterCep: current.filterCep,
         filterStatus: status,
+        groups: current.groups,
+        selectedGroupId: current.selectedGroupId,
       ),
     );
   }
@@ -186,36 +226,11 @@ class PartnersCubit extends Cubit<PartnersState> {
         token,
       );
       if (response.statusCode == 201) {
-        final List<PartnerModelList> newList = [
-          ...current.partners,
-          PartnerModelList.fromJson(partner.toJson()),
-        ];
-        final filtered = _applyFilters(
-          newList,
-          document: current.filterDocument,
-          city: current.filterCity,
-          phone: current.filterPhone,
-          uf: current.filterUf,
-          cep: current.filterCep,
-          status: current.filterStatus,
-        );
-        emit(
-          PartnersLoaded(
-            partners: newList,
-            filteredPartners: filtered,
-            filterDocument: current.filterDocument,
-            filterCity: current.filterCity,
-            filterPhone: current.filterPhone,
-            filterUf: current.filterUf,
-            filterCep: current.filterCep,
-            filterStatus: current.filterStatus,
-          ),
-        );
+        loadPartners(token: token, groupId: current.selectedGroupId ?? '');
       } else {
-        final msg = (response.data is Map
-                ? response.data['message']
-                : response.data)
-            ?.toString() ??
+        final msg =
+            (response.data is Map ? response.data['message'] : response.data)
+                ?.toString() ??
             'Erro ao criar parceiro';
         emit(PartnersError(msg));
       }

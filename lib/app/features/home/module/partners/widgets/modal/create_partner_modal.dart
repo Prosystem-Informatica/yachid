@@ -100,9 +100,22 @@ class _CreatePartnerModalState extends State<CreatePartnerModal> {
         );
         return;
       }
+      final cubit = context.read<PartnersCubit>();
+      final current = cubit.state;
+      final groupId = current is PartnersLoaded ? current.selectedGroupId : null;
+      if (groupId == null || groupId.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Selecione um grupo para cadastrar o parceiro'),
+          ),
+        );
+        return;
+      }
+
       PartnerModelDto? partner;
       try {
         partner = PartnerModelDto(
+          groupId: groupId,
           suframa: _suframaController.text.trim(),
           type: _selectedType!,
           accountingAccount: _accountingAccount,

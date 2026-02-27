@@ -27,7 +27,6 @@ class BankRegisterCard extends StatefulWidget {
 
 class _BankRegisterCardState extends State<BankRegisterCard> {
   final _formKey = GlobalKey<FormState>();
-  final _codigoController = TextEditingController();
   final _numeroBancoController = TextEditingController();
   final _nomeController = TextEditingController();
 
@@ -61,7 +60,6 @@ class _BankRegisterCardState extends State<BankRegisterCard> {
   }
 
   void _fillForm(BankDetail d) {
-    _codigoController.text = d.codigo;
     _numeroBancoController.text = d.numeroBanco;
     _nomeController.text = d.nome;
   }
@@ -96,7 +94,6 @@ class _BankRegisterCardState extends State<BankRegisterCard> {
 
     if (_isEditMode) {
       final dto = UpdateBankDto(
-        codigo: _codigoController.text.trim(),
         numeroBanco: _numeroBancoController.text.trim(),
         nome: _nomeController.text.trim(),
       );
@@ -118,7 +115,6 @@ class _BankRegisterCardState extends State<BankRegisterCard> {
       }
     } else {
       final dto = CreateBankDto(
-        codigo: _codigoController.text.trim(),
         numeroBanco: _numeroBancoController.text.trim(),
         nome: _nomeController.text.trim(),
       );
@@ -145,14 +141,12 @@ class _BankRegisterCardState extends State<BankRegisterCard> {
   }
 
   void _clearForm() {
-    _codigoController.clear();
     _numeroBancoController.clear();
     _nomeController.clear();
   }
 
   @override
   void dispose() {
-    _codigoController.dispose();
     _numeroBancoController.dispose();
     _nomeController.dispose();
     super.dispose();
@@ -249,17 +243,6 @@ class _BankRegisterCardState extends State<BankRegisterCard> {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _codigoController,
-                          decoration: _dec('Código *'),
-                          validator: (v) =>
-                              (v == null || v.trim().isEmpty)
-                                  ? 'Obrigatório'
-                                  : null,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
                       Expanded(
                         child: TextFormField(
                           controller: _numeroBancoController,

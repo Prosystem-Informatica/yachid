@@ -11,6 +11,7 @@ class EnterpriseModel {
   final String? website;
   final String? accountingEmail;
   final Address? address;
+  final String? groupId;
 
   const EnterpriseModel({
     this.id,
@@ -23,6 +24,7 @@ class EnterpriseModel {
     this.website,
     this.accountingEmail,
     this.address,
+    this.groupId,
   });
 
   bool get isSuccess => id != null && document != null;
@@ -42,6 +44,7 @@ class EnterpriseModel {
           json['address'] != null
               ? Address.fromJson(json['address'] as Map<String, dynamic>)
               : null,
+      groupId: json['group'] != null ? json['group']['id'] as String? : null,
     );
   }
 
@@ -57,6 +60,7 @@ class EnterpriseModel {
       'website': website,
       'accounting_email': accountingEmail,
       'address': address?.toJson(),
+      'groupId': groupId,
     };
   }
 

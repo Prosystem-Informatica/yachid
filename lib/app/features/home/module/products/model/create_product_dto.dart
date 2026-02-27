@@ -1,5 +1,5 @@
 class CreateProductDto {
-  final String codigo;
+  final String? codigo;
   final String? ultimoCodigo;
   final String? penultimoCodigo;
   final String? linha;
@@ -35,7 +35,7 @@ class CreateProductDto {
   final CreateProductStockDto? stock;
 
   CreateProductDto({
-    required this.codigo,
+    this.codigo,
     this.ultimoCodigo,
     this.penultimoCodigo,
     this.linha,
@@ -73,13 +73,13 @@ class CreateProductDto {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{
-      'codigo': codigo,
       'produto': produto,
       'status': status,
       'calcula_icms': calculaIcms,
       'produto_avulso': produtoAvulso,
       'tipo_custo': tipoCusto,
     };
+    if (codigo != null && codigo!.isNotEmpty) map['codigo'] = codigo;
     if (ultimoCodigo != null && ultimoCodigo!.isNotEmpty)
       map['ultimo_codigo'] = ultimoCodigo;
     if (penultimoCodigo != null && penultimoCodigo!.isNotEmpty)

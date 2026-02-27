@@ -90,9 +90,8 @@ class _BlocInjectionState extends State<BlocInjection> {
         ),
         BlocProvider(
           create:
-              (_) => BanksCubit(
-                repository: BanksRepository(rest: _apiRestClient),
-              ),
+              (_) =>
+                  BanksCubit(repository: BanksRepository(rest: _apiRestClient)),
         ),
       ],
       child: const AppWidget(),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
-import 'package:yachid/app/core/ui/side_bar_widget.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/home/module/products/model/create_product_dto.dart';
 import 'package:yachid/app/features/home/module/products/model/create_product_component_dto.dart';
@@ -10,8 +9,10 @@ import 'package:yachid/app/features/home/module/products/model/product_model.dar
 import 'package:yachid/app/features/home/module/products/model/update_product_dto.dart';
 import 'package:yachid/app/features/home/module/products/model/update_product_stock_dto.dart';
 import 'package:yachid/app/features/home/module/products/module/cubit/product_detail_cubit.dart';
+import 'package:yachid/app/features/home/module/products/model/update_product_nota_fiscal_dto.dart';
 import 'package:yachid/app/features/home/module/products/module/widgets/product_components_tab.dart';
 import 'package:yachid/app/features/home/module/products/module/widgets/product_detail_form.dart';
+import 'package:yachid/app/features/home/module/products/module/widgets/product_nota_fiscal_tab.dart';
 import 'package:yachid/app/features/home/module/products/module/widgets/product_tab_bar.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -76,6 +77,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   void _onCreateComponent(CreateProductComponentDto dto) {
     if (_productId == null) return;
     context.read<ProductDetailCubit>().createProductComponent(
+      _productId!,
+      dto,
+      context.read<AuthBlocCubit>().state.authModel.token ?? '',
+    );
+  }
+
+  void _onSaveNotaFiscal(UpdateProductNotaFiscalDto dto) {
+    if (_productId == null) return;
+    context.read<ProductDetailCubit>().updateProductNotaFiscal(
       _productId!,
       dto,
       context.read<AuthBlocCubit>().state.authModel.token ?? '',
@@ -174,25 +184,31 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           },
                         ),
                         Expanded(
-                          child:
-                              state.selectedIndex == 0
-                                  ? SingleChildScrollView(
-                                    padding: const EdgeInsets.all(24),
-                                    child: ProductDetailForm(
-                                      product: state.product,
-                                      isSaving: state.isSaving,
-                                      isSavingStock: state.isSavingStock,
-                                      onSave: _onSave,
-                                      onCreateStock: _onCreateStock,
-                                      onUpdateStock: _onUpdateStock,
-                                    ),
-                                  )
-                                  : ProductComponentsTab(
-                                    product: state.product,
-                                    productId: state.product.id,
-                                    isSaving: state.isSavingComponent,
-                                    onCreate: _onCreateComponent,
-                                  ),
+                          child: switch (state.selectedIndex) {
+                            0 => SingleChildScrollView(
+                              padding: const EdgeInsets.all(24),
+                              child: ProductDetailForm(
+                                product: state.product,
+                                isSaving: state.isSaving,
+                                isSavingStock: state.isSavingStock,
+                                onSave: _onSave,
+                                onCreateStock: _onCreateStock,
+                                onUpdateStock: _onUpdateStock,
+                              ),
+                            ),
+                            1 => ProductComponentsTab(
+                              product: state.product,
+                              productId: state.product.id,
+                              isSaving: state.isSavingComponent,
+                              onCreate: _onCreateComponent,
+                            ),
+                            2 => ProductNotaFiscalTab(
+                              product: state.product,
+                              isSaving: state.isSaving,
+                              onSave: _onSaveNotaFiscal,
+                            ),
+                            _ => const SizedBox.shrink(),
+                          },
                         ),
                       ],
                     ),

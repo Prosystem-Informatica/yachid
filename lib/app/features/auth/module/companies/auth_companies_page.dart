@@ -43,6 +43,7 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
         );
       },
       builder: (context, state) {
+        print('state.enterprisesModels: ${state.enterprisesModels}');
         if (state.status == AuthStateStatus.success) {
           return Scaffold(
             body: YachidBackgroundWidget(

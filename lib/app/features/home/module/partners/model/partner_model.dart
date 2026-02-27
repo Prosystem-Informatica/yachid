@@ -41,6 +41,7 @@ class PartnerModelDto {
   final String site;
   final String suframa;
   final PaymentAddressDto? paymentAddress;
+  final String groupId;
 
   PartnerModelDto({
     this.id,
@@ -64,6 +65,7 @@ class PartnerModelDto {
     required this.site,
     this.paymentAddress,
     required this.suframa,
+    required this.groupId,
   });
 
   /// Telefone principal para exibição (principal ou celular).
@@ -108,6 +110,7 @@ class PartnerModelDto {
                 json['payment_address'] as Map<String, dynamic>,
               )
               : null,
+      groupId: json['groupId'] as String? ?? json['group_id'] as String? ?? '',
     );
   }
 
@@ -157,8 +160,9 @@ class PartnerModelDto {
         'site': site,
         'payment_address': paymentAddress?.toJson(),
         'suframa': suframa,
+        'groupId': groupId,
       };
-    } catch (e, s) {
+    } catch (e) {
       print(e.toString());
       return {};
     }
