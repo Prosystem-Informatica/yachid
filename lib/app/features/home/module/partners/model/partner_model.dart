@@ -139,7 +139,6 @@ class PartnerModelDto {
   Map<String, dynamic> toJson() {
     try {
       return {
-        'codigo': "1",
         'name': name,
         'document': document,
         'fantasy_name': fantasyName,
@@ -163,7 +162,7 @@ class PartnerModelDto {
         'suframa': suframa,
         'groupId': groupId,
       };
-    } catch (e, s) {
+    } catch (e) {
       print(e.toString());
       return {};
     }

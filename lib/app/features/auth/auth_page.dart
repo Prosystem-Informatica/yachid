@@ -112,7 +112,7 @@ class _AuthPageState extends State<AuthPage> with Messages<AuthPage> {
                     ),
                     const SizedBox(height: 8),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () => Get.toNamed(Routes.FORGOT_PASSWORD),
                       child: const Text(
                         "Esqueci minha senha",
                         style: TextStyle(color: Color(0xFF5B9BD5)),

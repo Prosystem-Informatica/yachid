@@ -12,7 +12,7 @@ enum TipoComissao {
 }
 
 class CreateRepresentativeDto {
-  final String codigo;
+  final String? codigo;
   final String nome;
   final String? telefone;
   final double? comissao;
@@ -28,7 +28,7 @@ class CreateRepresentativeDto {
   final RepresentativeAddressDto? address;
 
   CreateRepresentativeDto({
-    required this.codigo,
+    this.codigo,
     required this.nome,
     this.telefone,
     this.comissao,
@@ -46,7 +46,7 @@ class CreateRepresentativeDto {
 
   Map<String, dynamic> toJson() {
     return {
-      'codigo': codigo,
+      if (codigo != null && codigo!.isNotEmpty) 'codigo': codigo,
       'nome': nome,
       if (telefone != null && telefone!.isNotEmpty) 'telefone': telefone,
       if (comissao != null) 'comissao': comissao,

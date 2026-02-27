@@ -16,7 +16,6 @@ class ProductRegisterCard extends StatefulWidget {
 
 class _ProductRegisterCardState extends State<ProductRegisterCard> {
   final _formKey = GlobalKey<FormState>();
-  final _codigoController = TextEditingController();
   final _ultimoCodigoController = TextEditingController();
   final _penultimoCodigoController = TextEditingController();
   final _produtoController = TextEditingController();
@@ -118,7 +117,6 @@ class _ProductRegisterCardState extends State<ProductRegisterCard> {
     }
 
     final dto = CreateProductDto(
-      codigo: _codigoController.text.trim(),
       ultimoCodigo:
           _ultimoCodigoController.text.trim().isEmpty
               ? null
@@ -195,7 +193,6 @@ class _ProductRegisterCardState extends State<ProductRegisterCard> {
   }
 
   void _clearForm() {
-    _codigoController.clear();
     _ultimoCodigoController.clear();
     _penultimoCodigoController.clear();
     _produtoController.clear();
@@ -239,7 +236,6 @@ class _ProductRegisterCardState extends State<ProductRegisterCard> {
 
   @override
   void dispose() {
-    _codigoController.dispose();
     _ultimoCodigoController.dispose();
     _penultimoCodigoController.dispose();
     _produtoController.dispose();
@@ -314,18 +310,6 @@ class _ProductRegisterCardState extends State<ProductRegisterCard> {
                       children: [
                         const SizedBox(height: 12),
                         _buildFormRow([
-                          _field(
-                            180,
-                            TextFormField(
-                              controller: _codigoController,
-                              decoration: _dec('Código *'),
-                              validator:
-                                  (v) =>
-                                      (v == null || v.trim().isEmpty)
-                                          ? 'Obrigatório'
-                                          : null,
-                            ),
-                          ),
                           _field(
                             140,
                             TextFormField(

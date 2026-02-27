@@ -129,22 +129,19 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
                             header: true,
                             onTap: () {},
                           ),
-                          ...state.enterprisesModels?.map(
-                                (e) => _row(
+                          ...state.enterprisesModels?.toList().asMap().entries.map(
+                                (entry) => _row(
                                   [
-                                    state.enterprisesModels!.isEmpty
-                                        ? '-'
-                                        : state.enterprisesModels!.length
-                                            .toString(),
-                                    e.fantasyName ?? '-',
-                                    e.email ?? '-',
-                                    e.document ?? '-',
-                                    e.status ?? '-',
+                                    (entry.key + 1).toString(),
+                                    (entry.value.fantasyName ?? '-'),
+                                    entry.value.email ?? '-',
+                                    entry.value.document ?? '-',
+                                    entry.value.status ?? '-',
                                     'Entrar',
                                   ],
                                   onTap: () {
                                     context.read<AuthBlocCubit>().selectCompany(
-                                      e,
+                                      entry.value,
                                     );
                                   },
                                 ),
@@ -185,29 +182,33 @@ class _AuthCompaniesPageState extends State<AuthCompaniesPage> {
   }
 
   void openCreateCompanyModal(BuildContext context) {
+    final authCubit = context.read<AuthBlocCubit>();
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
-        return Center(
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.8,
-              constraints: const BoxConstraints(maxWidth: 1100, maxHeight: 750),
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.92),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
+      builder: (dialogContext) {
+        return BlocProvider.value(
+          value: authCubit,
+          child: Center(
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                width: MediaQuery.of(dialogContext).size.width * 0.8,
+                constraints: const BoxConstraints(maxWidth: 1100, maxHeight: 750),
+                padding: const EdgeInsets.all(28),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.92),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const CreateCompaniesPage(),
               ),
-              child: const CreateCompaniesPage(),
             ),
           ),
         );

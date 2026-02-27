@@ -86,13 +86,6 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
         return;
       }
 
-      if (_base64Image == null || _base64Image!.isEmpty) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Selecione uma imagem')));
-        return;
-      }
-
       if (_selectedBranch == null) {
         ScaffoldMessenger.of(
           context,
@@ -108,7 +101,7 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
         document: _documentController.text.trim(),
         status: _selectedStatus!,
         role: _selectedRole!,
-        base64: _base64Image!,
+        base64: _base64Image,
         branch: _selectedBranch!.id,
       );
 

@@ -30,7 +30,6 @@ class RepresentativeRegisterCard extends StatefulWidget {
 class _RepresentativeRegisterCardState
     extends State<RepresentativeRegisterCard> {
   final _formKey = GlobalKey<FormState>();
-  final _codigoController = TextEditingController();
   final _nomeController = TextEditingController();
   final _telefoneController = TextEditingController();
   final _celularController = TextEditingController();
@@ -73,7 +72,7 @@ class _RepresentativeRegisterCardState
         .read<RepresentativesCubit>()
         .loadRepresentativeDetail(
           id: widget.representativeId!,
-          token: authModel?.token ?? '',
+          token: authModel.token ?? '',
         );
     if (!mounted) return;
     setState(() {
@@ -85,7 +84,6 @@ class _RepresentativeRegisterCardState
   }
 
   void _fillForm(RepresentativeDetail d) {
-    _codigoController.text = d.codigo;
     _nomeController.text = d.nome;
     _telefoneController.text = d.telefone ?? '';
     _celularController.text = d.celular ?? '';
@@ -163,11 +161,10 @@ class _RepresentativeRegisterCardState
     }
 
     final authModel = context.read<AuthBlocCubit>().state.authModel;
-    final token = authModel?.token ?? '';
+    final token = authModel.token ?? '';
 
     if (_isEditMode) {
       final dto = UpdateRepresentativeDto(
-        codigo: _codigoController.text.trim(),
         nome: _nomeController.text.trim(),
         telefone:
             _telefoneController.text.trim().isEmpty
@@ -221,7 +218,6 @@ class _RepresentativeRegisterCardState
       }
     } else {
       final dto = CreateRepresentativeDto(
-        codigo: _codigoController.text.trim(),
         nome: _nomeController.text.trim(),
         telefone:
             _telefoneController.text.trim().isEmpty
@@ -277,7 +273,6 @@ class _RepresentativeRegisterCardState
   }
 
   void _clearForm() {
-    _codigoController.clear();
     _nomeController.clear();
     _telefoneController.clear();
     _celularController.clear();
@@ -305,7 +300,6 @@ class _RepresentativeRegisterCardState
 
   @override
   void dispose() {
-    _codigoController.dispose();
     _nomeController.dispose();
     _telefoneController.dispose();
     _celularController.dispose();
@@ -372,19 +366,6 @@ class _RepresentativeRegisterCardState
                     Row(
                       children: [
                         Expanded(
-                          child: TextFormField(
-                            controller: _codigoController,
-                            decoration: _dec('Código *'),
-                            validator:
-                                (v) =>
-                                    (v == null || v.trim().isEmpty)
-                                        ? 'Obrigatório'
-                                        : null,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          flex: 2,
                           child: TextFormField(
                             controller: _nomeController,
                             decoration: _dec('Nome *'),

@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
+import 'package:yachid/app/app_routes.dart';
+import 'package:yachid/app/features/auth/module/companies/widgets/section_address_widget.dart';
+import 'package:yachid/app/features/auth/module/companies/widgets/section_contact_widget.dart';
+import 'package:yachid/app/features/auth/module/companies/widgets/section_data_widget.dart';
+import 'package:yachid/app/features/auth/module/companies/widgets/section_regime_tax_widget.dart';
+import 'package:yachid/app/features/auth/module/companies/widgets/section_tax_widget.dart';
 
 import '../../../../core/formatters/input_formatters.dart';
 import '../../../../core/ui/ui.dart';
@@ -106,16 +113,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
       openSections[key] = !openSections[key]!;
     });
   }
-
-  InputDecoration _dec(String label) {
-    return InputDecoration(
-      labelText: label,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-      isDense: true,
-    );
-  }
-
-  Widget _spacing() => const SizedBox(height: 15);
 
   bool _isCampoBloqueado(String campo) {
     return _camposPreenchidosCnpj.contains(campo);
@@ -322,7 +319,6 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
         });
       }
 
-      // Se o CNPJ foi limpo ou alterado, desbloqueia todos os campos
       if (cnpjLimpo.length < 14) {
         setState(() {
           _camposPreenchidosCnpj.clear();
@@ -404,573 +400,81 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    sectionDropdown(
-                      keyName: 'dados',
-                      title: 'Dados Cadastrais',
-                      children: [
-                        TextFormField(
-                          controller: cnpjCtrl,
-                          decoration: _dec('CNPJ').copyWith(
-                            suffixIcon:
-                                _isLoadingCnpj
-                                    ? const Padding(
-                                      padding: EdgeInsets.all(12.0),
-                                      child: SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      ),
-                                    )
-                                    : null,
-                            hintText: '00.000.000/0000-00',
-                            helperText: _cnpjErrorMessage,
-                            helperMaxLines: 2,
-                            errorText:
-                                _cnpjErrorMessage != null
-                                    ? _cnpjErrorMessage
-                                    : null,
-                            errorMaxLines: 2,
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [CnpjInputFormatter()],
-                          maxLength: 18,
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: razaoSocialCtrl,
-                          decoration: _dec('Razão Social'),
-                          readOnly: _isCampoBloqueado('razaoSocial'),
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: nomeFantasiaCtrl,
-                          decoration: _dec('Nome Fantasia'),
-                          readOnly: _isCampoBloqueado('nomeFantasia'),
-                        ),
-                        _spacing(),
-                        row([
-                          TextFormField(
-                            controller: inscrEstadualCtrl,
-                            decoration: _dec('Inscrição Estadual'),
-                            readOnly: _isCampoBloqueado('inscrEstadual'),
-                          ),
-                          TextFormField(
-                            controller: inscrMunicipalCtrl,
-                            decoration: _dec('Inscrição Municipal'),
-                          ),
-                        ]),
-                        _spacing(),
-                        TextFormField(
-                          controller: inscrEstSubTribCtrl,
-                          decoration: _dec('Inscr. Est. Subs. Tributária'),
-                        ),
-                      ],
+                    SectionDataWidget(
+                      cnpjCtrl: cnpjCtrl,
+                      razaoSocialCtrl: razaoSocialCtrl,
+                      nomeFantasiaCtrl: nomeFantasiaCtrl,
+                      inscrEstadualCtrl: inscrEstadualCtrl,
+                      inscrMunicipalCtrl: inscrMunicipalCtrl,
+                      inscrEstSubTribCtrl: inscrEstSubTribCtrl,
+                      isLoadingCnpj: _isLoadingCnpj,
+                      cnpjErrorMessage: _cnpjErrorMessage,
+                      isCampoBloqueado: _isCampoBloqueado,
                       openSections: openSections,
                       toggle: toggle,
                     ),
-                    sectionDropdown(
-                      keyName: 'endereco',
-                      title: 'Endereço',
-                      children: [
-                        row([
-                          TextFormField(
-                            controller: cepCtrl,
-                            decoration: _dec('CEP'),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [CepInputFormatter()],
-                            maxLength: 9,
-                            readOnly: _isCampoBloqueado('cep'),
-                          ),
-                          TextFormField(
-                            controller: enderecoCtrl,
-                            decoration: _dec('Endereço'),
-                            readOnly: _isCampoBloqueado('endereco'),
-                          ),
-                          TextFormField(
-                            controller: numeroCtrl,
-                            decoration: _dec('Número'),
-                            readOnly: _isCampoBloqueado('numero'),
-                          ),
-                        ]),
-                        _spacing(),
-                        row([
-                          TextFormField(
-                            controller: complementoCtrl,
-                            decoration: _dec('Complemento'),
-                          ),
-                          TextFormField(
-                            controller: bairroCtrl,
-                            decoration: _dec('Bairro'),
-                            readOnly: _isCampoBloqueado('bairro'),
-                          ),
-                        ]),
-                        _spacing(),
-                        row([
-                          TextFormField(
-                            controller: cidadeCtrl,
-                            decoration: _dec('Cidade'),
-                            readOnly: _isCampoBloqueado('cidade'),
-                          ),
-                          TextFormField(
-                            controller: ibgeCtrl,
-                            decoration: _dec('Código IBGE'),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [NumbersOnlyFormatter()],
-                          ),
-                          DropdownButtonFormField<String>(
-                            value: uf,
-                            decoration: _dec('UF - Estado'),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'AC',
-                                child: Text('AC - Acre'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'AL',
-                                child: Text('AL - Alagoas'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'AP',
-                                child: Text('AP - Amapá'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'AM',
-                                child: Text('AM - Amazonas'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'BA',
-                                child: Text('BA - Bahia'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'CE',
-                                child: Text('CE - Ceará'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'DF',
-                                child: Text('DF - Distrito Federal'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'ES',
-                                child: Text('ES - Espírito Santo'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'GO',
-                                child: Text('GO - Goiás'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'MA',
-                                child: Text('MA - Maranhão'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'MT',
-                                child: Text('MT - Mato Grosso'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'MS',
-                                child: Text('MS - Mato Grosso do Sul'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'MG',
-                                child: Text('MG - Minas Gerais'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'PA',
-                                child: Text('PA - Pará'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'PB',
-                                child: Text('PB - Paraíba'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'PR',
-                                child: Text('PR - Paraná'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'PE',
-                                child: Text('PE - Pernambuco'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'PI',
-                                child: Text('PI - Piauí'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'RJ',
-                                child: Text('RJ - Rio de Janeiro'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'RN',
-                                child: Text('RN - Rio Grande do Norte'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'RS',
-                                child: Text('RS - Rio Grande do Sul'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'RO',
-                                child: Text('RO - Rondônia'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'RR',
-                                child: Text('RR - Roraima'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'SC',
-                                child: Text('SC - Santa Catarina'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'SP',
-                                child: Text('SP - São Paulo'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'SE',
-                                child: Text('SE - Sergipe'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'TO',
-                                child: Text('TO - Tocantins'),
-                              ),
-                            ],
-                            onChanged:
-                                _isCampoBloqueado('uf')
-                                    ? null
-                                    : (v) => setState(() => uf = v ?? 'SP'),
-                          ),
-                        ]),
-                        _spacing(),
-                        TextFormField(
-                          controller: paisCtrl,
-                          decoration: _dec('País'),
-                        ),
-                      ],
+                    SectionAddressWidget(
+                      cepCtrl: cepCtrl,
+                      enderecoCtrl: enderecoCtrl,
+                      numeroCtrl: numeroCtrl,
+                      complementoCtrl: complementoCtrl,
+                      bairroCtrl: bairroCtrl,
+                      cidadeCtrl: cidadeCtrl,
+                      ibgeCtrl: ibgeCtrl,
+                      paisCtrl: paisCtrl,
+                      uf: uf,
+                      onUfChanged: (value) {
+                        setState(() {
+                          uf = value ?? 'SP';
+                        });
+                      },
+                      isCampoBloqueado: _isCampoBloqueado,
                       openSections: openSections,
                       toggle: toggle,
                     ),
-                    sectionDropdown(
-                      keyName: 'contato',
-                      title: 'Contato',
-                      children: [
-                        row([
-                          TextFormField(
-                            controller: telefoneCtrl,
-                            decoration: _dec('Telefone'),
-                            keyboardType: TextInputType.phone,
-                            inputFormatters: [PhoneInputFormatter()],
-                            maxLength: 15,
-                            readOnly: _isCampoBloqueado('telefone'),
-                          ),
-                          TextFormField(
-                            controller: faxCtrl,
-                            decoration: _dec('FAX'),
-                            keyboardType: TextInputType.phone,
-                            inputFormatters: [PhoneInputFormatter()],
-                            maxLength: 15,
-                          ),
-                        ]),
-                        _spacing(),
-                        TextFormField(
-                          controller: emailCtrl,
-                          decoration: _dec('Email'),
-                          readOnly: _isCampoBloqueado('email'),
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: emailNfeCtrl,
-                          decoration: _dec('Email p/ NFe'),
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: emailContadorCtrl,
-                          decoration: _dec('Email Contador'),
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: siteCtrl,
-                          decoration: _dec('Site'),
-                        ),
-                      ],
+                    SectionContactWidget(
+                      telefoneCtrl: telefoneCtrl,
+                      faxCtrl: faxCtrl,
+                      emailCtrl: emailCtrl,
+                      emailNfeCtrl: emailNfeCtrl,
+                      emailContadorCtrl: emailContadorCtrl,
+                      siteCtrl: siteCtrl,
+                      isCampoBloqueado: _isCampoBloqueado,
                       openSections: openSections,
                       toggle: toggle,
                     ),
-                    /*sectionDropdown(
-                      keyName: 'fiscal',
-                      title: 'Fiscal / Sistema',
-                      children: [
-                        row([
-                          TextFormField(
-                            controller: usuarioApiCtrl,
-                            decoration: _dec('Usuário API'),
-                          ),
-                          TextFormField(
-                            controller: senhaApiCtrl,
-                            decoration: _dec('Senha API'),
-                          ),
-                        ]),
-                        _spacing(),
-                        TextFormField(
-                          controller: pathApiCtrl,
-                          decoration: _dec('Path API'),
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: atualizadorCtrl,
-                          decoration: _dec('Atualizador'),
-                        ),
-                        _spacing(),
-                        DropdownButtonFormField(
-                          value: ambiente,
-                          decoration: _dec('Ambiente'),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'HOMOLOGACAO',
-                              child: Text('Homologação'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'PRODUCAO',
-                              child: Text('Produção'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'TESTE',
-                              child: Text('Teste'),
-                            ),
-                          ],
-                          onChanged: (v) => setState(() => ambiente = v!),
-                        ),
-                        _spacing(),
-                        DropdownButtonFormField(
-                          value: pedeCertificado,
-                          decoration: _dec('Pede Certificado'),
-                          items: const [
-                            DropdownMenuItem(value: 'SIM', child: Text('SIM')),
-                            DropdownMenuItem(value: 'NAO', child: Text('NÃO')),
-                          ],
-                          onChanged:
-                              (v) => setState(() => pedeCertificado = v!),
-                        ),
-                        _spacing(),
-                        TextFormField(
-                          controller: certificadoCtrl,
-                          decoration: _dec('Certificado'),
-                        ),
-                      ],
-                      openSections: openSections,
-                      toggle: toggle,
-                    ),*/
-                    sectionDropdown(
-                      keyName: 'tributario',
-                      title: 'Regime Tributário',
-                      children: [
-                        RadioListTile(
-                          value: 'SIMPLES_NACIONAL',
-                          groupValue: regimeTributario,
-                          onChanged:
-                              _isCampoBloqueado('regimeTributario')
-                                  ? null
-                                  : (v) => setState(
-                                    () => regimeTributario = v as String,
-                                  ),
-                          title: const Text('Simples Nacional'),
-                        ),
-                        _spacing(),
-                        RadioListTile(
-                          value: 'SIMPLES_EXCESSO_RECEITA',
-                          groupValue: regimeTributario,
-                          onChanged:
-                              _isCampoBloqueado('regimeTributario')
-                                  ? null
-                                  : (v) => setState(
-                                    () => regimeTributario = v as String,
-                                  ),
-                          title: const Text('Simples com Excesso de Receita'),
-                        ),
-                        _spacing(),
-                        RadioListTile(
-                          value: 'NORMAL',
-                          groupValue: regimeTributario,
-                          onChanged:
-                              _isCampoBloqueado('regimeTributario')
-                                  ? null
-                                  : (v) => setState(
-                                    () => regimeTributario = v as String,
-                                  ),
-                          title: const Text('Regime Normal'),
-                        ),
-                        _spacing(),
-                        row([
-                          TextFormField(
-                            controller: regimeIssqnCtrl,
-                            decoration: _dec('Regime Trib. ISSQN'),
-                          ),
-                          TextFormField(
-                            controller: indRetIssqnCtrl,
-                            decoration: _dec('Ind. Ret. ISSQN'),
-                          ),
-                        ]),
-                      ],
+                    SectionRegimeTaxWidget(
+                      regimeTributario: regimeTributario,
+                      isCampoBloqueado: _isCampoBloqueado,
+                      onChanged: (value) {
+                        setState(() {
+                          regimeTributario = value;
+                        });
+                      },
+                      regimeIssqnCtrl: regimeIssqnCtrl,
+                      indRetIssqnCtrl: indRetIssqnCtrl,
                       openSections: openSections,
                       toggle: toggle,
                     ),
-                    sectionDropdown(
-                      keyName: 'impostos',
-                      title: 'Alíquotas e Impostos',
-                      children: [
-                        if (isSimplesNacional)
-                          row([
-                            TextFormField(
-                              controller: aliquotaCtrl,
-                              decoration: _dec('Alíquota'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: cofinsCtrl,
-                              decoration: _dec('Cofins'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: pisCtrl,
-                              decoration: _dec('PIS'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: icmsCtrl,
-                              decoration: _dec('ICMS'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                          ]),
-                        if (isSimplesNacional) ...[
-                          _spacing(),
-                          TextFormField(
-                            controller: receitaBrutaCtrl,
-                            decoration: _dec('Receita Bruta Anual'),
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            inputFormatters: [ValueInputFormatter()],
-                          ),
-                        ],
-                        if (isExcessoOuNormal) ...[
-                          row([
-                            TextFormField(
-                              controller: bcIrpjCtrl,
-                              decoration: _dec('BC IRPJ %'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: aliqIrpjCtrl,
-                              decoration: _dec('Alíquota IRPJ %'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                          ]),
-                          _spacing(),
-                          row([
-                            TextFormField(
-                              controller: valorExcedenteCtrl,
-                              decoration: _dec('Valor Excedente R\$'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [CurrencyInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: excedentePercCtrl,
-                              decoration: _dec('Excedente %'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                          ]),
-                          _spacing(),
-                          row([
-                            TextFormField(
-                              controller: bcCsllCtrl,
-                              decoration: _dec('BC CSLL %'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: aliqCsllCtrl,
-                              decoration: _dec('Alíquota CSLL %'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                          ]),
-                          _spacing(),
-                          row([
-                            TextFormField(
-                              controller: ibsUfCtrl,
-                              decoration: _dec('IBS UF %'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: ibsMunCtrl,
-                              decoration: _dec('IBS Mun %'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                            TextFormField(
-                              controller: cbsCtrl,
-                              decoration: _dec('CBS %'),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              inputFormatters: [PercentageInputFormatter()],
-                            ),
-                          ]),
-                        ],
-                        _spacing(),
-                        row([
-                          TextFormField(
-                            controller: localBackupCtrl,
-                            decoration: _dec('Local Backup'),
-                          ),
-                          TextFormField(
-                            controller: localRemessaCtrl,
-                            decoration: _dec('Local Remessa'),
-                          ),
-                        ]),
-                      ],
+                    SectionTaxWidget(
+                      isSimplesNacional: isSimplesNacional,
+                      isExcessoOuNormal: isExcessoOuNormal,
+                      aliquotaCtrl: aliquotaCtrl,
+                      cofinsCtrl: cofinsCtrl,
+                      pisCtrl: pisCtrl,
+                      icmsCtrl: icmsCtrl,
+                      receitaBrutaCtrl: receitaBrutaCtrl,
+                      bcIrpjCtrl: bcIrpjCtrl,
+                      aliqIrpjCtrl: aliqIrpjCtrl,
+                      valorExcedenteCtrl: valorExcedenteCtrl,
+                      excedentePercCtrl: excedentePercCtrl,
+                      bcCsllCtrl: bcCsllCtrl,
+                      aliqCsllCtrl: aliqCsllCtrl,
+                      ibsUfCtrl: ibsUfCtrl,
+                      ibsMunCtrl: ibsMunCtrl,
+                      cbsCtrl: cbsCtrl,
+                      localBackupCtrl: localBackupCtrl,
+                      localRemessaCtrl: localRemessaCtrl,
                       openSections: openSections,
                       toggle: toggle,
                     ),

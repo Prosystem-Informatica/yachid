@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:bloc/bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -85,9 +83,9 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
       final res = await authRepository.createCompanies(companie: companie);
 
       if (res.isSuccess) {
-        emit(state.copyWith(status: AuthStateStatus.success));
-      } else if (!res.isSuccess) {
-        emit(state.copyWith(status: AuthStateStatus.error));
+        final entrepreneurId = prefs.getString("entrepreneurId") ?? '';
+        final token = state.authModel.token ?? '';
+        await getCompanies(entrepreneurId: entrepreneurId, token: token);
       }
     } on Exception {
       emit(
@@ -97,6 +95,10 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
         ),
       );
     }
+  }
+
+  Future<void> forgotPassword({required String email}) async {
+    await authRepository.forgotPassword(email: email);
   }
 
   void selectCompany(EnterpriseModel companie) {
