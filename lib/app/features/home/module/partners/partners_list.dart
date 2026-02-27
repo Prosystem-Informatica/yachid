@@ -28,14 +28,7 @@ class _PartnersListState extends State<PartnersList> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authModel = context.read<AuthBlocCubit>().state.authModel;
-      context.read<PartnersCubit>().loadPartners(
-        token: authModel.token ?? '',
-        enterpriseId:
-            authModel.user?.role == 'entrepreneur'
-                ? authModel.user?.enterpriseModel?.first.id ?? ''
-                : null,
-        branchId: authModel.user?.branchId ?? '',
-      );
+      context.read<PartnersCubit>().loadGroups(authModel.token ?? '');
     });
   }
 
@@ -116,6 +109,62 @@ class _PartnersListState extends State<PartnersList> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
+                                BlocBuilder<PartnersCubit, PartnersState>(
+                                  builder: (context, state) {
+                                    if (state is! PartnersLoaded ||
+                                        state.groups.isEmpty) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 16),
+                                      child: SizedBox(
+                                        width: 200,
+                                        child: DropdownButtonFormField<String>(
+                                          value: state.selectedGroupId,
+                                          decoration: InputDecoration(
+                                            labelText: 'Grupo',
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            isDense: true,
+                                            contentPadding: const EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 8,
+                                            ),
+                                          ),
+                                          items: state.groups
+                                              .map(
+                                                (g) => DropdownMenuItem(
+                                                  value: g.id,
+                                                  child: Text(
+                                                    g.name,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                          onChanged: (groupId) {
+                                            if (groupId != null) {
+                                              context
+                                                  .read<PartnersCubit>()
+                                                  .selectGroup(groupId);
+                                              context
+                                                  .read<PartnersCubit>()
+                                                  .loadPartners(
+                                                    token: context
+                                                            .read<AuthBlocCubit>()
+                                                            .state
+                                                            .authModel
+                                                            .token ?? '',
+                                                    groupId: groupId,
+                                                  );
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                                 FilledButton.icon(
                                   onPressed: _showCreatePartnerModal,
                                   icon: const Icon(Icons.add_rounded, size: 20),

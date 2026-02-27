@@ -24,16 +24,17 @@ class PartnerModelList {
   });
 
   factory PartnerModelList.fromJson(Map<String, dynamic> json) {
+    final address = json['address'] as Map<String, dynamic>?;
     return PartnerModelList(
-      id: json['id'],
-      codigo: json['codigo'],
-      document: json['document'],
-      client: json['name'],
-      fantasyName: json['fantasy_name'],
-      city: json['city'],
-      phone: json['main_phone'],
-      uf: json['uf'],
-      cep: json['cep'],
+      id: json['id']?.toString() ?? '',
+      codigo: json['codigo']?.toString() ?? '',
+      document: json['document']?.toString() ?? '',
+      client: json['name']?.toString() ?? '',
+      fantasyName: json['fantasy_name']?.toString() ?? '',
+      city: json['city']?.toString() ?? address?['city']?.toString() ?? '',
+      phone: json['main_phone']?.toString() ?? json['phone']?.toString() ?? '',
+      uf: json['uf']?.toString() ?? address?['uf']?.toString() ?? '',
+      cep: json['cep']?.toString() ?? address?['cep']?.toString() ?? '',
       status: json['status'] == 'ACTIVE' ? 'Ativo' : 'Inativo',
     );
   }

@@ -6,6 +6,7 @@ import 'package:yachid/app/features/home/module/products/model/update_product_dt
 import 'package:yachid/app/features/home/module/products/model/update_product_stock_dto.dart';
 import 'package:yachid/app/features/home/module/products/model/create_product_component_dto.dart';
 import 'package:yachid/app/features/home/module/products/model/update_product_component_dto.dart';
+import 'package:yachid/app/features/home/module/products/model/update_product_nota_fiscal_dto.dart';
 import 'package:yachid/app/repository/products/products_repository.dart';
 
 part 'product_detail_state.dart';
@@ -245,6 +246,57 @@ class ProductDetailCubit extends Cubit<ProductDetailState> {
         isSaving: current.isSaving,
         isSavingStock: current.isSavingStock,
         isSavingComponent: false,
+        selectedIndex: current.selectedIndex,
+      ));
+      emit(ProductDetailError(e.toString()));
+    }
+  }
+
+  Future<void> updateProductNotaFiscal(
+    String productId,
+    UpdateProductNotaFiscalDto dto,
+    String token,
+  ) async {
+    final current = state;
+    if (current is! ProductDetailLoaded) return;
+
+    emit(ProductDetailLoaded(
+      product: current.product,
+      isSaving: true,
+      isSavingStock: current.isSavingStock,
+      isSavingComponent: current.isSavingComponent,
+      selectedIndex: current.selectedIndex,
+    ));
+
+    try {
+      final response = await _repository.updateProductNotaFiscal(
+        productId,
+        dto,
+        token,
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        await loadProduct(productId, token);
+      } else {
+        emit(ProductDetailLoaded(
+          product: current.product,
+          isSaving: false,
+          isSavingStock: current.isSavingStock,
+          isSavingComponent: current.isSavingComponent,
+          selectedIndex: current.selectedIndex,
+        ));
+        final msg = (response.data is Map
+                ? (response.data as Map)['message']
+                : response.data)
+            ?.toString() ??
+            'Erro ao atualizar nota fiscal';
+        emit(ProductDetailError(msg));
+      }
+    } catch (e) {
+      emit(ProductDetailLoaded(
+        product: current.product,
+        isSaving: false,
+        isSavingStock: current.isSavingStock,
+        isSavingComponent: current.isSavingComponent,
         selectedIndex: current.selectedIndex,
       ));
       emit(ProductDetailError(e.toString()));

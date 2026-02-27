@@ -20,6 +20,8 @@ final class PartnersLoaded extends PartnersState {
   final PartnerStatus? filterStatus;
   final bool isLoading;
   final PaymentAddressDto? paymentAddress;
+  final List<GroupModel> groups;
+  final String? selectedGroupId;
 
   const PartnersLoaded({
     required this.partners,
@@ -32,6 +34,8 @@ final class PartnersLoaded extends PartnersState {
     this.filterStatus,
     this.isLoading = false,
     this.paymentAddress,
+    this.groups = const [],
+    this.selectedGroupId,
   });
 
   @override
@@ -46,6 +50,8 @@ final class PartnersLoaded extends PartnersState {
     filterStatus,
     isLoading,
     paymentAddress,
+    groups,
+    selectedGroupId,
   ];
 }
 

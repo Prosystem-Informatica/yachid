@@ -14,6 +14,7 @@ class ProductTabBar extends StatelessWidget {
   static const List<String> _tabLabels = [
     'Detalhes',
     'Componentes',
+    'Nota Fiscal',
   ];
 
   @override

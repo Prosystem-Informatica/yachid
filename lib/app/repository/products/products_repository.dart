@@ -9,6 +9,7 @@ import 'package:yachid/app/features/home/module/products/model/update_product_dt
 import 'package:yachid/app/features/home/module/products/model/create_product_component_dto.dart';
 import 'package:yachid/app/features/home/module/products/model/update_product_stock_dto.dart';
 import 'package:yachid/app/features/home/module/products/model/update_product_component_dto.dart';
+import 'package:yachid/app/features/home/module/products/model/update_product_nota_fiscal_dto.dart';
 
 class ProductsRepository {
   final RestClient _rest;
@@ -17,6 +18,7 @@ class ProductsRepository {
 
   Future<ProductsListResponse> getProducts({
     required String token,
+    required String groupId,
     String? search,
     int? limit,
     int? offset,
@@ -28,7 +30,7 @@ class ProductsRepository {
       if (offset != null) queryParams['offset'] = offset;
 
       final response = await _rest.get(
-        '/products',
+        '/products/$groupId',
         headers: {'Authorization': 'Bearer $token'},
         queryParameters: queryParams,
       );
@@ -70,10 +72,11 @@ class ProductsRepository {
   Future<RestClientResponse<dynamic>> createProduct(
     CreateProductDto product,
     String token,
+    String groupId,
   ) async {
     try {
       final response = await _rest.post(
-        '/products',
+        '/products/$groupId',
         data: jsonEncode(product.toJson()),
         headers: {
           'Authorization': 'Bearer $token',
@@ -160,6 +163,27 @@ class ProductsRepository {
       final response = await _rest.post(
         '/products/$productId/components',
         data: jsonEncode(component.toJson()),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      return response;
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<RestClientResponse<dynamic>> updateProductNotaFiscal(
+    String productId,
+    UpdateProductNotaFiscalDto updateDto,
+    String token,
+  ) async {
+    try {
+      final response = await _rest.patch(
+        '/products/$productId/nota-fiscal',
+        data: jsonEncode(updateDto.toJson()),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

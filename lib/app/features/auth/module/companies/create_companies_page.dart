@@ -77,7 +77,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
   final _cnpjRepository = CnpjRepository();
   bool _isLoadingCnpj = false;
   String? _cnpjErrorMessage;
-  
+
   // Rastreia quais campos foram preenchidos pela busca do CNPJ
   final Set<String> _camposPreenchidosCnpj = {};
 
@@ -116,11 +116,11 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
   }
 
   Widget _spacing() => const SizedBox(height: 15);
-  
+
   bool _isCampoBloqueado(String campo) {
     return _camposPreenchidosCnpj.contains(campo);
   }
-  
+
   String _getNomeEstado(String uf) {
     const estados = {
       'AC': 'Acre',
@@ -202,7 +202,7 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
 
     try {
       final cnpjData = await _cnpjRepository.consultarCnpj(cnpj: cnpjLimpo);
-      
+
       // Limpa os campos preenchidos anteriormente
       _camposPreenchidosCnpj.clear();
 
@@ -282,7 +282,8 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
           (r) => r.enabled == true,
           orElse: () => cnpjData.registrations!.first,
         );
-        if (enabledRegistration.number != null && enabledRegistration.number!.isNotEmpty) {
+        if (enabledRegistration.number != null &&
+            enabledRegistration.number!.isNotEmpty) {
           inscrEstadualCtrl.text = enabledRegistration.number!;
           _camposPreenchidosCnpj.add('inscrEstadual');
         }
@@ -314,20 +315,20 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
     cnpjCtrl.addListener(() {
       final cnpj = cnpjCtrl.text;
       final cnpjLimpo = cnpj.replaceAll(RegExp(r'[^\d]'), '');
-      
+
       if (_cnpjErrorMessage != null) {
         setState(() {
           _cnpjErrorMessage = null;
         });
       }
-      
+
       // Se o CNPJ foi limpo ou alterado, desbloqueia todos os campos
       if (cnpjLimpo.length < 14) {
         setState(() {
           _camposPreenchidosCnpj.clear();
         });
       }
-      
+
       if (cnpjLimpo.length == 14 && !_isLoadingCnpj) {
         _buscarCnpj(cnpj);
       }
@@ -522,35 +523,119 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                             value: uf,
                             decoration: _dec('UF - Estado'),
                             items: const [
-                              DropdownMenuItem(value: 'AC', child: Text('AC - Acre')),
-                              DropdownMenuItem(value: 'AL', child: Text('AL - Alagoas')),
-                              DropdownMenuItem(value: 'AP', child: Text('AP - Amapá')),
-                              DropdownMenuItem(value: 'AM', child: Text('AM - Amazonas')),
-                              DropdownMenuItem(value: 'BA', child: Text('BA - Bahia')),
-                              DropdownMenuItem(value: 'CE', child: Text('CE - Ceará')),
-                              DropdownMenuItem(value: 'DF', child: Text('DF - Distrito Federal')),
-                              DropdownMenuItem(value: 'ES', child: Text('ES - Espírito Santo')),
-                              DropdownMenuItem(value: 'GO', child: Text('GO - Goiás')),
-                              DropdownMenuItem(value: 'MA', child: Text('MA - Maranhão')),
-                              DropdownMenuItem(value: 'MT', child: Text('MT - Mato Grosso')),
-                              DropdownMenuItem(value: 'MS', child: Text('MS - Mato Grosso do Sul')),
-                              DropdownMenuItem(value: 'MG', child: Text('MG - Minas Gerais')),
-                              DropdownMenuItem(value: 'PA', child: Text('PA - Pará')),
-                              DropdownMenuItem(value: 'PB', child: Text('PB - Paraíba')),
-                              DropdownMenuItem(value: 'PR', child: Text('PR - Paraná')),
-                              DropdownMenuItem(value: 'PE', child: Text('PE - Pernambuco')),
-                              DropdownMenuItem(value: 'PI', child: Text('PI - Piauí')),
-                              DropdownMenuItem(value: 'RJ', child: Text('RJ - Rio de Janeiro')),
-                              DropdownMenuItem(value: 'RN', child: Text('RN - Rio Grande do Norte')),
-                              DropdownMenuItem(value: 'RS', child: Text('RS - Rio Grande do Sul')),
-                              DropdownMenuItem(value: 'RO', child: Text('RO - Rondônia')),
-                              DropdownMenuItem(value: 'RR', child: Text('RR - Roraima')),
-                              DropdownMenuItem(value: 'SC', child: Text('SC - Santa Catarina')),
-                              DropdownMenuItem(value: 'SP', child: Text('SP - São Paulo')),
-                              DropdownMenuItem(value: 'SE', child: Text('SE - Sergipe')),
-                              DropdownMenuItem(value: 'TO', child: Text('TO - Tocantins')),
+                              DropdownMenuItem(
+                                value: 'AC',
+                                child: Text('AC - Acre'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'AL',
+                                child: Text('AL - Alagoas'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'AP',
+                                child: Text('AP - Amapá'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'AM',
+                                child: Text('AM - Amazonas'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'BA',
+                                child: Text('BA - Bahia'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'CE',
+                                child: Text('CE - Ceará'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'DF',
+                                child: Text('DF - Distrito Federal'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'ES',
+                                child: Text('ES - Espírito Santo'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'GO',
+                                child: Text('GO - Goiás'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'MA',
+                                child: Text('MA - Maranhão'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'MT',
+                                child: Text('MT - Mato Grosso'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'MS',
+                                child: Text('MS - Mato Grosso do Sul'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'MG',
+                                child: Text('MG - Minas Gerais'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'PA',
+                                child: Text('PA - Pará'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'PB',
+                                child: Text('PB - Paraíba'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'PR',
+                                child: Text('PR - Paraná'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'PE',
+                                child: Text('PE - Pernambuco'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'PI',
+                                child: Text('PI - Piauí'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'RJ',
+                                child: Text('RJ - Rio de Janeiro'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'RN',
+                                child: Text('RN - Rio Grande do Norte'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'RS',
+                                child: Text('RS - Rio Grande do Sul'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'RO',
+                                child: Text('RO - Rondônia'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'RR',
+                                child: Text('RR - Roraima'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'SC',
+                                child: Text('SC - Santa Catarina'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'SP',
+                                child: Text('SP - São Paulo'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'SE',
+                                child: Text('SE - Sergipe'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'TO',
+                                child: Text('TO - Tocantins'),
+                              ),
                             ],
-                            onChanged: _isCampoBloqueado('uf') ? null : (v) => setState(() => uf = v ?? 'SP'),
+                            onChanged:
+                                _isCampoBloqueado('uf')
+                                    ? null
+                                    : (v) => setState(() => uf = v ?? 'SP'),
                           ),
                         ]),
                         _spacing(),
@@ -679,27 +764,36 @@ class _CreateCompaniesPageState extends State<CreateCompaniesPage>
                         RadioListTile(
                           value: 'SIMPLES_NACIONAL',
                           groupValue: regimeTributario,
-                          onChanged: _isCampoBloqueado('regimeTributario')
-                              ? null
-                              : (v) => setState(() => regimeTributario = v as String),
+                          onChanged:
+                              _isCampoBloqueado('regimeTributario')
+                                  ? null
+                                  : (v) => setState(
+                                    () => regimeTributario = v as String,
+                                  ),
                           title: const Text('Simples Nacional'),
                         ),
                         _spacing(),
                         RadioListTile(
                           value: 'SIMPLES_EXCESSO_RECEITA',
                           groupValue: regimeTributario,
-                          onChanged: _isCampoBloqueado('regimeTributario')
-                              ? null
-                              : (v) => setState(() => regimeTributario = v as String),
+                          onChanged:
+                              _isCampoBloqueado('regimeTributario')
+                                  ? null
+                                  : (v) => setState(
+                                    () => regimeTributario = v as String,
+                                  ),
                           title: const Text('Simples com Excesso de Receita'),
                         ),
                         _spacing(),
                         RadioListTile(
                           value: 'NORMAL',
                           groupValue: regimeTributario,
-                          onChanged: _isCampoBloqueado('regimeTributario')
-                              ? null
-                              : (v) => setState(() => regimeTributario = v as String),
+                          onChanged:
+                              _isCampoBloqueado('regimeTributario')
+                                  ? null
+                                  : (v) => setState(
+                                    () => regimeTributario = v as String,
+                                  ),
                           title: const Text('Regime Normal'),
                         ),
                         _spacing(),

@@ -15,6 +15,7 @@ class HomeCleanPage extends StatelessWidget {
         // TODO: implement listener
       },
       builder: (context, state) {
+        print(state.selectedCompanie);
         return Scaffold(
           body: Row(
             children: [
