@@ -1,6 +1,6 @@
 class RepresentativeModelList {
   final String id;
-  final String codigo;
+  final int codigo;
   final String nome;
   final String? telefone;
   final String? celular;
@@ -39,7 +39,7 @@ class RepresentativeModelList {
     final address = json['address'] as Map<String, dynamic>?;
     return RepresentativeModelList(
       id: json['id'] as String,
-      codigo: json['codigo'] as String? ?? '',
+      codigo: json['codigo'] as int? ?? 0,
       nome: json['nome'] as String? ?? '',
       telefone: json['telefone'] as String?,
       celular: json['celular'] as String?,

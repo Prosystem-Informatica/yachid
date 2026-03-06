@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yachid/app/core/formatters/input_formatters.dart';
+import 'package:yachid/app/core/helpers/environments.dart';
+import 'package:yachid/app/core/rest/http/http_rest_client.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
-import 'package:yachid/app/core/ui/yachid_form.dart';
+import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/home/module/partners/module/model/delivery_address.dart';
+import 'package:yachid/app/repository/cep/cep_repository.dart';
 
 class DeliveryAddressRegisterCard extends StatefulWidget {
   const DeliveryAddressRegisterCard({super.key, this.onSaved, this.onCancel});
@@ -25,7 +30,124 @@ class _DeliveryAddressRegisterCardState
   final _ufController = TextEditingController();
   final _observationsController = TextEditingController();
 
+  final _cepRepository = CepRepository(
+    rest: HttpRestClient(
+      baseUrl: Environments.get('BASE_URL') ?? '',
+      env: Environments.get('ENV') ?? '',
+      port: Environments.get('PORT') ?? '',
+    ),
+  );
+
   bool _bonification = false;
+  bool _isLoadingCep = false;
+  String? _cepErrorMessage;
+  bool _isStreetReadOnly = false;
+  bool _isRegionReadOnly = false;
+  bool _isNeighborhoodReadOnly = false;
+  bool _isCityReadOnly = false;
+  bool _isUfReadOnly = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _cepController.addListener(() {
+      final cepLimpo = _cepController.text.replaceAll(RegExp(r'[^\d]'), '');
+      if (_cepErrorMessage != null && cepLimpo.length < 8) {
+        setState(() => _cepErrorMessage = null);
+      }
+      if (cepLimpo.length < 8) {
+        _resetApiReadOnly();
+      }
+      if (cepLimpo.length == 8 && !_isLoadingCep) {
+        _buscarCep(cepLimpo);
+      }
+    });
+  }
+
+  void _resetApiReadOnly() {
+    setState(() {
+      _isStreetReadOnly = false;
+      _isRegionReadOnly = false;
+      _isNeighborhoodReadOnly = false;
+      _isCityReadOnly = false;
+      _isUfReadOnly = false;
+    });
+  }
+
+  void _applyApiValue({
+    required TextEditingController controller,
+    required String? value,
+    required ValueChanged<bool> setReadOnly,
+  }) {
+    final normalized = value?.trim() ?? '';
+    if (normalized.isNotEmpty) {
+      controller.text = normalized;
+      setReadOnly(true);
+    } else {
+      setReadOnly(false);
+    }
+  }
+
+  Future<void> _buscarCep(String cep) async {
+    final cepLimpo = cep.replaceAll(RegExp(r'[^\d]'), '');
+    if (cepLimpo.length != 8) return;
+
+    setState(() {
+      _isLoadingCep = true;
+      _cepErrorMessage = null;
+    });
+
+    try {
+      final token = context.read<AuthBlocCubit>().state.authModel.token ?? '';
+      final data = await _cepRepository.lookupCep(cep: cepLimpo, token: token);
+      setState(() {
+        _applyApiValue(
+          controller: _streetController,
+          value: data.logradouro,
+          setReadOnly: (v) => _isStreetReadOnly = v,
+        );
+        _applyApiValue(
+          controller: _regionController,
+          value: data.regiao,
+          setReadOnly: (v) => _isRegionReadOnly = v,
+        );
+        _applyApiValue(
+          controller: _neighborhoodController,
+          value: data.bairro,
+          setReadOnly: (v) => _isNeighborhoodReadOnly = v,
+        );
+        _applyApiValue(
+          controller: _cityController,
+          value: data.localidade,
+          setReadOnly: (v) => _isCityReadOnly = v,
+        );
+        _applyApiValue(
+          controller: _ufController,
+          value: data.uf,
+          setReadOnly: (v) => _isUfReadOnly = v,
+        );
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _cepErrorMessage = 'CEP inválido ou não encontrado';
+          _resetApiReadOnly();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingCep = false);
+      }
+    }
+  }
+
+  Widget _apiLockedSuffix(bool isReadOnly) {
+    if (!isReadOnly) return const SizedBox.shrink();
+    return const Tooltip(
+      message: 'Preenchido automaticamente pela API de CEP',
+      child: Icon(Icons.lock_rounded, size: 18, color: AppColors.gray600),
+    );
+  }
 
   @override
   void dispose() {
@@ -90,7 +212,15 @@ class _DeliveryAddressRegisterCardState
     _cityController.clear();
     _ufController.clear();
     _observationsController.clear();
-    setState(() => _bonification = false);
+    setState(() {
+      _bonification = false;
+      _cepErrorMessage = null;
+      _isStreetReadOnly = false;
+      _isRegionReadOnly = false;
+      _isNeighborhoodReadOnly = false;
+      _isCityReadOnly = false;
+      _isUfReadOnly = false;
+    });
   }
 
   void _handleCancel() {
@@ -193,29 +323,36 @@ class _DeliveryAddressRegisterCardState
   Widget _buildFormGrid(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final crossAxisCount = width > 720 ? 3 : (width > 520 ? 2 : 1);
-        const spacing = 24.0;
-        const runSpacing = 20.0;
-        final itemWidth =
-            width > 520
-                ? (width - 48 - spacing * (crossAxisCount - 1)) / crossAxisCount
-                : null;
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Wrap(
-              spacing: spacing,
-              runSpacing: runSpacing,
+            const SizedBox(height: 12),
+            Row(
+              spacing: 12,
               children: [
-                _field(
-                  itemWidth,
+                Expanded(
+                  flex: 1,
                   child: TextFormField(
                     controller: _cepController,
-                    decoration: _decoration('CEP'),
+                    decoration: _decoration('CEP').copyWith(
+                      errorText: _cepErrorMessage,
+                      suffixIcon:
+                          _isLoadingCep
+                              ? const Padding(
+                                padding: EdgeInsets.all(12),
+                                child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              )
+                              : null,
+                    ),
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
+                    inputFormatters: [CepInputFormatter()],
                     validator:
                         (v) =>
                             (v == null || v.trim().isEmpty)
@@ -223,25 +360,15 @@ class _DeliveryAddressRegisterCardState
                                 : null,
                   ),
                 ),
-                _field(
-                  itemWidth,
-                  child: TextFormField(
-                    controller: _streetController,
-                    decoration: _decoration('Logradouro'),
-                    textInputAction: TextInputAction.next,
-                    validator:
-                        (v) =>
-                            (v == null || v.trim().isEmpty)
-                                ? 'Informe o logradouro'
-                                : null,
-                  ),
-                ),
-                _field(
-                  itemWidth,
+                Expanded(
+                  flex: 2,
                   child: TextFormField(
                     controller: _regionController,
-                    decoration: _decoration('Região'),
+                    decoration: _decoration(
+                      'Região',
+                    ).copyWith(suffixIcon: _apiLockedSuffix(_isRegionReadOnly)),
                     textInputAction: TextInputAction.next,
+                    readOnly: _isRegionReadOnly,
                     validator:
                         (v) =>
                             (v == null || v.trim().isEmpty)
@@ -249,12 +376,38 @@ class _DeliveryAddressRegisterCardState
                                 : null,
                   ),
                 ),
-                _field(
-                  itemWidth,
+                Expanded(flex: 3, child: Container()),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              spacing: 12,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: TextFormField(
+                    controller: _streetController,
+                    decoration: _decoration(
+                      'Logradouro',
+                    ).copyWith(suffixIcon: _apiLockedSuffix(_isStreetReadOnly)),
+                    textInputAction: TextInputAction.next,
+                    readOnly: _isStreetReadOnly,
+                    validator:
+                        (v) =>
+                            (v == null || v.trim().isEmpty)
+                                ? 'Informe o logradouro'
+                                : null,
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
                   child: TextFormField(
                     controller: _neighborhoodController,
-                    decoration: _decoration('Bairro'),
+                    decoration: _decoration('Bairro').copyWith(
+                      suffixIcon: _apiLockedSuffix(_isNeighborhoodReadOnly),
+                    ),
                     textInputAction: TextInputAction.next,
+                    readOnly: _isNeighborhoodReadOnly,
                     validator:
                         (v) =>
                             (v == null || v.trim().isEmpty)
@@ -262,12 +415,15 @@ class _DeliveryAddressRegisterCardState
                                 : null,
                   ),
                 ),
-                _field(
-                  width > 720 ? (itemWidth! * 2 + spacing) : itemWidth,
+                Expanded(
+                  flex: 2,
                   child: TextFormField(
                     controller: _cityController,
-                    decoration: _decoration('Cidade'),
+                    decoration: _decoration(
+                      'Cidade',
+                    ).copyWith(suffixIcon: _apiLockedSuffix(_isCityReadOnly)),
                     textInputAction: TextInputAction.next,
+                    readOnly: _isCityReadOnly,
                     validator:
                         (v) =>
                             (v == null || v.trim().isEmpty)
@@ -275,17 +431,18 @@ class _DeliveryAddressRegisterCardState
                                 : null,
                   ),
                 ),
-                _field(
-                  width > 720 ? 100 : (width > 520 ? 140 : null),
-                  child: YachidFormField(
+                Expanded(
+                  flex: 1,
+                  child: TextFormField(
                     controller: _ufController,
-                    label: 'UF',
-                    hint: '',
+                    decoration: _decoration(
+                      'UF',
+                    ).copyWith(suffixIcon: _apiLockedSuffix(_isUfReadOnly)),
                     keyboardType: TextInputType.text,
                     textCapitalization: TextCapitalization.characters,
-                    maxLength: 2,
-                    textInputAction: TextInputAction.next,
 
+                    textInputAction: TextInputAction.next,
+                    readOnly: _isUfReadOnly,
                     validator:
                         (v) =>
                             (v == null || v.trim().isEmpty)
@@ -295,6 +452,7 @@ class _DeliveryAddressRegisterCardState
                 ),
               ],
             ),
+
             const SizedBox(height: 20),
             TextFormField(
               controller: _observationsController,
@@ -306,11 +464,6 @@ class _DeliveryAddressRegisterCardState
         );
       },
     );
-  }
-
-  Widget _field(double? width, {required Widget child}) {
-    if (width == null) return child;
-    return SizedBox(width: width, child: child);
   }
 
   Widget _buildBonificationRow() {

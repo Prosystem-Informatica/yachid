@@ -44,7 +44,7 @@ class _BanksListState extends State<BanksList> {
 
   void _onEditPressed(BankModelList bank) {
     setState(() {
-      _editingBankId = bank.id;
+      _editingBankId = bank.id.toString();
       _showRegisterCard = true;
     });
   }
@@ -62,6 +62,10 @@ class _BanksListState extends State<BanksList> {
 
   @override
   Widget build(BuildContext context) {
+    return _buildBankList();
+  }
+
+  Widget _buildBankList() {
     return Scaffold(
       backgroundColor: AppColors.textOnPrimary,
       body: Row(

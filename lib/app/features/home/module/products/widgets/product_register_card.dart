@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
 import 'package:yachid/app/features/home/module/products/model/create_product_dto.dart';
+import 'package:yachid/app/features/home/module/partners/widgets/table/widgets/table_cell.dart';
+import 'package:yachid/app/features/home/module/partners/widgets/table/widgets/table_header.dart';
 
 import '../../../../../core/widgets/widgets.dart';
 
@@ -48,6 +50,13 @@ class _ProductRegisterCardState extends State<ProductRegisterCard> {
   final _prateleirasController = TextEditingController();
   final _estoqueMinController = TextEditingController(text: '0');
   final _estoqueMaxController = TextEditingController(text: '0');
+  static const List<Map<String, String>> _mockFamilias = [
+    {'codigo': 'F001', 'name': 'Alimentos'},
+    {'codigo': 'F002', 'name': 'Bebidas'},
+    {'codigo': 'F003', 'name': 'Higiene'},
+    {'codigo': 'F004', 'name': 'Limpeza'},
+    {'codigo': 'F005', 'name': 'Utilidades'},
+  ];
 
   bool _status = true;
   bool _calculaIcms = false;
@@ -64,6 +73,154 @@ class _ProductRegisterCardState extends State<ProductRegisterCard> {
 
   void _toggle(String key) {
     setState(() => _openSections[key] = !_openSections[key]!);
+  }
+
+  void _selectFamilia(Map<String, String> item, BuildContext modalContext) {
+    final codigo = item['codigo'] ?? '';
+    final name = item['name'] ?? '';
+    final value = '$codigo - $name';
+    setState(() {
+      _familiaController.text = value;
+    });
+    Navigator.of(modalContext).pop();
+  }
+
+  Future<void> _openFamiliaModal() async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        const colWidth = 220.0;
+        return Dialog(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720, maxHeight: 560),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  const Text(
+                    'Selecionar família',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 36),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          constraints: const BoxConstraints(minWidth: 500),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.06),
+                                blurRadius: 20,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 18,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor.withValues(
+                                    alpha: 0.06,
+                                  ),
+                                ),
+                                child: const Row(
+                                  children: [
+                                    PartnersTableHeaderCell(
+                                      label: 'codigo',
+                                      width: colWidth,
+                                    ),
+                                    PartnersTableHeaderCell(
+                                      label: 'name',
+                                      width: colWidth,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ..._mockFamilias.asMap().entries.map((entry) {
+                                final index = entry.key;
+                                final item = entry.value;
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color:
+                                        index.isEven
+                                            ? Colors.white
+                                            : AppColors.gray300.withValues(
+                                              alpha: 0.12,
+                                            ),
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        _selectFamilia(item, context);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 16,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            PartnersTableCell(
+                                              text: item['codigo'] ?? '',
+                                              width: colWidth,
+                                            ),
+                                            PartnersTableCell(
+                                              text: item['name'] ?? '',
+                                              width: colWidth,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 36),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      FilledButton.icon(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Fluxo de inclusão em construção.'),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.add_rounded, size: 18),
+                        label: const Text('Incluir Família'),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Fechar'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   InputDecoration _dec(String label, {String? hint}) {
@@ -309,48 +466,53 @@ class _ProductRegisterCardState extends State<ProductRegisterCard> {
                       toggle: _toggle,
                       children: [
                         const SizedBox(height: 12),
-                        _buildFormRow([
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _ultimoCodigoController,
-                              decoration: _dec('Último Código'),
+                        // _buildFormRow([
+                        //   _field(
+                        //     140,
+                        //     TextFormField(
+                        //       controller: _ultimoCodigoController,
+                        //       decoration: _dec('Último Código'),
+                        //     ),
+                        //   ),
+                        //   _field(
+                        //     140,
+                        //     TextFormField(
+                        //       controller: _penultimoCodigoController,
+                        //       decoration: _dec('Penúltimo Código'),
+                        //     ),
+                        //   ),
+                        // ]),
+                        Row(
+                          spacing: 24,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _produtoController,
+                                decoration: _dec('Produto *'),
+                                validator:
+                                    (v) =>
+                                        (v == null || v.trim().isEmpty)
+                                            ? 'Obrigatório'
+                                            : null,
+                              ),
                             ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _penultimoCodigoController,
-                              decoration: _dec('Penúltimo Código'),
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _linhaController,
+                                decoration: _dec('Linha'),
+                              ),
                             ),
-                          ),
-                          _field(
-                            320,
-                            TextFormField(
-                              controller: _produtoController,
-                              decoration: _dec('Produto *'),
-                              validator:
-                                  (v) =>
-                                      (v == null || v.trim().isEmpty)
-                                          ? 'Obrigatório'
-                                          : null,
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _codBarrasController,
+                                decoration: _dec('Cód. Barras'),
+                              ),
                             ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _linhaController,
-                              decoration: _dec('Linha'),
-                            ),
-                          ),
-                          _field(
-                            160,
-                            TextFormField(
-                              controller: _codBarrasController,
-                              decoration: _dec('Cód. Barras'),
-                            ),
-                          ),
-                        ]),
+                          ],
+                        ),
                         const SizedBox(height: 12),
                         _buildFormRow([
                           _field(
@@ -364,7 +526,11 @@ class _ProductRegisterCardState extends State<ProductRegisterCard> {
                             140,
                             TextFormField(
                               controller: _familiaController,
-                              decoration: _dec('Família'),
+                              readOnly: true,
+                              onTap: _openFamiliaModal,
+                              decoration: _dec('Família').copyWith(
+                                suffixIcon: const Icon(Icons.search_rounded),
+                              ),
                             ),
                           ),
                           _field(
@@ -529,100 +695,117 @@ class _ProductRegisterCardState extends State<ProductRegisterCard> {
                       openSections: _openSections,
                       toggle: _toggle,
                       children: [
+                        Row(
+                          spacing: 16,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _custoCalculadoController,
+                                decoration: _dec('Custo Calculado'),
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _custoDigitadoController,
+                                decoration: _dec('Custo Digitado'),
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _custoMedioController,
+                                decoration: _dec('Custo Médio'),
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 12),
-                        _buildFormRow([
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _custoCalculadoController,
-                              decoration: _dec('Custo Calculado'),
-                              keyboardType: TextInputType.number,
+                        Row(
+                          spacing: 16,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _ultimoCustoController,
+                                decoration: _dec('Último Custo'),
+                                keyboardType: TextInputType.number,
+                              ),
                             ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _custoDigitadoController,
-                              decoration: _dec('Custo Digitado'),
-                              keyboardType: TextInputType.number,
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _penultimoCustoController,
+                                decoration: _dec('Penúltimo Custo'),
+                                keyboardType: TextInputType.number,
+                              ),
                             ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _custoMedioController,
-                              decoration: _dec('Custo Médio'),
-                              keyboardType: TextInputType.number,
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _antPenCustoController,
+                                decoration: _dec('Ant. Pen. Custo'),
+                                keyboardType: TextInputType.number,
+                              ),
                             ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _ultimoCustoController,
-                              decoration: _dec('Último Custo'),
-                              keyboardType: TextInputType.number,
-                            ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _penultimoCustoController,
-                              decoration: _dec('Penúltimo Custo'),
-                              keyboardType: TextInputType.number,
-                            ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _antPenCustoController,
-                              decoration: _dec('Ant. Pen. Custo'),
-                              keyboardType: TextInputType.number,
-                            ),
-                          ),
-                        ]),
+                          ],
+                        ),
                         const SizedBox(height: 12),
-                        _buildFormRow([
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _precoMin7Controller,
-                              decoration: _dec('Preço Mín. 7%'),
-                              keyboardType: TextInputType.number,
+                        Row(
+                          spacing: 16,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _precoMin7Controller,
+                                decoration: _dec('Preço Mín. 7%'),
+                                keyboardType: TextInputType.number,
+                              ),
                             ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _precoMin12Controller,
-                              decoration: _dec('Preço Mín. 12%'),
-                              keyboardType: TextInputType.number,
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _precoMin12Controller,
+                                decoration: _dec('Preço Mín. 12%'),
+                                keyboardType: TextInputType.number,
+                              ),
                             ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _precoMin18Controller,
-                              decoration: _dec('Preço Mín. 18%'),
-                              keyboardType: TextInputType.number,
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _precoMin18Controller,
+                                decoration: _dec('Preço Mín. 18%'),
+                                keyboardType: TextInputType.number,
+                              ),
                             ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _precoTabelaController,
-                              decoration: _dec('Preço Tabela'),
-                              keyboardType: TextInputType.number,
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          spacing: 16,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _precoTabelaController,
+                                decoration: _dec('Preço Tabela'),
+                                keyboardType: TextInputType.number,
+                              ),
                             ),
-                          ),
-                          _field(
-                            140,
-                            TextFormField(
-                              controller: _precoAnteriorController,
-                              decoration: _dec('Preço Anterior'),
-                              keyboardType: TextInputType.number,
+                            Expanded(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _precoAnteriorController,
+                                decoration: _dec('Preço Anterior'),
+                                keyboardType: TextInputType.number,
+                              ),
                             ),
-                          ),
-                        ]),
+                          ],
+                        ),
                       ],
                     ),
                     sectionDropdown(
@@ -641,52 +824,55 @@ class _ProductRegisterCardState extends State<ProductRegisterCard> {
                         ),
                         if (_includeStock) ...[
                           const SizedBox(height: 12),
-                          _buildFormRow([
-                            _field(
-                              200,
-                              TextFormField(
-                                controller: _ruaController,
-                                decoration: _dec('Rua *'),
-                                validator:
-                                    _includeStock
-                                        ? (v) =>
-                                            (v == null || v.trim().isEmpty)
-                                                ? 'Obrigatório'
-                                                : null
-                                        : null,
+                          Row(
+                            spacing: 16,
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: TextFormField(
+                                  controller: _ruaController,
+                                  decoration: _dec('Rua *'),
+                                  validator:
+                                      _includeStock
+                                          ? (v) =>
+                                              (v == null || v.trim().isEmpty)
+                                                  ? 'Obrigatório'
+                                                  : null
+                                          : null,
+                                ),
                               ),
-                            ),
-                            _field(
-                              180,
-                              TextFormField(
-                                controller: _prateleirasController,
-                                decoration: _dec('Prateleiras *'),
-                                validator:
-                                    _includeStock
-                                        ? (v) =>
-                                            (v == null || v.trim().isEmpty)
-                                                ? 'Obrigatório'
-                                                : null
-                                        : null,
+                              Expanded(
+                                flex: 1,
+                                child: TextFormField(
+                                  controller: _prateleirasController,
+                                  decoration: _dec('Prateleiras *'),
+                                  validator:
+                                      _includeStock
+                                          ? (v) =>
+                                              (v == null || v.trim().isEmpty)
+                                                  ? 'Obrigatório'
+                                                  : null
+                                          : null,
+                                ),
                               ),
-                            ),
-                            _field(
-                              120,
-                              TextFormField(
-                                controller: _estoqueMinController,
-                                decoration: _dec('Estoque Mín'),
-                                keyboardType: TextInputType.number,
+                              Expanded(
+                                flex: 1,
+                                child: TextFormField(
+                                  controller: _estoqueMinController,
+                                  decoration: _dec('Estoque Mín'),
+                                  keyboardType: TextInputType.number,
+                                ),
                               ),
-                            ),
-                            _field(
-                              120,
-                              TextFormField(
-                                controller: _estoqueMaxController,
-                                decoration: _dec('Estoque Máx'),
-                                keyboardType: TextInputType.number,
+                              Expanded(
+                                flex: 1,
+                                child: TextFormField(
+                                  controller: _estoqueMaxController,
+                                  decoration: _dec('Estoque Máx'),
+                                  keyboardType: TextInputType.number,
+                                ),
                               ),
-                            ),
-                          ]),
+                            ],
+                          ),
                         ],
                       ],
                     ),

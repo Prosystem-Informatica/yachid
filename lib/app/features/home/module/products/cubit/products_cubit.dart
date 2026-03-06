@@ -51,7 +51,9 @@ class ProductsCubit extends Cubit<ProductsState> {
         searchLower.isEmpty
             ? current.products
             : current.products.where((p) {
-              return (p.codigo.toLowerCase().contains(searchLower)) ||
+              return (p.codigo.toString().toLowerCase().contains(
+                    searchLower,
+                  )) ||
                   (p.produto.toLowerCase().contains(searchLower)) ||
                   (p.codBarras?.toLowerCase().contains(searchLower) ?? false);
             }).toList();

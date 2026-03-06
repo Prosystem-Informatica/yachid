@@ -9,7 +9,14 @@ import 'package:yachid/app/features/home/module/products/model/product_model_lis
 class ProductsTable extends StatelessWidget {
   final List<ProductModelList> products;
 
-  const ProductsTable({super.key, required this.products});
+  /// Se fornecido, chama ao clicar na linha em vez de navegar.
+  final void Function(String productId)? onProductTap;
+
+  const ProductsTable({
+    super.key,
+    required this.products,
+    this.onProductTap,
+  });
 
   static const _columns = [
     'Código',
@@ -53,12 +60,15 @@ class ProductsTable extends StatelessWidget {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: _columns
-                  .map((label) => PartnersTableHeaderCell(
-                        label: label,
-                        width: colWidth,
-                      ))
-                  .toList(),
+              children:
+                  _columns
+                      .map(
+                        (label) => PartnersTableHeaderCell(
+                          label: label,
+                          width: colWidth,
+                        ),
+                      )
+                      .toList(),
             ),
           ),
           ...products.asMap().entries.map((entry) {
@@ -67,15 +77,22 @@ class ProductsTable extends StatelessWidget {
             return Container(
               key: ValueKey(p.id),
               decoration: BoxDecoration(
-                color: index.isEven
-                    ? Colors.white
-                    : AppColors.gray300.withValues(alpha: 0.12),
+                color:
+                    index.isEven
+                        ? Colors.white
+                        : AppColors.gray300.withValues(alpha: 0.12),
               ),
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    Get.toNamed(Routes.PRODUCT_DETAILS.replaceFirst(':id', p.id));
+                    if (onProductTap != null) {
+                      onProductTap!(p.id);
+                    } else {
+                      Get.toNamed(
+                        Routes.PRODUCT_DETAILS.replaceFirst(':id', p.id),
+                      );
+                    }
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -84,7 +101,10 @@ class ProductsTable extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        PartnersTableCell(text: p.codigo, width: colWidth),
+                        PartnersTableCell(
+                          text: p.codigo.toString(),
+                          width: colWidth,
+                        ),
                         PartnersTableCell(
                           text: p.produto,
                           width: colWidth,
@@ -115,9 +135,12 @@ class ProductsTable extends StatelessWidget {
                               vertical: 5,
                             ),
                             decoration: BoxDecoration(
-                              color: p.status
-                                  ? AppColors.success.withValues(alpha: 0.15)
-                                  : AppColors.error.withValues(alpha: 0.15),
+                              color:
+                                  p.status
+                                      ? AppColors.success.withValues(
+                                        alpha: 0.15,
+                                      )
+                                      : AppColors.error.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -126,7 +149,10 @@ class ProductsTable extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: p.status ? AppColors.success : AppColors.error,
+                                color:
+                                    p.status
+                                        ? AppColors.success
+                                        : AppColors.error,
                               ),
                             ),
                           ),

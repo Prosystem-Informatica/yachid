@@ -22,8 +22,10 @@ final class PartnersLoaded extends PartnersState {
   final PaymentAddressDto? paymentAddress;
   final List<GroupModel> groups;
   final String? selectedGroupId;
+  final bool showRegisterCard;
 
   const PartnersLoaded({
+    this.showRegisterCard = false,
     required this.partners,
     required this.filteredPartners,
     this.filterDocument = '',
@@ -37,6 +39,38 @@ final class PartnersLoaded extends PartnersState {
     this.groups = const [],
     this.selectedGroupId,
   });
+
+  PartnersLoaded copyWith({
+    bool? showRegisterCard,
+    List<PartnerModelList>? partners,
+    List<PartnerModelList>? filteredPartners,
+    String? filterDocument,
+    String? filterCity,
+    String? filterPhone,
+    String? filterUf,
+    String? filterCep,
+    PartnerStatus? filterStatus,
+    bool? isLoading,
+    PaymentAddressDto? paymentAddress,
+    List<GroupModel>? groups,
+    String? selectedGroupId,
+  }) {
+    return PartnersLoaded(
+      showRegisterCard: showRegisterCard ?? this.showRegisterCard,
+      partners: partners ?? this.partners,
+      filteredPartners: filteredPartners ?? this.filteredPartners,
+      filterDocument: filterDocument ?? this.filterDocument,
+      filterCity: filterCity ?? this.filterCity,
+      filterPhone: filterPhone ?? this.filterPhone,
+      filterUf: filterUf ?? this.filterUf,
+      filterCep: filterCep ?? this.filterCep,
+      filterStatus: filterStatus ?? this.filterStatus,
+      isLoading: isLoading ?? this.isLoading,
+      paymentAddress: paymentAddress ?? this.paymentAddress,
+      groups: groups ?? this.groups,
+      selectedGroupId: selectedGroupId ?? this.selectedGroupId,
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -52,6 +86,7 @@ final class PartnersLoaded extends PartnersState {
     paymentAddress,
     groups,
     selectedGroupId,
+    showRegisterCard,
   ];
 }
 

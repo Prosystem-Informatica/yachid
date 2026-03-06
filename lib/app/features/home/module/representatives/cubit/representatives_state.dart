@@ -24,7 +24,7 @@ final class RepresentativesLoaded extends RepresentativesState {
     if (filterSearch.trim().isEmpty) return representatives;
     final term = filterSearch.trim().toLowerCase();
     return representatives.where((r) {
-      return r.codigo.toLowerCase().contains(term) ||
+      return r.codigo.toString().contains(term) ||
           r.nome.toLowerCase().contains(term) ||
           (r.documento?.toLowerCase().contains(term) ?? false) ||
           (r.email?.toLowerCase().contains(term) ?? false);

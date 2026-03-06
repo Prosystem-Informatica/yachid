@@ -30,6 +30,25 @@ class EnterpriseModel {
   bool get isSuccess => id != null && document != null;
 
   factory EnterpriseModel.fromJson(Map<String, dynamic> json) {
+    String? parsedGroupId;
+    final group = json['group'];
+    if (group is Map<String, dynamic>) {
+      parsedGroupId = group['id'] as String?;
+    }
+
+    final groupEnterprises = json['groupEnterprises'];
+    if ((parsedGroupId == null || parsedGroupId.isEmpty) &&
+        groupEnterprises is List &&
+        groupEnterprises.isNotEmpty) {
+      final first = groupEnterprises.first;
+      if (first is Map<String, dynamic>) {
+        final nestedGroup = first['group'];
+        if (nestedGroup is Map<String, dynamic>) {
+          parsedGroupId = nestedGroup['id'] as String?;
+        }
+      }
+    }
+
     return EnterpriseModel(
       id: json['id'] as String?,
       document: json['document'] as String?,
@@ -44,7 +63,7 @@ class EnterpriseModel {
           json['address'] != null
               ? Address.fromJson(json['address'] as Map<String, dynamic>)
               : null,
-      groupId: json['group'] != null ? json['group']['id'] as String? : null,
+      groupId: parsedGroupId,
     );
   }
 

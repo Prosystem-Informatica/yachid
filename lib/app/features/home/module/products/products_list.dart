@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/home/module/products/cubit/products_cubit.dart';
+import 'package:yachid/app/features/home/module/products/module/product_detail_page.dart';
 import 'package:yachid/app/features/home/module/products/widgets/product_register_card.dart';
 import 'package:yachid/app/features/home/module/products/widgets/products_filters.dart';
 import 'package:yachid/app/features/home/module/products/widgets/table/products_table.dart';
@@ -18,15 +19,33 @@ class _ProductsListState extends State<ProductsList> {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   bool _showRegisterCard = false;
+  String? _selectedProductId;
   late String groupId;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authModel = context.read<AuthBlocCubit>().state.authModel;
-      groupId = authModel.user?.enterpriseModel?.first.groupId ?? '';
-      print('groupId: $groupId');
+      final authState = context.read<AuthBlocCubit>().state;
+      final authModel = authState.authModel;
+      final enterprises = authModel.user?.enterpriseModel;
+      groupId =
+          authState.selectedCompanie?.groupId ??
+          ((enterprises != null && enterprises.isNotEmpty)
+              ? enterprises.first.groupId
+              : null) ??
+          '';
+
+      if (groupId.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Não foi possível identificar o grupo da empresa.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
       context.read<ProductsCubit>().loadProducts(
         token: authModel.token ?? '',
         groupId: groupId,
@@ -58,6 +77,13 @@ class _ProductsListState extends State<ProductsList> {
 
   @override
   Widget build(BuildContext context) {
+    if (_selectedProductId != null) {
+      return ProductDetailPage(
+        productId: _selectedProductId!,
+        onBack: () => setState(() => _selectedProductId = null),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.textOnPrimary,
       body: Row(
@@ -213,6 +239,9 @@ class _ProductsListState extends State<ProductsList> {
                                       scrollDirection: Axis.horizontal,
                                       child: ProductsTable(
                                         products: state.filteredProducts,
+                                        onProductTap: (id) =>
+                                            setState(() =>
+                                                _selectedProductId = id),
                                       ),
                                     ),
                                   ),

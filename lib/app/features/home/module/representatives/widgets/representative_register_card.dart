@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yachid/app/core/helpers/environments.dart';
+import 'package:yachid/app/core/rest/http/http_rest_client.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/home/module/representatives/cubit/representatives_cubit.dart';
@@ -7,6 +9,7 @@ import 'package:yachid/app/features/home/module/representatives/model/create_rep
 import 'package:yachid/app/features/home/module/representatives/model/representative_address_dto.dart';
 import 'package:yachid/app/features/home/module/representatives/model/representative_detail.dart';
 import 'package:yachid/app/features/home/module/representatives/model/update_representative_dto.dart';
+import 'package:yachid/app/repository/cep/cep_repository.dart';
 
 class RepresentativeRegisterCard extends StatefulWidget {
   const RepresentativeRegisterCard({
@@ -46,6 +49,13 @@ class _RepresentativeRegisterCardState
   final _cityController = TextEditingController();
   final _countryController = TextEditingController(text: 'Brasil');
   final _ufController = TextEditingController();
+  final _cepRepository = CepRepository(
+    rest: HttpRestClient(
+      baseUrl: Environments.get('BASE_URL') ?? "",
+      env: Environments.get('ENV') ?? "",
+      port: Environments.get('PORT') ?? "",
+    ),
+  );
 
   TipoComissao? _tipoComissao = TipoComissao.semComissao;
   bool _status = true;
@@ -54,14 +64,114 @@ class _RepresentativeRegisterCardState
   bool _includeAddress = false;
   bool _isLoading = false;
   bool _initialLoading = false;
+  bool _isLoadingCep = false;
+  String? _cepErrorMessage;
+  bool _isStreetReadOnly = false;
+  bool _isNeighborhoodReadOnly = false;
+  bool _isCityReadOnly = false;
+  bool _isUfReadOnly = false;
+  bool _isComplementReadOnly = false;
 
   bool get _isEditMode => widget.representativeId != null;
 
   @override
   void initState() {
     super.initState();
+    _cepController.addListener(() {
+      final cepLimpo = _cepController.text.replaceAll(RegExp(r'[^\d]'), '');
+      if (_cepErrorMessage != null && cepLimpo.length < 8) {
+        setState(() => _cepErrorMessage = null);
+      }
+      if (cepLimpo.length < 8) {
+        _resetApiReadOnly();
+      }
+      if (cepLimpo.length == 8 && !_isLoadingCep) {
+        _buscarCep(cepLimpo);
+      }
+    });
     if (_isEditMode) {
       _loadDetail();
+    }
+  }
+
+  void _resetApiReadOnly() {
+    setState(() {
+      _isStreetReadOnly = false;
+      _isNeighborhoodReadOnly = false;
+      _isCityReadOnly = false;
+      _isUfReadOnly = false;
+      _isComplementReadOnly = false;
+    });
+  }
+
+  void _applyApiValue({
+    required TextEditingController controller,
+    required String? value,
+    required ValueChanged<bool> setReadOnly,
+  }) {
+    final normalized = value?.trim() ?? '';
+    if (normalized.isNotEmpty) {
+      controller.text = normalized;
+      setReadOnly(true);
+    } else {
+      setReadOnly(false);
+    }
+  }
+
+  Future<void> _buscarCep(String cep) async {
+    final cepLimpo = cep.replaceAll(RegExp(r'[^\d]'), '');
+    if (cepLimpo.length != 8) return;
+
+    setState(() {
+      _isLoadingCep = true;
+      _cepErrorMessage = null;
+    });
+
+    try {
+      final token = context.read<AuthBlocCubit>().state.authModel.token ?? '';
+      final data = await _cepRepository.lookupCep(cep: cepLimpo, token: token);
+      setState(() {
+        _applyApiValue(
+          controller: _streetController,
+          value: data.logradouro,
+          setReadOnly: (v) => _isStreetReadOnly = v,
+        );
+        _applyApiValue(
+          controller: _neighborhoodController,
+          value: data.bairro,
+          setReadOnly: (v) => _isNeighborhoodReadOnly = v,
+        );
+        _applyApiValue(
+          controller: _cityController,
+          value: data.localidade,
+          setReadOnly: (v) => _isCityReadOnly = v,
+        );
+        _applyApiValue(
+          controller: _ufController,
+          value: data.uf,
+          setReadOnly: (v) => _isUfReadOnly = v,
+        );
+        _applyApiValue(
+          controller: _complementController,
+          value: data.complemento,
+          setReadOnly: (v) => _isComplementReadOnly = v,
+        );
+      });
+    } catch (_) {
+      if (mounted && cepLimpo.length == 8) {
+        setState(() {
+          _cepErrorMessage = 'CEP inválido ou não encontrado';
+          _isStreetReadOnly = false;
+          _isNeighborhoodReadOnly = false;
+          _isCityReadOnly = false;
+          _isUfReadOnly = false;
+          _isComplementReadOnly = false;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingCep = false);
+      }
     }
   }
 
@@ -126,6 +236,14 @@ class _RepresentativeRegisterCardState
       filled: true,
       fillColor: Colors.white,
       isDense: true,
+    );
+  }
+
+  Widget _apiLockedSuffix(bool isReadOnly) {
+    if (!isReadOnly) return const SizedBox.shrink();
+    return const Tooltip(
+      message: 'Preenchido automaticamente pela API de CEP',
+      child: Icon(Icons.lock_rounded, size: 18, color: AppColors.gray600),
     );
   }
 
@@ -295,6 +413,12 @@ class _RepresentativeRegisterCardState
       _prePedido = false;
       _aplicativo = false;
       _includeAddress = false;
+      _isStreetReadOnly = false;
+      _isNeighborhoodReadOnly = false;
+      _isCityReadOnly = false;
+      _isUfReadOnly = false;
+      _isComplementReadOnly = false;
+      _cepErrorMessage = null;
     });
   }
 
@@ -523,7 +647,22 @@ class _RepresentativeRegisterCardState
                         width: 120,
                         child: TextFormField(
                           controller: _cepController,
-                          decoration: _dec('CEP'),
+                          decoration: _dec('CEP').copyWith(
+                            errorText: _cepErrorMessage,
+                            suffixIcon:
+                                _isLoadingCep
+                                    ? const Padding(
+                                      padding: EdgeInsets.all(12),
+                                      child: SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    )
+                                    : null,
+                          ),
                           keyboardType: TextInputType.number,
                         ),
                       ),
@@ -534,7 +673,10 @@ class _RepresentativeRegisterCardState
                             flex: 3,
                             child: TextFormField(
                               controller: _streetController,
-                              decoration: _dec('Rua'),
+                              decoration: _dec('Rua').copyWith(
+                                suffixIcon: _apiLockedSuffix(_isStreetReadOnly),
+                              ),
+                              readOnly: _isStreetReadOnly,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -549,30 +691,46 @@ class _RepresentativeRegisterCardState
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _complementController,
-                        decoration: _dec('Complemento'),
+                        decoration: _dec('Complemento').copyWith(
+                          suffixIcon: _apiLockedSuffix(_isComplementReadOnly),
+                        ),
+                        readOnly: _isComplementReadOnly,
                       ),
                       const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
+                            flex: 2,
                             child: TextFormField(
                               controller: _neighborhoodController,
-                              decoration: _dec('Bairro'),
+                              decoration: _dec('Bairro').copyWith(
+                                suffixIcon: _apiLockedSuffix(
+                                  _isNeighborhoodReadOnly,
+                                ),
+                              ),
+                              readOnly: _isNeighborhoodReadOnly,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
+                            flex: 2,
                             child: TextFormField(
                               controller: _cityController,
-                              decoration: _dec('Cidade'),
+                              decoration: _dec('Cidade').copyWith(
+                                suffixIcon: _apiLockedSuffix(_isCityReadOnly),
+                              ),
+                              readOnly: _isCityReadOnly,
                             ),
                           ),
                           const SizedBox(width: 12),
-                          SizedBox(
-                            width: 60,
+                          Expanded(
+                            flex: 1,
                             child: TextFormField(
                               controller: _ufController,
-                              decoration: _dec('UF'),
+                              decoration: _dec('UF').copyWith(
+                                suffixIcon: _apiLockedSuffix(_isUfReadOnly),
+                              ),
+                              readOnly: _isUfReadOnly,
                             ),
                           ),
                         ],

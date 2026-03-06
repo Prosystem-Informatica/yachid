@@ -4,7 +4,7 @@ class PartnerDetails {
   final String id;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final String codigo;
+  final int codigo;
   final String document;
   final String ieRg;
   final String name;
@@ -63,7 +63,7 @@ class PartnerDetails {
       id: json['id'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      codigo: json['codigo'] as String,
+      codigo: json['codigo'] as int,
       document: json['document'] as String,
       ieRg: json['ie_rg'] as String,
       name: json['name'] as String,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
-import 'package:yachid/app/core/ui/side_bar_widget.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/home/module/partners/widgets/partners_filters.dart';
 import 'package:yachid/app/features/home/module/partners/widgets/table/partners_table.dart';
@@ -22,6 +21,8 @@ class _PartnersListState extends State<PartnersList> {
   final _filterPhone = TextEditingController();
   final _filterUf = TextEditingController();
   final _filterCep = TextEditingController();
+  final _scrollController = ScrollController();
+  bool _showRegisterCard = false;
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class _PartnersListState extends State<PartnersList> {
     _filterPhone.dispose();
     _filterUf.dispose();
     _filterCep.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -51,11 +53,15 @@ class _PartnersListState extends State<PartnersList> {
         state.filterStatus != null;
   }
 
-  void _showCreatePartnerModal() {
-    showDialog(
-      context: context,
-      builder: (context) => const CreatePartnerModal(),
-    );
+  void _onCadastrarPressed() {
+    setState(() => _showRegisterCard = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 
   @override
@@ -124,25 +130,30 @@ class _PartnersListState extends State<PartnersList> {
                                           decoration: InputDecoration(
                                             labelText: 'Grupo',
                                             border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
                                             isDense: true,
-                                            contentPadding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 8,
-                                            ),
-                                          ),
-                                          items: state.groups
-                                              .map(
-                                                (g) => DropdownMenuItem(
-                                                  value: g.id,
-                                                  child: Text(
-                                                    g.name,
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 12,
+                                                  vertical: 8,
                                                 ),
-                                              )
-                                              .toList(),
+                                          ),
+                                          items:
+                                              state.groups
+                                                  .map(
+                                                    (g) => DropdownMenuItem(
+                                                      value: g.id,
+                                                      child: Text(
+                                                        g.name,
+                                                        overflow:
+                                                            TextOverflow
+                                                                .ellipsis,
+                                                      ),
+                                                    ),
+                                                  )
+                                                  .toList(),
                                           onChanged: (groupId) {
                                             if (groupId != null) {
                                               context
@@ -151,11 +162,15 @@ class _PartnersListState extends State<PartnersList> {
                                               context
                                                   .read<PartnersCubit>()
                                                   .loadPartners(
-                                                    token: context
-                                                            .read<AuthBlocCubit>()
+                                                    token:
+                                                        context
+                                                            .read<
+                                                              AuthBlocCubit
+                                                            >()
                                                             .state
                                                             .authModel
-                                                            .token ?? '',
+                                                            .token ??
+                                                        '',
                                                     groupId: groupId,
                                                   );
                                             }
@@ -166,7 +181,7 @@ class _PartnersListState extends State<PartnersList> {
                                   },
                                 ),
                                 FilledButton.icon(
-                                  onPressed: _showCreatePartnerModal,
+                                  onPressed: _onCadastrarPressed,
                                   icon: const Icon(Icons.add_rounded, size: 20),
                                   label: const Text('Novo'),
                                   style: FilledButton.styleFrom(
@@ -188,71 +203,124 @@ class _PartnersListState extends State<PartnersList> {
                       ],
                     ),
                   ),
-                  PartnersFilters(),
-                  const SizedBox(width: 12),
-
-                  BlocBuilder<PartnersCubit, PartnersState>(
-                    builder: (context, state) {
-                      if (state is PartnersInitial) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (state is PartnersError) {
-                        return Center(
-                          child: Text(
-                            state.message,
-                            style: const TextStyle(color: Colors.red),
-                          ),
-                        );
-                      }
-                      if (state is PartnersLoaded) {
-                        if (state.filteredPartners.isEmpty) {
+                  context.read<PartnersCubit>().state is PartnersLoaded &&
+                          (context.read<PartnersCubit>().state
+                                  as PartnersLoaded)
+                              .partners
+                              .isNotEmpty
+                      ? PartnersFilters()
+                      : const SizedBox.shrink(),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: BlocBuilder<PartnersCubit, PartnersState>(
+                      builder: (context, state) {
+                        if (state is PartnersInitial) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (state is PartnersError) {
                           return Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.people_outline,
-                                  size: 64,
-                                  color: Colors.grey[400],
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  _hasActiveFilters(state)
-                                      ? 'Nenhum resultado para os filtros'
-                                      : 'Nenhum cliente/fornecedor cadastrado',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                                if (!_hasActiveFilters(state)) ...[
-                                  const SizedBox(height: 16),
-                                  ElevatedButton.icon(
-                                    onPressed: _showCreatePartnerModal,
-                                    icon: const Icon(Icons.add),
-                                    label: const Text('Cadastrar'),
-                                  ),
-                                ],
-                              ],
+                            child: Text(
+                              state.message,
+                              style: const TextStyle(color: Colors.red),
                             ),
                           );
                         }
-                        return Container(
-                          color: AppColors.textOnPrimary,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 24,
-                          ),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: PartnersTable(
-                              partners: state.filteredPartners,
+                        if (state is PartnersLoaded) {
+                          final hasPartners = state.filteredPartners.isNotEmpty;
+                          final showCard = !hasPartners || _showRegisterCard;
+                          return ListView(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.only(
+                              left: 24,
+                              right: 24,
+                              bottom: 32,
                             ),
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
+                            children: [
+                              if (hasPartners && !state.showRegisterCard) ...[
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: PartnersTable(
+                                      partners: state.filteredPartners,
+                                    ),
+                                  ),
+                                ),
+                                if (showCard) ...[
+                                  const SizedBox(height: 24),
+                                  PartnerRegisterCard(
+                                    onSaved: (_) {
+                                      setState(() => _showRegisterCard = false);
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Parceiro cadastrado com sucesso!',
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                    },
+                                    onCancel: () {
+                                      context
+                                          .read<PartnersCubit>()
+                                          .setShowRegisterCard(false);
+                                      setState(() => _showRegisterCard = false);
+                                    },
+                                  ),
+                                ],
+                              ] else ...[
+                                Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 32,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Icon(
+                                          Icons.people_outline,
+                                          size: 64,
+                                          color: Colors.grey[400],
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          _hasActiveFilters(state)
+                                              ? 'Nenhum resultado para os filtros'
+                                              : 'Nenhum cliente/fornecedor cadastrado',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                PartnerRegisterCard(
+                                  onSaved: (_) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Parceiro cadastrado com sucesso!',
+                                        ),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ],
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
                   ),
                 ],
               ),

@@ -30,9 +30,12 @@ class ProductsRepository {
       if (offset != null) queryParams['offset'] = offset;
 
       final response = await _rest.get(
-        '/products/$groupId',
+        '/products',
         headers: {'Authorization': 'Bearer $token'},
-        queryParameters: queryParams,
+        queryParameters: {
+          ...queryParams,
+          'groupId': groupId,
+        },
       );
 
       final products = <ProductModelList>[];

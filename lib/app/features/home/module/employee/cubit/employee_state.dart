@@ -10,6 +10,7 @@ class EmployeeState extends Equatable {
   final List<EmployeeModel> employees;
   final bool isLoadingEmployees;
   final String? selectedBranchId;
+  final String? selectedEnterpriseId;
 
   const EmployeeState({
     required this.status,
@@ -19,6 +20,7 @@ class EmployeeState extends Equatable {
     this.employees = const [],
     this.isLoadingEmployees = false,
     this.selectedBranchId,
+    this.selectedEnterpriseId,
   });
 
   const EmployeeState.initial()
@@ -28,7 +30,8 @@ class EmployeeState extends Equatable {
       isLoadingBranches = false,
       employees = const [],
       isLoadingEmployees = false,
-      selectedBranchId = null;
+      selectedBranchId = null,
+      selectedEnterpriseId = null;
 
   EmployeeState copyWith({
     EmployeeStateStatus? status,
@@ -38,6 +41,7 @@ class EmployeeState extends Equatable {
     List<EmployeeModel>? employees,
     bool? isLoadingEmployees,
     String? selectedBranchId,
+    String? selectedEnterpriseId,
   }) {
     return EmployeeState(
       status: status ?? this.status,
@@ -47,6 +51,7 @@ class EmployeeState extends Equatable {
       employees: employees ?? this.employees,
       isLoadingEmployees: isLoadingEmployees ?? this.isLoadingEmployees,
       selectedBranchId: selectedBranchId ?? this.selectedBranchId,
+      selectedEnterpriseId: selectedEnterpriseId ?? this.selectedEnterpriseId,
     );
   }
 
@@ -59,5 +64,6 @@ class EmployeeState extends Equatable {
     employees,
     isLoadingEmployees,
     selectedBranchId,
+    selectedEnterpriseId,
   ];
 }

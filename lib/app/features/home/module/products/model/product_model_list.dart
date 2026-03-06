@@ -1,6 +1,6 @@
 class ProductModelList {
   final String id;
-  final String codigo;
+  final int codigo;
   final String produto;
   final String? tipo;
   final String? unidade;
@@ -33,12 +33,14 @@ class ProductModelList {
     if (stocks != null && stocks.isNotEmpty) {
       final firstStock = stocks.first as Map<String, dynamic>;
       final val = firstStock['saldo_disponivel'];
-      if (val != null) saldo = (val is num) ? val.toDouble() : double.tryParse(val.toString());
+      if (val != null) {
+        saldo = (val is num) ? val.toDouble() : double.tryParse(val.toString());
+      }
     }
 
     return ProductModelList(
       id: json['id'] as String? ?? '',
-      codigo: json['codigo'] as String? ?? '',
+      codigo: json['codigo'] as int? ?? 0,
       produto: json['produto'] as String? ?? '',
       tipo: json['tipo'] as String?,
       unidade: json['unidade'] as String?,

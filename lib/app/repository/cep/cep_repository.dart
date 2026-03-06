@@ -1,48 +1,38 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'dart:developer';
 
-import '../../model/models.dart';
+import 'package:yachid/app/core/rest/rest_client.dart';
+import 'package:yachid/app/model/models.dart';
 
 class CepRepository {
-  static const String baseUrl = 'open.cnpja.com';
-  static const String apiPath = '/office';
+  final RestClient _rest;
 
-  Future<CepResponseModel> consultarCnpj({
-    required String cnpj,
+  CepRepository({required RestClient rest}) : _rest = rest;
+
+  Future<CepResponseModel> lookupCep({
+    required String cep,
+    required String token,
   }) async {
     try {
-      final cnpjLimpo = cnpj.replaceAll(RegExp(r'[^\d]'), '');
-
-      if (cnpjLimpo.length != 14) {
-        throw Exception('CNPJ inválido. Deve conter 14 dígitos.');
+      final cepLimpo = cep.replaceAll(RegExp(r'[^\d]'), '');
+      if (cepLimpo.length != 8) {
+        throw Exception('CEP inválido. Deve conter 8 dígitos.');
       }
 
-      final url = Uri.https(
-        baseUrl,
-        '$apiPath/$cnpjLimpo',
-      );
-
-      final response = await http.get(
-        url,
+      final response = await _rest.get(
+        '/cep/$cepLimpo',
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
         },
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return CepResponseModel.fromJson(data);
-      } else if (response.statusCode == 404) {
-        throw Exception('CNPJ não encontrado.');
-      } else {
-        throw Exception(
-            'Erro ao consultar CNPJ: ${response.statusCode} - ${response.body}');
+      if (response.data is! Map<String, dynamic>) {
+        throw Exception('Resposta inválida ao consultar CEP.');
       }
+
+      return CepResponseModel.fromJson(response.data as Map<String, dynamic>);
     } catch (e) {
-      if (e is Exception) {
-        rethrow;
-      }
-      throw Exception('Erro ao consultar CNPJ: $e');
+      log(e.toString());
+      rethrow;
     }
   }
 }

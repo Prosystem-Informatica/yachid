@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yachid/app/core/ui/app_colors.dart';
-import 'package:yachid/app/core/ui/side_bar_widget.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 import 'package:yachid/app/features/home/module/employee/widgets/menu_card.dart';
 import 'package:yachid/app/features/home/module/employee/widgets/status_chip.dart';
 
 import 'cubit/employee_cubit.dart';
-import 'model/branch_model.dart';
 import 'model/employee_model.dart';
-import 'widgets/create_employee_modal.dart';
+import 'widgets/employee_register_card.dart';
 
 class EmployeePage extends StatefulWidget {
   const EmployeePage({super.key});
@@ -19,6 +17,9 @@ class EmployeePage extends StatefulWidget {
 }
 
 class _EmployeePageState extends State<EmployeePage> {
+  bool _showRegisterCard = false;
+  String? _editingEmployeeId;
+
   @override
   void initState() {
     super.initState();
@@ -27,24 +28,51 @@ class _EmployeePageState extends State<EmployeePage> {
       final token = authCubit.state.authModel.token ?? "";
       final enterpriseId =
           authCubit.state.authModel.user?.enterpriseModel?.first.id ?? "";
-
       context.read<EmployeeCubit>().loadBranches(enterpriseId, token);
+      _loadEmployees(null, token);
     });
   }
 
   void _loadEmployees(String? branchId, String token) {
+    final cubit = context.read<EmployeeCubit>();
     if (branchId != null && branchId.isNotEmpty) {
-      context.read<EmployeeCubit>().loadEmployees(branchId, token);
+      cubit.loadEmployees(branchId: branchId, token: token);
     } else {
-      context.read<EmployeeCubit>().clearEmployees();
+      final enterpriseId = context
+          .read<AuthBlocCubit>()
+          .state
+          .authModel
+          .user
+          ?.enterpriseModel
+          ?.first
+          .id;
+      if (enterpriseId != null && enterpriseId.isNotEmpty) {
+        cubit.loadEmployees(enterpriseId: enterpriseId, token: token);
+      } else {
+        cubit.clearEmployees();
+      }
     }
   }
 
-  void _showCreateEmployeeModal() {
-    showDialog(
-      context: context,
-      builder: (context) => const CreateEmployeeModal(),
-    );
+  void _onCadastrarPressed() {
+    setState(() {
+      _editingEmployeeId = null;
+      _showRegisterCard = true;
+    });
+  }
+
+  void _onEditPressed(EmployeeModel employee) {
+    setState(() {
+      _editingEmployeeId = employee.id;
+      _showRegisterCard = true;
+    });
+  }
+
+  void _onFormCancel() {
+    setState(() {
+      _showRegisterCard = false;
+      _editingEmployeeId = null;
+    });
   }
 
   InputDecoration _dec(String label) {
@@ -125,7 +153,7 @@ class _EmployeePageState extends State<EmployeePage> {
                             IconButton(
                               icon: const Icon(Icons.add),
                               tooltip: 'Incluir Funcionário',
-                              onPressed: _showCreateEmployeeModal,
+                              onPressed: _onCadastrarPressed,
                             ),
                           ],
                         );
@@ -141,14 +169,28 @@ class _EmployeePageState extends State<EmployeePage> {
                           );
                         }
 
-                        if (state.selectedBranchId == null) {
-                          return const Center(
-                            child: Text(
-                              'Selecione uma filial para visualizar os funcionários',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
+                        if (_showRegisterCard) {
+                          return SingleChildScrollView(
+                            padding: const EdgeInsets.only(
+                              left: 24,
+                              right: 24,
+                              top: 24,
+                              bottom: 32,
+                            ),
+                            child: EmployeeRegisterCard(
+                              employeeId: _editingEmployeeId,
+                              onSaved: (_) {
+                                setState(() => _showRegisterCard = false);
+                                _loadEmployees(state.selectedBranchId, token);
+                              },
+                              onUpdated: (_, __) {
+                                setState(() {
+                                  _showRegisterCard = false;
+                                  _editingEmployeeId = null;
+                                });
+                                _loadEmployees(state.selectedBranchId, token);
+                              },
+                              onCancel: _onFormCancel,
                             ),
                           );
                         }
@@ -171,6 +213,16 @@ class _EmployeePageState extends State<EmployeePage> {
                                     color: Colors.grey[600],
                                   ),
                                 ),
+                                const SizedBox(height: 24),
+                                FilledButton.icon(
+                                  onPressed: _onCadastrarPressed,
+                                  icon: const Icon(Icons.add, size: 20),
+                                  label: const Text('Cadastrar funcionário'),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: AppColors.primaryColor,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                ),
                               ],
                             ),
                           );
@@ -182,7 +234,7 @@ class _EmployeePageState extends State<EmployeePage> {
                           itemBuilder: (context, index) {
                             final employee = state.employees[index];
                             return MenuCard(
-                              onTap: () {},
+                              onTap: () => _onEditPressed(employee),
                               iconDecoration: BoxDecoration(
                                 color: AppColors.textOnPrimaryLight.withValues(
                                   alpha: 0.1,
@@ -191,7 +243,6 @@ class _EmployeePageState extends State<EmployeePage> {
                               ),
                               icon: Icon(Icons.person, color: Colors.grey[600]),
                               title: employee.name,
-
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -206,40 +257,41 @@ class _EmployeePageState extends State<EmployeePage> {
                                             : AppColors.error,
                                   ),
                                   const SizedBox(width: 8),
-                                  PopupMenuButton(
-                                    itemBuilder:
-                                        (context) => [
-                                          const PopupMenuItem(
-                                            value: 'edit',
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.edit, size: 20),
-                                                SizedBox(width: 8),
-                                                Text('Editar'),
-                                              ],
+                                  PopupMenuButton<String>(
+                                    itemBuilder: (context) => [
+                                      const PopupMenuItem(
+                                        value: 'edit',
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.edit, size: 20),
+                                            SizedBox(width: 8),
+                                            Text('Editar'),
+                                          ],
+                                        ),
+                                      ),
+                                      const PopupMenuItem(
+                                        value: 'delete',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.delete,
+                                              size: 20,
+                                              color: Colors.red,
                                             ),
-                                          ),
-                                          const PopupMenuItem(
-                                            value: 'delete',
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.delete,
-                                                  size: 20,
-                                                  color: Colors.red,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text(
-                                                  'Excluir',
-                                                  style: TextStyle(
-                                                    color: Colors.red,
-                                                  ),
-                                                ),
-                                              ],
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Excluir',
+                                              style: TextStyle(color: Colors.red),
                                             ),
-                                          ),
-                                        ],
-                                    onSelected: (value) {},
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        _onEditPressed(employee);
+                                      }
+                                    },
                                   ),
                                 ],
                               ),

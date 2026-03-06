@@ -14,7 +14,7 @@ import 'package:yachid/app/repository/partners/partners_repository.dart';
 
 class DadosTab extends StatelessWidget {
   DadosTab({super.key, required this.partner}) {
-    codigoController.text = partner.codigo;
+    codigoController.text = partner.codigo.toString();
     documentController.text = partner.document;
     ieRgController.text = partner.ieRg;
     personTypeController.text = partner.personType;
@@ -161,9 +161,10 @@ class DadosTab extends StatelessWidget {
                                       email: emailController.text,
                                       site: siteController.text,
                                       status:
-                                          statusController.text == 'ACTIVE'
-                                              ? 'Ativo'
-                                              : 'Inativo',
+                                          statusController.text.toUpperCase() ==
+                                                  'ACTIVE'
+                                              ? 'ACTIVE'
+                                              : 'INACTIVE',
                                       accountingAccount:
                                           accountingAccountController.text,
                                       type: typeController.text,
@@ -378,11 +379,82 @@ class DadosTab extends StatelessWidget {
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: DataField(
-                              isEditing: state.isEditing,
-                              label: 'Status',
-                              value: partner.status,
-                              controller: statusController,
+                            child: ValueListenableBuilder<TextEditingValue>(
+                              valueListenable: statusController,
+                              builder: (context, statusValue, _) {
+                                final statusText =
+                                    statusValue.text.toUpperCase();
+                                final isActive =
+                                    statusText == 'ACTIVE' ||
+                                    statusText == 'ATIVO';
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.gray300.withValues(
+                                      alpha: 0.25,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.toggle_on_rounded,
+                                        size: 20,
+                                        color: AppColors.gray700,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        'Status',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.gray800,
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                        isActive ? 'Ativo' : 'Inativo',
+                                        style: TextStyle(
+                                          color:
+                                              isActive
+                                                  ? AppColors.success
+                                                  : AppColors.error,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Switch(
+                                        value: isActive,
+                                        activeTrackColor: AppColors.primaryColor
+                                            .withValues(alpha: 0.5),
+                                        thumbColor:
+                                            WidgetStateProperty.resolveWith((
+                                              states,
+                                            ) {
+                                              if (states.contains(
+                                                WidgetState.selected,
+                                              )) {
+                                                return AppColors.primaryColor;
+                                              }
+                                              return null;
+                                            }),
+                                        onChanged:
+                                            state.isEditing
+                                                ? (value) {
+                                                  statusController.text =
+                                                      value
+                                                          ? 'ACTIVE'
+                                                          : 'INACTIVE';
+                                                }
+                                                : null,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           SizedBox.shrink(),

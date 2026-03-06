@@ -24,12 +24,7 @@ class AuthRepository {
         headers: headers,
       );
 
-
       var jsonData = AuthModel.fromJson(response.data);
-
-      prefs.setString("token", jsonData.token ?? "");
-      prefs.setString("entrepreneurId", jsonData.user!.id ?? "");
-
 
       return jsonData;
     } catch (e) {
@@ -74,7 +69,11 @@ class AuthRepository {
       );
 
       final statusCode = response.statusCode ?? 0;
-      final isSuccess = statusCode == 200 || statusCode == 201 || statusCode == 203 || statusCode == 204;
+      final isSuccess =
+          statusCode == 200 ||
+          statusCode == 201 ||
+          statusCode == 203 ||
+          statusCode == 204;
 
       print("isSuccess : $isSuccess");
 

@@ -26,6 +26,8 @@ class AuthBlocCubit extends Cubit<AuthBlocState> {
         password: password,
       );
       if (authValidation.isSuccess) {
+        prefs.setString("token", authValidation.token ?? "");
+        prefs.setString("entrepreneurId", authValidation.user?.id ?? "");
         emit(
           state.copyWith(
             status: AuthStateStatus.success,

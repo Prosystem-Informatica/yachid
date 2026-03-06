@@ -15,16 +15,13 @@ final class BanksLoaded extends BanksState {
   final List<BankModelList> banks;
   final String filterSearch;
 
-  const BanksLoaded({
-    required this.banks,
-    this.filterSearch = '',
-  });
+  const BanksLoaded({required this.banks, this.filterSearch = ''});
 
   List<BankModelList> get filteredBanks {
     if (filterSearch.trim().isEmpty) return banks;
     final term = filterSearch.trim().toLowerCase();
     return banks.where((b) {
-      return b.codigo.toLowerCase().contains(term) ||
+      return b.codigo.toString().toLowerCase().contains(term) ||
           b.nome.toLowerCase().contains(term) ||
           b.numeroBanco.toLowerCase().contains(term);
     }).toList();

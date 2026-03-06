@@ -65,10 +65,7 @@ class DeliveryAddressPage extends StatelessWidget {
             }
             if (state is DeliveryAddressLoaded) {
               if (state.deliveryAddresses.isEmpty) {
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: 32),
-                  child: registerCard,
-                );
+                return const SizedBox.shrink();
               }
 
               return Container(

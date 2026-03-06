@@ -51,12 +51,13 @@ class RepresentativesTable extends StatelessWidget {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: _columns
-                  .map((label) => PartnersTableHeaderCell(
-                        label: label,
-                        width: width,
-                      ))
-                  .toList(),
+              children:
+                  _columns
+                      .map(
+                        (label) =>
+                            PartnersTableHeaderCell(label: label, width: width),
+                      )
+                      .toList(),
             ),
           ),
           ...representatives.asMap().entries.map((entry) {
@@ -65,9 +66,10 @@ class RepresentativesTable extends StatelessWidget {
             return Container(
               key: ValueKey(r.id),
               decoration: BoxDecoration(
-                color: index.isEven
-                    ? Colors.white
-                    : AppColors.gray300.withValues(alpha: 0.12),
+                color:
+                    index.isEven
+                        ? Colors.white
+                        : AppColors.gray300.withValues(alpha: 0.12),
               ),
               child: Material(
                 color: Colors.transparent,
@@ -80,22 +82,25 @@ class RepresentativesTable extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        PartnersTableCell(text: r.codigo, width: width),
+                        PartnersTableCell(
+                          text: r.codigo.toString(),
+                          width: width,
+                        ),
                         PartnersTableCell(
                           text: r.nome,
                           width: width,
                           bold: true,
                         ),
-                        PartnersTableCell(text: r.telefone ?? '—', width: width),
+                        PartnersTableCell(
+                          text: r.telefone ?? '—',
+                          width: width,
+                        ),
                         PartnersTableCell(text: r.celular ?? '—', width: width),
                         PartnersTableCell(
                           text: r.comissao.toStringAsFixed(2),
                           width: width,
                         ),
-                        PartnersTableCell(
-                          text: r.tipoComissao,
-                          width: width,
-                        ),
+                        PartnersTableCell(text: r.tipoComissao, width: width),
                         PartnersTableCell(text: r.city ?? '—', width: width),
                         PartnersTableCell(
                           width: width,
@@ -110,9 +115,10 @@ class RepresentativesTable extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: r.status
-                                    ? AppColors.success
-                                    : AppColors.error,
+                                color:
+                                    r.status
+                                        ? AppColors.success
+                                        : AppColors.error,
                               ),
                             ),
                           ),

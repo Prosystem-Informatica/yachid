@@ -1,6 +1,6 @@
 class BankModelList {
   final String id;
-  final String codigo;
+  final int codigo;
   final String numeroBanco;
   final String nome;
 
@@ -14,7 +14,7 @@ class BankModelList {
   factory BankModelList.fromJson(Map<String, dynamic> json) {
     return BankModelList(
       id: json['id'] as String,
-      codigo: json['codigo'] as String? ?? '',
+      codigo: json['codigo'] as int? ?? 0,
       numeroBanco: json['numero_banco'] as String? ?? '',
       nome: json['nome'] as String? ?? '',
     );

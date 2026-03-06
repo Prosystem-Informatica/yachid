@@ -4,7 +4,6 @@ class CreateEmployeeDto {
   final String name;
   final String email;
   final String phone;
-  final String password;
   final String document;
   final EmployeeStatus status;
   final EmployeeRole role;
@@ -15,7 +14,6 @@ class CreateEmployeeDto {
     required this.name,
     required this.email,
     required this.phone,
-    required this.password,
     required this.document,
     required this.status,
     required this.role,
@@ -28,10 +26,10 @@ class CreateEmployeeDto {
       'name': name,
       'email': email,
       'phone': phone,
-      'password': password,
       'document': document,
-      'status': status.value,
-      'role': role.value,
+      'status':
+          status.value == EmployeeStatus.ATIVO.value ? 'ACTIVE' : 'INACTIVE',
+      'role': role.value == EmployeeRole.ADMINISTRADOR.value ? 'ADMIN' : 'USER',
       'branch': branch,
     };
 

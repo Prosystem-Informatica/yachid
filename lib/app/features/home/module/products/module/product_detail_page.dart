@@ -16,7 +16,17 @@ import 'package:yachid/app/features/home/module/products/module/widgets/product_
 import 'package:yachid/app/features/home/module/products/module/widgets/product_tab_bar.dart';
 
 class ProductDetailPage extends StatefulWidget {
-  const ProductDetailPage({super.key});
+  const ProductDetailPage({
+    super.key,
+    this.productId,
+    this.onBack,
+  });
+
+  /// ID do produto (quando embutido, sem navegação).
+  final String? productId;
+
+  /// Callback ao clicar em Voltar (quando embutido).
+  final VoidCallback? onBack;
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
@@ -32,6 +42,15 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   void _loadProduct() {
+    // Prioridade: parâmetro do widget > rota
+    if (widget.productId != null && widget.productId!.isNotEmpty) {
+      _productId = widget.productId;
+      context.read<ProductDetailCubit>().loadProduct(
+        _productId!,
+        context.read<AuthBlocCubit>().state.authModel.token ?? '',
+      );
+      return;
+    }
     final route = ModalRoute.of(context);
     if (route != null && route.settings.name != null) {
       final uri = Uri.parse(route.settings.name!);
@@ -156,7 +175,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                         const SizedBox(height: 24),
                         TextButton.icon(
-                          onPressed: () => Get.back(),
+                          onPressed: widget.onBack ?? () => Get.back(),
                           icon: const Icon(Icons.arrow_back),
                           label: const Text('Voltar'),
                         ),
@@ -173,7 +192,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       children: [
                         _Header(
                           product: state.product,
-                          onBack: () => Get.back(),
+                          onBack: widget.onBack ?? () => Get.back(),
                         ),
                         ProductTabBar(
                           selectedIndex: state.selectedIndex,

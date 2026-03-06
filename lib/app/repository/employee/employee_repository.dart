@@ -5,7 +5,9 @@ import 'package:yachid/app/core/rest/rest_client_response.dart';
 import '../../core/rest/rest_client.dart';
 import '../../features/home/module/employee/model/create_employee_dto.dart';
 import '../../features/home/module/employee/model/branch_model.dart';
+import '../../features/home/module/employee/model/employee_detail.dart';
 import '../../features/home/module/employee/model/employee_model.dart';
+import '../../features/home/module/employee/model/update_employee_dto.dart';
 
 class EmployeeRepository {
   final RestClient _rest;
@@ -59,14 +61,58 @@ class EmployeeRepository {
     }
   }
 
-  Future<List<EmployeeModel>> getEmployees(
-    String branchId,
-    String token,
-  ) async {
+  Future<EmployeeDetail> getEmployee({
+    required String id,
+    required String token,
+  }) async {
     try {
       final response = await _rest.get(
+        '/employee/$id',
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      return EmployeeDetail.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<RestClientResponse<dynamic>> updateEmployee({
+    required String id,
+    required UpdateEmployeeDto dto,
+    required String token,
+  }) async {
+    try {
+      final response = await _rest.patch(
+        '/employee/$id',
+        data: jsonEncode(dto.toJson()),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      return response;
+    } catch (e) {
+      log(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<List<EmployeeModel>> getEmployees({
+    String? branchId,
+    String? enterpriseId,
+    required String token,
+  }) async {
+    try {
+      final queryParams = <String, String?>{};
+      if (branchId != null && branchId.isNotEmpty) {
+        queryParams['branchId'] = branchId;
+      } else if (enterpriseId != null && enterpriseId.isNotEmpty) {
+        queryParams['enterpriseId'] = enterpriseId;
+      }
+      final response = await _rest.get(
         '/employee/employees',
-        queryParameters: {'branchId': branchId},
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
         headers: {'Authorization': 'Bearer $token'},
       );
       List<EmployeeModel> employees = [];

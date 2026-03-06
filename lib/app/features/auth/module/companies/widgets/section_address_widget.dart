@@ -15,6 +15,8 @@ class SectionAddressWidget extends StatelessWidget {
 
   final String uf;
   final Function(String?) onUfChanged;
+  final bool isLoadingCep;
+  final String? cepErrorMessage;
 
   final bool Function(String campo) isCampoBloqueado;
 
@@ -33,6 +35,8 @@ class SectionAddressWidget extends StatelessWidget {
     required this.paisCtrl,
     required this.uf,
     required this.onUfChanged,
+    this.isLoadingCep = false,
+    this.cepErrorMessage,
     required this.isCampoBloqueado,
     required this.openSections,
     required this.toggle,
@@ -127,7 +131,20 @@ class SectionAddressWidget extends StatelessWidget {
   Widget _cepField() {
     return TextFormField(
       controller: cepCtrl,
-      decoration: _dec('CEP'),
+      decoration: _dec('CEP').copyWith(
+        errorText: cepErrorMessage,
+        suffixIcon:
+            isLoadingCep
+                ? const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+                : null,
+      ),
       keyboardType: TextInputType.number,
       inputFormatters: [CepInputFormatter()],
       maxLength: 9,

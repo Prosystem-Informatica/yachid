@@ -35,6 +35,12 @@ class PartnersCubit extends Cubit<PartnersState> {
     }
   }
 
+  void setShowRegisterCard(bool show) {
+    final current = state;
+    if (current is! PartnersLoaded) return;
+    emit(current.copyWith(showRegisterCard: show));
+  }
+
   Future<void> loadPartners({
     required String token,
     required String groupId,

@@ -79,9 +79,11 @@ class _ProductDetailFormState extends State<ProductDetailForm> {
   }
 
   void _initFromProduct(ProductModel p) {
-    _codigoController = TextEditingController(text: p.codigo);
+    _codigoController = TextEditingController(text: p.codigo.toString());
     _ultimoCodigoController = TextEditingController(text: p.ultimoCodigo ?? '');
-    _penultimoCodigoController = TextEditingController(text: p.penultimoCodigo ?? '');
+    _penultimoCodigoController = TextEditingController(
+      text: p.penultimoCodigo ?? '',
+    );
     _produtoController = TextEditingController(text: p.produto);
     _linhaController = TextEditingController(text: p.linha ?? '');
     _codBarrasController = TextEditingController(text: p.codBarras ?? '');
@@ -90,39 +92,58 @@ class _ProductDetailFormState extends State<ProductDetailForm> {
     _unidadeController = TextEditingController(text: p.unidade ?? '');
     _fabricanteController = TextEditingController(text: p.fabricante ?? '');
     _gramaturaController = TextEditingController(text: p.gramatura ?? '');
-    _codTributarioController = TextEditingController(text: p.codTributario ?? '');
+    _codTributarioController = TextEditingController(
+      text: p.codTributario ?? '',
+    );
     _embalagemController = TextEditingController(text: p.embalagem ?? '');
-    _classificacaoController = TextEditingController(text: p.classificacao ?? '');
+    _classificacaoController = TextEditingController(
+      text: p.classificacao ?? '',
+    );
     _pesoBrutoController = TextEditingController(
-        text: p.pesoBruto?.toString() ?? '');
+      text: p.pesoBruto?.toString() ?? '',
+    );
     _pesoLiquidoController = TextEditingController(
-        text: p.pesoLiquido?.toString() ?? '');
+      text: p.pesoLiquido?.toString() ?? '',
+    );
     _pesoProdutoController = TextEditingController(
-        text: p.pesoProduto?.toString() ?? '');
+      text: p.pesoProduto?.toString() ?? '',
+    );
     _validadeController = TextEditingController(
-        text: p.validade?.toString() ?? '');
+      text: p.validade?.toString() ?? '',
+    );
     _custoCalculadoController = TextEditingController(
-        text: p.custoCalculado?.toString() ?? '');
+      text: p.custoCalculado?.toString() ?? '',
+    );
     _custoDigitadoController = TextEditingController(
-        text: p.custoDigitado?.toString() ?? '');
+      text: p.custoDigitado?.toString() ?? '',
+    );
     _custoMedioController = TextEditingController(
-        text: p.custoMedio?.toString() ?? '');
+      text: p.custoMedio?.toString() ?? '',
+    );
     _ultimoCustoController = TextEditingController(
-        text: p.ultimoCusto?.toString() ?? '');
+      text: p.ultimoCusto?.toString() ?? '',
+    );
     _penultimoCustoController = TextEditingController(
-        text: p.penultimoCusto?.toString() ?? '');
+      text: p.penultimoCusto?.toString() ?? '',
+    );
     _antPenCustoController = TextEditingController(
-        text: p.antPenCusto?.toString() ?? '');
+      text: p.antPenCusto?.toString() ?? '',
+    );
     _precoMin7Controller = TextEditingController(
-        text: p.precoMin7?.toString() ?? '');
+      text: p.precoMin7?.toString() ?? '',
+    );
     _precoMin12Controller = TextEditingController(
-        text: p.precoMin12?.toString() ?? '');
+      text: p.precoMin12?.toString() ?? '',
+    );
     _precoMin18Controller = TextEditingController(
-        text: p.precoMin18?.toString() ?? '');
+      text: p.precoMin18?.toString() ?? '',
+    );
     _precoTabelaController = TextEditingController(
-        text: p.precoTabela?.toString() ?? '');
+      text: p.precoTabela?.toString() ?? '',
+    );
     _precoAnteriorController = TextEditingController(
-        text: p.precoAnterior?.toString() ?? '');
+      text: p.precoAnterior?.toString() ?? '',
+    );
     _status = p.status;
     _calculaIcms = p.calculaIcms;
     _produtoAvulso = p.produtoAvulso;
@@ -176,46 +197,60 @@ class _ProductDetailFormState extends State<ProductDetailForm> {
   void _submit() {
     final dto = UpdateProductDto(
       codigo: _codigoController.text.trim(),
-      ultimoCodigo: _ultimoCodigoController.text.trim().isEmpty
-          ? null
-          : _ultimoCodigoController.text.trim(),
-      penultimoCodigo: _penultimoCodigoController.text.trim().isEmpty
-          ? null
-          : _penultimoCodigoController.text.trim(),
+      ultimoCodigo:
+          _ultimoCodigoController.text.trim().isEmpty
+              ? null
+              : _ultimoCodigoController.text.trim(),
+      penultimoCodigo:
+          _penultimoCodigoController.text.trim().isEmpty
+              ? null
+              : _penultimoCodigoController.text.trim(),
       produto: _produtoController.text.trim(),
       status: _status,
-      linha: _linhaController.text.trim().isEmpty
-          ? null
-          : _linhaController.text.trim(),
-      codBarras: _codBarrasController.text.trim().isEmpty
-          ? null
-          : _codBarrasController.text.trim(),
-      tipo: _tipoController.text.trim().isEmpty ? null : _tipoController.text.trim(),
-      familia: _familiaController.text.trim().isEmpty
-          ? null
-          : _familiaController.text.trim(),
-      unidade: _unidadeController.text.trim().isEmpty
-          ? null
-          : _unidadeController.text.trim(),
-      fabricante: _fabricanteController.text.trim().isEmpty
-          ? null
-          : _fabricanteController.text.trim(),
-      gramatura: _gramaturaController.text.trim().isEmpty
-          ? null
-          : _gramaturaController.text.trim(),
+      linha:
+          _linhaController.text.trim().isEmpty
+              ? null
+              : _linhaController.text.trim(),
+      codBarras:
+          _codBarrasController.text.trim().isEmpty
+              ? null
+              : _codBarrasController.text.trim(),
+      tipo:
+          _tipoController.text.trim().isEmpty
+              ? null
+              : _tipoController.text.trim(),
+      familia:
+          _familiaController.text.trim().isEmpty
+              ? null
+              : _familiaController.text.trim(),
+      unidade:
+          _unidadeController.text.trim().isEmpty
+              ? null
+              : _unidadeController.text.trim(),
+      fabricante:
+          _fabricanteController.text.trim().isEmpty
+              ? null
+              : _fabricanteController.text.trim(),
+      gramatura:
+          _gramaturaController.text.trim().isEmpty
+              ? null
+              : _gramaturaController.text.trim(),
       calculaIcms: _calculaIcms,
-      codTributario: _codTributarioController.text.trim().isEmpty
-          ? null
-          : _codTributarioController.text.trim(),
+      codTributario:
+          _codTributarioController.text.trim().isEmpty
+              ? null
+              : _codTributarioController.text.trim(),
       pesoBruto: _parseDouble(_pesoBrutoController.text),
       pesoLiquido: _parseDouble(_pesoLiquidoController.text),
       pesoProduto: _parseDouble(_pesoProdutoController.text),
-      embalagem: _embalagemController.text.trim().isEmpty
-          ? null
-          : _embalagemController.text.trim(),
-      classificacao: _classificacaoController.text.trim().isEmpty
-          ? null
-          : _classificacaoController.text.trim(),
+      embalagem:
+          _embalagemController.text.trim().isEmpty
+              ? null
+              : _embalagemController.text.trim(),
+      classificacao:
+          _classificacaoController.text.trim().isEmpty
+              ? null
+              : _classificacaoController.text.trim(),
       validade: _parseInt(_validadeController.text),
       produtoAvulso: _produtoAvulso,
       tipoCusto: _tipoCusto,
@@ -235,19 +270,75 @@ class _ProductDetailFormState extends State<ProductDetailForm> {
   }
 
   InputDecoration _dec(String label) => InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        isDense: true,
-      );
+    labelText: label,
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    isDense: true,
+  );
 
-  Widget _sectionTitle(String title) => Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: AppColors.gray800,
+  Widget _sectionBody({required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.gray300.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _sectionTitle({
+    required String title,
+    required String description,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.primaryColor.withValues(alpha: 0.15),
         ),
-      );
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 18, color: AppColors.primaryColor),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.gray900,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.gray600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -271,282 +362,354 @@ class _ProductDetailFormState extends State<ProductDetailForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Editar Produto',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.gray900,
-            ),
-          ),
-          const SizedBox(height: 24),
-          _sectionTitle('Dados do Produto'),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: [
-                  SizedBox(
-                    width: 220,
-                    child: TextFormField(
-                      controller: _codigoController,
-                      decoration: _dec('Código'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 140,
-                    child: TextFormField(
-                      controller: _ultimoCodigoController,
-                      decoration: _dec('Último Código'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 140,
-                    child: TextFormField(
-                      controller: _penultimoCodigoController,
-                      decoration: _dec('Penúltimo Código'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 320,
-                    child: TextFormField(
-                      controller: _produtoController,
-                      decoration: _dec('Produto'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 180,
-                    child: TextFormField(
-                      controller: _linhaController,
-                      decoration: _dec('Linha'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 180,
-                    child: TextFormField(
-                      controller: _codBarrasController,
-                      decoration: _dec('Cód. Barras'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 140,
-                    child: TextFormField(
-                      controller: _tipoController,
-                      decoration: _dec('Tipo'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 140,
-                    child: TextFormField(
-                      controller: _familiaController,
-                      decoration: _dec('Família'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 120,
-                    child: TextFormField(
-                      controller: _unidadeController,
-                      decoration: _dec('Unidade'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 180,
-                    child: TextFormField(
-                      controller: _fabricanteController,
-                      decoration: _dec('Fabricante'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 140,
-                    child: TextFormField(
-                      controller: _gramaturaController,
-                      decoration: _dec('Gramatura'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 160,
-                    child: TextFormField(
-                      controller: _codTributarioController,
-                      decoration: _dec('Cód. Tributário'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 120,
-                    child: TextFormField(
-                      controller: _embalagemController,
-                      decoration: _dec('Embalagem'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 160,
-                    child: TextFormField(
-                      controller: _classificacaoController,
-                      decoration: _dec('Classificação'),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 100,
-                    child: TextFormField(
-                      controller: _pesoBrutoController,
-                      decoration: _dec('Peso Bruto'),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 100,
-                    child: TextFormField(
-                      controller: _pesoLiquidoController,
-                      decoration: _dec('Peso Líquido'),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 100,
-                    child: TextFormField(
-                      controller: _pesoProdutoController,
-                      decoration: _dec('Peso Produto'),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 100,
-                    child: TextFormField(
-                      controller: _validadeController,
-                      decoration: _dec('Validade'),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ],
-              ),
-          const SizedBox(height: 28),
-          _sectionTitle('Custos e Preços'),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: [
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _custoCalculadoController,
-                  decoration: _dec('Custo Calculado'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _custoDigitadoController,
-                  decoration: _dec('Custo Digitado'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _custoMedioController,
-                  decoration: _dec('Custo Médio'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _ultimoCustoController,
-                  decoration: _dec('Último Custo'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _penultimoCustoController,
-                  decoration: _dec('Penúltimo Custo'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _antPenCustoController,
-                  decoration: _dec('Ant. Pen. Custo'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _precoMin7Controller,
-                  decoration: _dec('Preço Mín. 7%'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _precoMin12Controller,
-                  decoration: _dec('Preço Mín. 12%'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _precoMin18Controller,
-                  decoration: _dec('Preço Mín. 18%'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _precoTabelaController,
-                  decoration: _dec('Preço Tabela'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextFormField(
-                  controller: _precoAnteriorController,
-                  decoration: _dec('Preço Anterior'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
           Row(
             children: [
-              Checkbox(
-                value: _status,
-                onChanged: (v) => setState(() => _status = v ?? true),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.inventory_2_outlined,
+                  size: 22,
+                  color: AppColors.primaryColor,
+                ),
               ),
-              const Text('Ativo'),
-              const SizedBox(width: 24),
-              Checkbox(
-                value: _calculaIcms,
-                onChanged: (v) => setState(() => _calculaIcms = v ?? false),
-              ),
-              const Text('Calcula ICMS'),
-              const SizedBox(width: 24),
-              Checkbox(
-                value: _produtoAvulso,
-                onChanged: (v) => setState(() => _produtoAvulso = v ?? false),
-              ),
-              const Text('Produto Avulso'),
-              const SizedBox(width: 24),
-              DropdownButton<String>(
-                value: _tipoCusto,
-                items: ['CALCULADO', 'DIGITADO']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (v) => setState(() => _tipoCusto = v ?? 'CALCULADO'),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Editar Produto',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.gray900,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Atualize os dados principais, custos e estoque.',
+                      style: TextStyle(fontSize: 13, color: AppColors.gray600),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
+          const SizedBox(height: 24),
+          _sectionTitle(
+            title: 'Dados do Produto',
+            description: 'Informações gerais e características do item',
+            icon: Icons.inventory_2_outlined,
+          ),
+          const SizedBox(height: 12),
+          _sectionBody(
+            child: Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: [
+                SizedBox(
+                  width: 220,
+                  child: TextFormField(
+                    readOnly: true,
+                    controller: _codigoController,
+                    decoration: _dec('Código'),
+                  ),
+                ),
+                SizedBox(
+                  width: 140,
+                  child: TextFormField(
+                    controller: _ultimoCodigoController,
+                    decoration: _dec('Último Código'),
+                  ),
+                ),
+                SizedBox(
+                  width: 140,
+                  child: TextFormField(
+                    controller: _penultimoCodigoController,
+                    decoration: _dec('Penúltimo Código'),
+                  ),
+                ),
+                SizedBox(
+                  width: 320,
+                  child: TextFormField(
+                    controller: _produtoController,
+                    decoration: _dec('Produto'),
+                  ),
+                ),
+                SizedBox(
+                  width: 180,
+                  child: TextFormField(
+                    controller: _linhaController,
+                    decoration: _dec('Linha'),
+                  ),
+                ),
+                SizedBox(
+                  width: 180,
+                  child: TextFormField(
+                    controller: _codBarrasController,
+                    decoration: _dec('Cód. Barras'),
+                  ),
+                ),
+                SizedBox(
+                  width: 140,
+                  child: TextFormField(
+                    controller: _tipoController,
+                    decoration: _dec('Tipo'),
+                  ),
+                ),
+                SizedBox(
+                  width: 140,
+                  child: TextFormField(
+                    readOnly: true,
+                    controller: _familiaController,
+                    decoration: _dec('Família'),
+                  ),
+                ),
+                SizedBox(
+                  width: 120,
+                  child: TextFormField(
+                    controller: _unidadeController,
+                    decoration: _dec('Unidade'),
+                  ),
+                ),
+                SizedBox(
+                  width: 180,
+                  child: TextFormField(
+                    controller: _fabricanteController,
+                    decoration: _dec('Fabricante'),
+                  ),
+                ),
+                SizedBox(
+                  width: 140,
+                  child: TextFormField(
+                    controller: _gramaturaController,
+                    decoration: _dec('Gramatura'),
+                  ),
+                ),
+                SizedBox(
+                  width: 160,
+                  child: TextFormField(
+                    controller: _codTributarioController,
+                    decoration: _dec('Cód. Tributário'),
+                  ),
+                ),
+                SizedBox(
+                  width: 120,
+                  child: TextFormField(
+                    controller: _embalagemController,
+                    decoration: _dec('Embalagem'),
+                  ),
+                ),
+                SizedBox(
+                  width: 160,
+                  child: TextFormField(
+                    controller: _classificacaoController,
+                    decoration: _dec('Classificação'),
+                  ),
+                ),
+                SizedBox(
+                  width: 100,
+                  child: TextFormField(
+                    controller: _pesoBrutoController,
+                    decoration: _dec('Peso Bruto'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(
+                  width: 100,
+                  child: TextFormField(
+                    controller: _pesoLiquidoController,
+                    decoration: _dec('Peso Líquido'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(
+                  width: 100,
+                  child: TextFormField(
+                    controller: _pesoProdutoController,
+                    decoration: _dec('Peso Produto'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(
+                  width: 100,
+                  child: TextFormField(
+                    controller: _validadeController,
+                    decoration: _dec('Validade'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 28),
-          _sectionTitle('Estoque'),
+          Divider(height: 1),
+          const SizedBox(height: 28),
+          _sectionTitle(
+            title: 'Custos e Preços',
+            description: 'Valores de custo, preço e margens do produto',
+            icon: Icons.attach_money_rounded,
+          ),
+          const SizedBox(height: 12),
+          _sectionBody(
+            child: Column(
+              children: [
+                Row(
+                  spacing: 16,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _custoCalculadoController,
+                        decoration: _dec('Custo Calculado'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _custoDigitadoController,
+                        decoration: _dec('Custo Digitado'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _custoMedioController,
+                        decoration: _dec('Custo Médio'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _ultimoCustoController,
+                        decoration: _dec('Último Custo'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _penultimoCustoController,
+                        decoration: _dec('Penúltimo Custo'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  spacing: 16,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _antPenCustoController,
+                        decoration: _dec('Ant. Pen. Custo'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _precoTabelaController,
+                        decoration: _dec('Preço Tabela'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _precoAnteriorController,
+                        decoration: _dec('Preço Anterior'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  spacing: 16,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _precoMin7Controller,
+                        decoration: _dec('Preço Mín. 7%'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _precoMin12Controller,
+                        decoration: _dec('Preço Mín. 12%'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: TextFormField(
+                        controller: _precoMin18Controller,
+                        decoration: _dec('Preço Mín. 18%'),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _status,
+                      onChanged: (v) => setState(() => _status = v ?? true),
+                    ),
+                    const Text('Ativo'),
+                    const SizedBox(width: 24),
+                    Checkbox(
+                      value: _calculaIcms,
+                      onChanged:
+                          (v) => setState(() => _calculaIcms = v ?? false),
+                    ),
+                    const Text('Calcula ICMS'),
+                    const SizedBox(width: 24),
+                    Checkbox(
+                      value: _produtoAvulso,
+                      onChanged:
+                          (v) => setState(() => _produtoAvulso = v ?? false),
+                    ),
+                    const Text('Produto Avulso'),
+                    const SizedBox(width: 24),
+                    DropdownButton<String>(
+                      value: _tipoCusto,
+                      items:
+                          ['CALCULADO', 'DIGITADO']
+                              .map(
+                                (e) =>
+                                    DropdownMenuItem(value: e, child: Text(e)),
+                              )
+                              .toList(),
+                      onChanged:
+                          (v) => setState(() => _tipoCusto = v ?? 'CALCULADO'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 28),
+          _sectionTitle(
+            title: 'Estoque',
+            description: 'Saldo, movimentação e endereço de armazenagem',
+            icon: Icons.warehouse_outlined,
+          ),
           const SizedBox(height: 12),
           if (widget.product.stocks != null &&
               widget.product.stocks!.isNotEmpty) ...[
@@ -557,8 +720,8 @@ class _ProductDetailFormState extends State<ProductDetailForm> {
                   stock: s,
                   isSaving: widget.isSavingStock,
                   onCreate: (_) {},
-                  onUpdate: (stockId, dto) =>
-                      widget.onUpdateStock(stockId, dto),
+                  onUpdate:
+                      (stockId, dto) => widget.onUpdateStock(stockId, dto),
                 ),
               ),
             ),
@@ -572,24 +735,30 @@ class _ProductDetailFormState extends State<ProductDetailForm> {
           const SizedBox(height: 32),
           Center(
             child: FilledButton.icon(
-            onPressed: widget.isSaving ? null : _submit,
-            icon: widget.isSaving
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.save, size: 20),
-            label: Text(widget.isSaving ? 'Salvando...' : 'Salvar alterações'),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+              onPressed: widget.isSaving ? null : _submit,
+              icon:
+                  widget.isSaving
+                      ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.save, size: 20),
+              label: Text(
+                widget.isSaving ? 'Salvando...' : 'Salvar alterações',
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
-          ),
           ),
         ],
       ),

@@ -8,11 +8,7 @@ class BanksTable extends StatelessWidget {
   final List<BankModelList> banks;
   final void Function(BankModelList) onTap;
 
-  const BanksTable({
-    super.key,
-    required this.banks,
-    required this.onTap,
-  });
+  const BanksTable({super.key, required this.banks, required this.onTap});
 
   static const _columns = ['Código', 'Número Banco', 'Nome', ''];
 
@@ -41,12 +37,13 @@ class BanksTable extends StatelessWidget {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: _columns
-                  .map((label) => PartnersTableHeaderCell(
-                        label: label,
-                        width: width,
-                      ))
-                  .toList(),
+              children:
+                  _columns
+                      .map(
+                        (label) =>
+                            PartnersTableHeaderCell(label: label, width: width),
+                      )
+                      .toList(),
             ),
           ),
           ...banks.asMap().entries.map((entry) {
@@ -55,9 +52,10 @@ class BanksTable extends StatelessWidget {
             return Container(
               key: ValueKey(b.id),
               decoration: BoxDecoration(
-                color: index.isEven
-                    ? Colors.white
-                    : AppColors.gray300.withValues(alpha: 0.12),
+                color:
+                    index.isEven
+                        ? Colors.white
+                        : AppColors.gray300.withValues(alpha: 0.12),
               ),
               child: Material(
                 color: Colors.transparent,
@@ -70,11 +68,11 @@ class BanksTable extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        PartnersTableCell(text: b.codigo, width: width),
                         PartnersTableCell(
-                          text: b.numeroBanco,
+                          text: b.codigo.toString(),
                           width: width,
                         ),
+                        PartnersTableCell(text: b.numeroBanco, width: width),
                         PartnersTableCell(
                           text: b.nome,
                           width: width,

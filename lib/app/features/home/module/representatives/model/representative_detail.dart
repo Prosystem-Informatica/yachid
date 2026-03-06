@@ -5,7 +5,7 @@ class RepresentativeDetail {
   final String id;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final String codigo;
+  final int codigo;
   final String nome;
   final String? telefone;
   final String? celular;
@@ -61,7 +61,7 @@ class RepresentativeDetail {
       id: json['id'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      codigo: json['codigo'] as String? ?? '',
+      codigo: json['codigo'] as int,
       nome: json['nome'] as String? ?? '',
       telefone: json['telefone'] as String?,
       celular: json['celular'] as String?,

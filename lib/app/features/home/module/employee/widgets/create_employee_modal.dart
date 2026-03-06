@@ -3,6 +3,7 @@ import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yachid/app/core/ui/app_colors.dart';
 import 'package:yachid/app/features/auth/cubit/auth_bloc_cubit.dart';
 
 import '../../../../../core/widgets/widgets.dart';
@@ -24,9 +25,8 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _documentController = TextEditingController();
-  final _passwordController = TextEditingController();
 
-  EmployeeStatus? _selectedStatus;
+  EmployeeStatus _selectedStatus = EmployeeStatus.ATIVO;
   EmployeeRole? _selectedRole;
   BranchModel? _selectedBranch;
   String? _base64Image;
@@ -72,13 +72,6 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      if (_selectedStatus == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Selecione o status do funcionário')),
-        );
-        return;
-      }
-
       if (_selectedRole == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Selecione o cargo do funcionário')),
@@ -95,11 +88,10 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
 
       final dto = CreateEmployeeDto(
         name: _nameController.text.trim(),
-        password: _passwordController.text.trim(),
         email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),
         document: _documentController.text.trim(),
-        status: _selectedStatus!,
+        status: _selectedStatus,
         role: _selectedRole!,
         base64: _base64Image,
         branch: _selectedBranch!.id,
@@ -138,7 +130,6 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
     _emailController.dispose();
     _phoneController.dispose();
     _documentController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
@@ -290,29 +281,64 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
                           const SizedBox(width: 12),
                           Expanded(
                             flex: 1,
-                            child: DropdownButtonFormField<EmployeeStatus>(
-                              decoration: _dec('Status *'),
-                              value: _selectedStatus,
-                              items:
-                                  EmployeeStatus.values
-                                      .map(
-                                        (status) => DropdownMenuItem(
-                                          value: status,
-                                          child: Text(status.name),
-                                        ),
-                                      )
-                                      .toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedStatus = value;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Status é obrigatório';
-                                }
-                                return null;
-                              },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: AppColors.gray300),
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                              ),
+                              child: Row(
+                                children: [
+                                  const Expanded(
+                                    child: Text(
+                                      'Status',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                  Text(
+                                    _selectedStatus == EmployeeStatus.ATIVO
+                                        ? 'Ativo'
+                                        : 'Inativo',
+                                    style: TextStyle(
+                                      color:
+                                          _selectedStatus ==
+                                                  EmployeeStatus.ATIVO
+                                              ? AppColors.success
+                                              : AppColors.error,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Switch(
+                                    value:
+                                        _selectedStatus == EmployeeStatus.ATIVO,
+                                    activeTrackColor: AppColors.primaryColor
+                                        .withValues(alpha: 0.5),
+                                    thumbColor: WidgetStateProperty.resolveWith(
+                                      (states) {
+                                        if (states.contains(
+                                          WidgetState.selected,
+                                        )) {
+                                          return AppColors.primaryColor;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedStatus =
+                                            value
+                                                ? EmployeeStatus.ATIVO
+                                                : EmployeeStatus.INATIVO;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -344,21 +370,6 @@ class _CreateEmployeeModalState extends State<CreateEmployeeModal> {
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _passwordController,
-                        decoration: _dec('Senha *'),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Senha é obrigatória';
-                          }
-                          if (value.length < 6) {
-                            return 'Senha deve ter no mínimo 6 caracteres';
-                          }
-                          return null;
-                        },
                       ),
                     ],
                     openSections: openSections,

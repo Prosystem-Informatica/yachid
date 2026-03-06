@@ -2,7 +2,7 @@ import 'product_nota_fiscal_model.dart';
 
 class ProductModel {
   final String id;
-  final String codigo;
+  final int codigo;
   final String? ultimoCodigo;
   final String? penultimoCodigo;
   final String? linha;
@@ -89,14 +89,13 @@ class ProductModel {
     final components =
         componentsList
             ?.map(
-              (e) =>
-                  ProductComponentModel.fromJson(e as Map<String, dynamic>),
+              (e) => ProductComponentModel.fromJson(e as Map<String, dynamic>),
             )
             .toList();
 
     return ProductModel(
       id: json['id'] as String? ?? '',
-      codigo: json['codigo'] as String? ?? '',
+      codigo: json['codigo'] as int? ?? 0,
       ultimoCodigo: json['ultimo_codigo'] as String?,
       penultimoCodigo: json['penultimo_codigo'] as String?,
       linha: json['linha'] as String?,
@@ -131,11 +130,12 @@ class ProductModel {
       precoAnterior: _parseDouble(json['preco_anterior']),
       stocks: stocks,
       components: components,
-      notaFiscal: json['nota_fiscal'] != null
-          ? ProductNotaFiscalModel.fromJson(
-              json['nota_fiscal'] as Map<String, dynamic>,
-            )
-          : null,
+      notaFiscal:
+          json['nota_fiscal'] != null
+              ? ProductNotaFiscalModel.fromJson(
+                json['nota_fiscal'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
